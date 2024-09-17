@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.common;
 
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -20,6 +22,18 @@ public class RobotHardware {
     DcMotorEx dtRightBackMotor;
 
 
+    //linear slides
+    DcMotorEx verticalExtensionMotor;
+
+    //claw
+    Servo outakeClawLeft;
+    Servo outakeClawRight;
+
+
+    //declare subsystems of the subsystem class
+
+
+
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
 
@@ -32,6 +46,18 @@ public class RobotHardware {
 
     public List<LynxModule> modules;
     public LynxModule CONTROL_HUB;
+
+
+    public void init(HardwareMap hwMap) {
+
+    }
+
+
+    public void periodic() {
+
+    }
+
+
 
 
 }
