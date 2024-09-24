@@ -1,15 +1,20 @@
 package org.firstinspires.ftc.teamcode.common;
 
 
+import com.arcrobotics.ftclib.command.Subsystem;
+
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 //Serve as initlization of the robot hardware
@@ -25,6 +30,9 @@ public class RobotHardware {
     //linear slides
     DcMotorEx verticalExtensionMotor;
 
+    //horizontal extension slides
+    DcMotorEx horizontalExtensionMotor;
+
     //claw
     Servo outakeClawLeft;
     Servo outakeClawRight;
@@ -32,6 +40,10 @@ public class RobotHardware {
 
     //declare subsystems of the subsystem class
 
+
+
+
+    HardwareMap hardwareMap;
 
 
     private VisionPortal visionPortal;
@@ -48,13 +60,52 @@ public class RobotHardware {
     public LynxModule CONTROL_HUB;
 
 
-    public void init(HardwareMap hwMap) {
+    // list of all subsystems
+    ArrayList<Subsystem> subsystems;
 
+    public static RobotHardware getInstance() {
+        if(instance == null) {
+            instance = new RobotHardware();
+        }
+        return instance;
+    }
+
+    private RobotHardware(){
+        subsystems = new ArrayList<>();
+    }
+
+    public void create(HardwareMap hardwareMap) {
+        this.hardwareMap = hardwareMap;
+    }
+
+    // initializes subsystems
+    public void init() {
+        for(Subsystem subsystem : subsystems) {
+            subsystem.init();
+        }
+    }
+
+    public void read() {
+
+        for(Subsystem subsystem : subsystems) {
+            subsystem.read();
+        }
+    }
+
+    public void write() {
+        for(Subsystem subsystem : subsystems) {
+            subsystem.write();
+        }
     }
 
 
     public void periodic() {
 
+    }
+
+
+    public void addSubsystem(Subsystem... subsystems) {
+        this.subsystems.addAll(Arrays.asList(subsystems));
     }
 
 
