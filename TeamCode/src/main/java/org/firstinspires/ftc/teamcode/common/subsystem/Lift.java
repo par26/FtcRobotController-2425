@@ -16,6 +16,9 @@ public class Lift implements Subsystem {
 
     private final RobotHardware robot;
 
+    public static double MAX_DOWN_POWER = 0.10;
+    public static double MAX_UP_POWER = .90;
+
     public static double
             kP = 0.0031, kI = 0, kD = 0.0001, kF = 0.00, // PID values
 
@@ -44,7 +47,7 @@ public class Lift implements Subsystem {
     double targetVelocity;
     double currentVelocity;
 
-    public Lift(HardwareMap hardwareMap) {
+    public Lift() {
 
         this.robot = RobotHardware.getInstance();
 
@@ -105,8 +108,8 @@ public class Lift implements Subsystem {
         power = Range.clip(power, -1, 1);
         // cache motor powers to prevent unnecessary writes
         if(Math.abs(power - lastPower) > 0.02) {
-            liftMotor.setPower(power);
-            liftMotor2.setPower(power);
+            robot.liftMotor.setPower(power);
+            robot.liftMotor2.setPower(power);
             lastPower = power;
         }
     }
