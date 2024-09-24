@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.common;
 import com.arcrobotics.ftclib.command.Subsystem;
 
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -80,9 +81,7 @@ public class RobotHardware {
 
     // initializes subsystems
     public void init() {
-        for(Subsystem subsystem : subsystems) {
-            subsystem.init();
-        }
+        dtLeftBackMotor = new DcMotorEx("leftFrontMotor");
     }
 
     public void read() {
