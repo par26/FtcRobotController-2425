@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.common.vision;
 
 import org.openftc.easyopencv.OpenCvPipeline;
 
