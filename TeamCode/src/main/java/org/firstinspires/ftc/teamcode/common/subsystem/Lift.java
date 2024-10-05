@@ -21,7 +21,7 @@ public class Lift implements Subsystem {
 
 
     TICKS_PER_REV = 384.5, // ticks
-            PULLEY_CIRCUMFERENCE = 4.40945, // inches
+            PULLEY_CIRCUMFERENCE = 4.40945;// inches
 
     public static int
             MIN_POS = 0, MAX_POS = 2500,
@@ -44,7 +44,7 @@ public class Lift implements Subsystem {
     double targetVelocity;
     double currentVelocity;
 
-    public Lift(HardwareMap hardwareMap) {
+    public Lift(HardwareMap hardwareMap, DcMotorEx motor) {
 
         this.robot = RobotHardware.getInstance();
 
