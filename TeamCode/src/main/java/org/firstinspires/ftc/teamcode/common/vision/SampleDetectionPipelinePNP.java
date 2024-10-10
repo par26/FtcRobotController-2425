@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.common.vision;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import org.opencv.calib3d.Calib3d;
@@ -37,6 +40,8 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
     Mat morphedYellowThreshold = new Mat();
 
     Mat contoursOnPlainImageMat = new Mat();
+
+    Telemetry telemetry;
 
     /*
      * Threshold values
@@ -94,7 +99,7 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
     // Keep track of what stage the viewport is showing
     int stageNum = 0;
 
-    public SampleDetectionPipelinePNP()
+    public SampleDetectionPipelinePNP(Telemetry telemetry)
     {
         // Initialize camera parameters
         // Replace these values with your actual camera calibration parameters
@@ -105,6 +110,7 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
         double cx = 320; // Replace with your camera's principal point x-coordinate (usually image width / 2)
         double cy = 240; // Replace with your camera's principal point y-coordinate (usually image height / 2)
 
+
         cameraMatrix.put(0, 0,
                 fx, 0, cx,
                 0, fy, cy,
@@ -114,6 +120,8 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
         // If you have calibrated your camera and have these values, use them
         // Otherwise, you can assume zero distortion for simplicity
         distCoeffs = new MatOfDouble(0, 0, 0, 0, 0);
+
+        this.telemetry = telemetry;
     }
 
     @Override
@@ -142,6 +150,14 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
 
         clientStoneList = new ArrayList<>(internalStoneList);
 
+        for (AnalyzedStone stone : clientStoneList){
+            double dist = findDistance(stone);
+            telemetry.addLine(String.valueOf(dist));
+
+        }
+
+        telemetry.update();
+
         /*
          * Decide which buffer to send to the viewport
          */
@@ -154,6 +170,7 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
 
             case FINAL:
             {
+
                 return input;
             }
 
@@ -178,6 +195,8 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
                 return contoursOnPlainImageMat;
             }
         }
+
+
 
         return input;
     }
@@ -311,6 +330,7 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
 
         if (success)
         {
+
             // Draw the coordinate axes on the image
             drawAxis(input, rvec, tvec, cameraMatrix, distCoeffs);
 
@@ -322,6 +342,8 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
             analyzedStone.tvec = tvec;
             internalStoneList.add(analyzedStone);
         }
+
+
     }
 
     void drawAxis(Mat img, Mat rvec, Mat tvec, Mat cameraMatrix, MatOfDouble distCoeffs)
@@ -459,6 +481,20 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
             default:
                 return RED;
         }
+    }
+
+
+
+    double findDistance(AnalyzedStone stone) {
+
+        double distance = Math.sqrt(
+                Math.pow(stone.tvec.get(0, 0)[0], 2) +  // tvec_x
+                        Math.pow(stone.tvec.get(1, 0)[0], 2) +  // tvec_y
+                        Math.pow(stone.tvec.get(2, 0)[0], 2)    // tvec_z (depth)
+        );
+
+        return distance;
+
     }
 }
 
