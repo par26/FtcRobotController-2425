@@ -43,10 +43,13 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
 
     Telemetry telemetry;
 
+    public double minArea = 40;
+
+    public double aspectRatioThresh = 0.5;
     /*
      * Threshold values
      */
-    static final int YELLOW_MASK_THRESHOLD = 57;
+    public int YELLOW_MASK_THRESHOLD = 57;
     static final int BLUE_MASK_THRESHOLD = 150;
     static final int RED_MASK_THRESHOLD = 198;
 
@@ -279,7 +282,11 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
 
         // Do a rect fit to the contour, and draw it on the screen
         RotatedRect rotatedRectFitToContour = Imgproc.minAreaRect(contour2f);
-        drawRotatedRect(rotatedRectFitToContour, input, color);
+        if((rotatedRectFitToContour.size.width *  rotatedRectFitToContour.size.height) > minArea &&
+                Math.abs(findAspectRatio(rotatedRectFitToContour.size) - (8.9/3.8)) > aspectRatioThresh) {
+            drawRotatedRect(rotatedRectFitToContour, input, color);
+        }
+
 
         // The angle OpenCV gives us can be ambiguous, so look at the shape of
         // the rectangle to fix that.
@@ -295,8 +302,8 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
 
         // Prepare object points and image points for solvePnP
         // Assuming the object is a rectangle with known dimensions
-        double objectWidth = 10.0;  // Replace with your object's width in real-world units (e.g., centimeters)
-        double objectHeight = 5.0;  // Replace with your object's height in real-world units
+        double objectWidth = 3.5;  // Replace with your object's width in real-world units (e.g., centimeters)
+        double objectHeight = 1.5;  // Replace with your object's height in real-world units
 
         // Define the 3D coordinates of the object corners in the object coordinate space
         MatOfPoint3f objectPoints = new MatOfPoint3f(
@@ -327,6 +334,9 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
                 rvec,
                 tvec
         );
+
+
+
 
         if (success)
         {
@@ -484,6 +494,18 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
     }
 
 
+    double findAspectRatio(Size sample) {
+        double height = sample.height;
+        double width = sample.width;
+
+        if(sample.height > sample.width) {
+            height = sample.width;
+            width = sample.height;
+        }
+
+        return (height / width);
+    }
+
 
     double findDistance(AnalyzedStone stone) {
 
@@ -497,4 +519,3 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
 
     }
 }
-
