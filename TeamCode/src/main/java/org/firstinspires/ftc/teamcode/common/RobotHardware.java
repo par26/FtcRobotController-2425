@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.common;
 
 import com.arcrobotics.ftclib.command.Subsystem;
 
+import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -11,6 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
@@ -22,25 +25,33 @@ import java.util.List;
 public class RobotHardware {
 
     //driveTrain
-    DcMotorEx dtLeftFrontMotor;
-    DcMotorEx dtRightFrontMotor;
-    DcMotorEx dtLeftBackMotor;
-    DcMotorEx dtRightBackMotor;
+    public DcMotorEx dtLeftFrontMotor;
+    public DcMotorEx dtRightFrontMotor;
+    public DcMotorEx dtLeftBackMotor;
+    public DcMotorEx dtRightBackMotor;
+
+
+    //intake
+    public CRServo intakeWheel;
+    public ServoEx intakePivotLeft;
+    public ServoEx intakePivotRight;
+
 
 
     //linear slides
-    DcMotorEx verticalExtensionMotor;
+    public DcMotorEx liftMotor;
+    public DcMotorEx liftMotor2;
 
     //horizontal extension slides
-    DcMotorEx horizontalExtensionMotor;
+    public DcMotorEx horizontalExtensionMotor;
 
     //claw
-    Servo outakeClawLeft;
-    Servo outakeClawRight;
-
+    public ServoEx outakeClawLeft;
+    public ServoEx outakeClawRight;
+    public ServoEx outakeWrist
 
     //declare subsystems of the subsystem class
-
+    Lift lift;
 
 
     HardwareMap hardwareMap;
@@ -74,26 +85,30 @@ public class RobotHardware {
         subsystems = new ArrayList<>();
     }
 
-    public void create(HardwareMap hardwareMap) {
-        this.hardwareMap = hardwareMap;
-    }
 
     // initializes subsystems
-    public void init() {
-        dtLeftBackMotor = new DcMotorEx("leftFrontMotor");
+    public void init(final HardwareMap hardwareMap) {
+        dtLeftBackMotor = hardwareMap.get(DcMotorEx.class, "leftFrontMotor");
+
+
+
+
+
+        lift = new Lift();
+
+
+
+
+
+
     }
 
     public void read() {
 
-        for(Subsystem subsystem : subsystems) {
-            subsystem.read();
-        }
     }
 
     public void write() {
-        for(Subsystem subsystem : subsystems) {
-            subsystem.write();
-        }
+
     }
 
 
