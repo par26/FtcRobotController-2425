@@ -1,6 +1,7 @@
 repositories {
     mavenCentral()
     google() // Needed for androidx
+    maven { url = 'https://maven.brott.dev/' }
 }
 
 dependencies {
@@ -15,7 +16,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
 
     //stuff i added
-    implementation 'com.acmerobotics.dashboard:dashboard:0.4.14' // ftc dashboard
+    implementation 'com.acmerobotics.dashboard:dashboard:0.4.16' // ftc dashboard
     implementation 'org.ftclib.ftclib:core:2.1.1' // core
     
 }
