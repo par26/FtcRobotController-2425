@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.common.pedroPathing.tuning.Follower
 import static org.firstinspires.ftc.teamcode.common.pedroPathing.tuning.FollowerConstants.rightFrontMotorName;
 import static org.firstinspires.ftc.teamcode.common.pedroPathing.tuning.FollowerConstants.rightRearMotorName;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -16,9 +17,12 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.common.pedroPathing.follower.Follower;
 
+
+@Config
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class Teleop extends OpMode  {
 
-    Follower drive;
+    MechanumDrive drive;
 
     private DcMotorEx leftFront;
     private DcMotorEx leftRear;
@@ -92,17 +96,8 @@ public class Teleop extends OpMode  {
     @Override
     public void init() {
 
-        drive = new Follower(hardwareMap);
+        drive = new MechanumDrive(hardwareMap);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, leftFrontMotorName);
-        leftRear = hardwareMap.get(DcMotorEx.class, leftRearMotorName);
-        rightRear = hardwareMap.get(DcMotorEx.class, rightRearMotorName);
-        rightFront = hardwareMap.get(DcMotorEx.class, rightFrontMotorName);
-
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //rightElbowServo = hardwareMap.get(ServoImplEx.class, "rightElbowServo");
         //leftElbowServo = hardwareMap.get(ServoImplEx.class, "leftElbowServo");
@@ -121,9 +116,9 @@ public class Teleop extends OpMode  {
         rightSlide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
 
-        leftSlide.setDirection(DcMotorEx.Direction.REVERSE);
+        //leftSlide.setDirection(DcMotorEx.Direction.REVERSE);
 
-        leftClaw = hardwareMap.get(Servo.class, "leftClaw");
+        /*eftClaw = hardwareMap.get(Servo.class, "leftClaw");
 
         rightClaw = hardwareMap.get(Servo.class, "rightClaw");
 
@@ -148,9 +143,8 @@ public class Teleop extends OpMode  {
         leftServo.setDirection(Servo.Direction.REVERSE);
 
         leftServo.setPosition(0.006);
-        rightServo.setPosition(0.006);
+        rightServo.setPosition(0.006); */
 
-        drive.startTeleopDrive();
     }
 
     @Override
@@ -159,7 +153,7 @@ public class Teleop extends OpMode  {
 
 
 
-
+        /*
         if(Math.abs(leftClaw.getPosition() - leftClose) < .01) {
             clawClosed = true;
         } else {
@@ -180,7 +174,7 @@ public class Teleop extends OpMode  {
                 //clawClosed = true;
             }
         }
-
+        */
        /* //Close left
         pa = ca;
         ca = gamepad1.a;
@@ -188,7 +182,7 @@ public class Teleop extends OpMode  {
             leftClaw.setPosition(leftOpen);
             rightClaw.setPosition(rightOpen);
 
-        }*/
+        }
         pb = cb;
         cb = gamepad1.b;
         if (cb && !pb) {
@@ -202,7 +196,7 @@ public class Teleop extends OpMode  {
             leftServo.setPosition(1.0);
             rightServo.setPosition(1.0);
         }
-
+        */
 
 
         double slidePower = Range.clip(gamepad1.right_trigger - gamepad1.left_trigger, -0.75, 0.75);
@@ -214,13 +208,11 @@ public class Teleop extends OpMode  {
             rightSlide.setPower(slidePower);
         }
 
-
-
-        drive.update();
+        drive.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x * 1.1, gamepad1.right_stick_x);
         //powerSlides(slidePower);
 
 
-        telemetry.addData("Claw close value", clawClosed);
+       // telemetry.addData("Claw close value", clawClosed);
         telemetry.update();
 
     }
