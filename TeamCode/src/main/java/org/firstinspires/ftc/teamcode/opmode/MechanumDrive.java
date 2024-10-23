@@ -58,7 +58,7 @@ public class MechanumDrive {
         frontLeftMotor.setPower(frontLeftPower);
         frontRightMotor.setPower(frontRightPower);
         backLeftMotor.setPower(backLeftPower);
-        backRightMotor.setPower(backRightPower);
+        backRightMotor.setPower(backRightPower * .75);
     }
 
     public double squareInput(double input) {
