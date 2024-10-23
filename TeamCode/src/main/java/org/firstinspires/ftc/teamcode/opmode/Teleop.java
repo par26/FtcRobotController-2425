@@ -145,6 +145,20 @@ public class Teleop extends OpMode  {
         leftServo.setPosition(0.006);
         rightServo.setPosition(0.006); */
 
+
+        leftServo = hardwareMap.get(ServoImplEx.class, "leftServo");
+        rightServo = hardwareMap.get(ServoImplEx.class, "rightServo");
+
+
+
+
+        leftServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        rightServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
+
+        leftServo.setDirection(Servo.Direction.REVERSE);
+
+        leftServo.setPosition(0.006);
+        rightServo.setPosition(0.006);
     }
 
     @Override
@@ -197,6 +211,20 @@ public class Teleop extends OpMode  {
             rightServo.setPosition(1.0);
         }
         */
+
+        pb = cb;
+        cb = gamepad1.b;
+        if (cb && !pb) {
+            leftServo.setPosition(0.006);
+            rightServo.setPosition(0.006);
+        }
+
+        py = cy;
+        cy = gamepad1.y;
+        if (cy && !py) {
+            leftServo.setPosition(1.0);
+            rightServo.setPosition(1.0);
+        }
 
 
         double slidePower = Range.clip(gamepad1.right_trigger - gamepad1.left_trigger, -0.75, 0.75);
