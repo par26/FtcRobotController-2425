@@ -78,7 +78,7 @@ public class MechanumDrive {
         double bRightPow = Range.clip(drive - turn + strafe, -.85, .85);
 
 
-        setPowers(fRightPow, fLeftPow, bLeftPow, bRightPow);
+        setPowers(fLeftPow, fRightPow, bLeftPow, bRightPow);
     }
 
 
