@@ -58,7 +58,7 @@ public class MechanumDrive {
         frontLeftMotor.setPower(frontLeftPower);
         frontRightMotor.setPower(frontRightPower);
         backLeftMotor.setPower(backLeftPower);
-        backRightMotor.setPower(backRightPower * .75);
+        backRightMotor.setPower(backRightPower);
     }
 
     public double squareInput(double input) {
@@ -78,7 +78,7 @@ public class MechanumDrive {
         double bRightPow = Range.clip(drive - turn + strafe, -.85, .85);
 
 
-        setPowers(fLeftPow, fRightPow, bLeftPow, bRightPow);
+        setPowers(fRightPow, fLeftPow, bLeftPow, bRightPow);
     }
 
 
