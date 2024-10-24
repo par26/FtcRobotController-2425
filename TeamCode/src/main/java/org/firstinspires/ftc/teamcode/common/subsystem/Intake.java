@@ -40,7 +40,7 @@ public class Intake {
         twistArm = new RunAction(this::twistArm);
 
     }
-    //o
+    //ok
     //spin to win part
     public void setSpin(State state, boolean onlyChangeState) {
         if (onlyChangeState) {
