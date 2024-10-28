@@ -137,9 +137,9 @@ public class Follower {
     private double previousRawDriveError;
 
     public static boolean drawOnDashboard = true;
-    public static boolean useTranslational = true;
+    public static boolean useTranslational = false;
     public static boolean useCentripetal = false;
-    public static boolean useHeading = true;
+    public static boolean useHeading = false;
     public static boolean useDrive = true;
 
     /**

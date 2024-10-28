@@ -10,6 +10,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
@@ -22,7 +23,6 @@ import org.firstinspires.ftc.teamcode.common.pedroPathing.follower.Follower;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class Teleop extends OpMode  {
 
-    MechanumDrive drive;
 
     private DcMotorEx leftFront;
     private DcMotorEx leftRear;
@@ -34,11 +34,19 @@ public class Teleop extends OpMode  {
     boolean clawClosed;
     boolean elbowExtended;
 
+    boolean wristTwisted;
+
     public static double idle_power = 0.0;
 
     ServoImplEx leftServo;
     ServoImplEx rightServo;
     DcMotorEx leftSlideMotor;
+
+    double clawOpen = 0;
+    double clawClose = 0.2;
+
+
+    Servo wrist;
 
     DcMotorEx rightSlideMotor;
 
@@ -78,11 +86,12 @@ public class Teleop extends OpMode  {
     //rising edge for start button
     boolean psb, csb = false;
 
-    Servo leftClaw;
+    Servo claw;
     Servo rightClaw;
 
     DcMotorEx leftSlide;
     DcMotorEx rightSlide;
+
 
 
 
@@ -96,7 +105,29 @@ public class Teleop extends OpMode  {
     @Override
     public void init() {
 
-        drive = new MechanumDrive(hardwareMap);
+
+        //follower.initialize();
+
+        leftFront = hardwareMap.get(DcMotorEx.class, leftFrontMotorName);
+        leftRear = hardwareMap.get(DcMotorEx.class, leftRearMotorName);
+        rightRear = hardwareMap.get(DcMotorEx.class, rightRearMotorName);
+        rightFront = hardwareMap.get(DcMotorEx.class, rightFrontMotorName);
+
+        leftFront.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        leftRear.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        rightFront.setDirection(DcMotorEx.Direction.REVERSE);
+        //rightRear.setDirection(DcMotorEx.Direction.REVERSE);
+        //leftRear.setDirection(DcMotorEx.Direction.REVERSE);
+
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //leftRear.setDirection(DcMotorEx.Direction.REVERSE);
 
 
         //rightElbowServo = hardwareMap.get(ServoImplEx.class, "rightElbowServo");
@@ -116,7 +147,8 @@ public class Teleop extends OpMode  {
         rightSlide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
 
-        //leftSlide.setDirection(DcMotorEx.Direction.REVERSE);
+
+        rightSlide.setDirection(DcMotorEx.Direction.REVERSE);
 
         /*eftClaw = hardwareMap.get(Servo.class, "leftClaw");
 
@@ -145,33 +177,69 @@ public class Teleop extends OpMode  {
         leftServo.setPosition(0.006);
         rightServo.setPosition(0.006); */
 
+        claw = hardwareMap.get(ServoImplEx.class, "claw");
+
 
         leftServo = hardwareMap.get(ServoImplEx.class, "leftServo");
         rightServo = hardwareMap.get(ServoImplEx.class, "rightServo");
 
 
+        wrist = hardwareMap.get(ServoImplEx.class, "wrist");
+
+
+        rightServo.setDirection(Servo.Direction.REVERSE);
 
 
         leftServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
         rightServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
-        leftServo.setDirection(Servo.Direction.REVERSE);
 
-        leftServo.setPosition(0.006);
-        rightServo.setPosition(0.006);
+        //leftServo.setDirection(Servo.Direction.REVERSE);
+        leftServo.setPosition(1);
+        rightServo.setPosition(1);
+
+        wrist.setPosition(0);
     }
 
     @Override
     public void loop() {
 
 
+        double y = -gamepad1.right_stick_x; // Remember, this is reversed!
+        double x = gamepad1.left_stick_x; // this is strafing
+        double rx = gamepad1.left_stick_y;
 
 
-        /*
-        if(Math.abs(leftClaw.getPosition() - leftClose) < .01) {
+        if(Math.abs(y) > 0.04) {
+            leftFront.setPower(-y);
+            leftRear.setPower(y);
+            rightFront.setPower(-y);
+            rightRear.setPower(y);
+        } else {
+
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 0.85);
+            double leftFrontPower = (y + x + rx) / denominator;
+            double leftRearPower = (y - x + rx) / denominator;
+            double rightFrontPower = (-y - x - rx) / denominator;
+            double rightRearPower = (-y + x - rx) / denominator;
+
+            leftFront.setPower(leftFrontPower);
+            leftRear.setPower(leftRearPower);
+            rightFront.setPower(rightFrontPower);
+            rightRear.setPower(rightRearPower);
+        }
+
+
+        if(Math.abs(claw.getPosition() - clawClose) < .01) {
             clawClosed = true;
         } else {
             clawClosed = false;
+        }
+
+        if(Math.abs(wrist.getPosition()- 0.666) < .02) {
+            wristTwisted = true;
+        } else {
+            wristTwisted = false;
         }
 
 
@@ -180,63 +248,67 @@ public class Teleop extends OpMode  {
         ca = gamepad1.a;
         if (ca && !pa) {
             if(clawClosed) {
-                leftClaw.setPosition(leftOpen);
-                rightClaw.setPosition(rightOpen);
+                claw.setPosition(clawOpen);
             } else {
-                leftClaw.setPosition(leftClose);
-                rightClaw.setPosition(rightClose);
+                claw.setPosition(clawClose);
                 //clawClosed = true;
             }
         }
-        */
-       /* //Close left
+
+
+        //Open left
+        px = cx;
+        cx = gamepad1.x;
+        if (cx && !px) {
+            if(wristTwisted) {
+                wrist.setPosition(0.0);
+            } else {
+                wrist.setPosition(.666666);
+                //clawClosed = true;
+            }
+        }
+
+
         pa = ca;
         ca = gamepad1.a;
         if (ca && !pa) {
-            leftClaw.setPosition(leftOpen);
-            rightClaw.setPosition(rightOpen);
+            claw.setPosition(rightOpen);
+
+
 
         }
+
+
+
+
         pb = cb;
         cb = gamepad1.b;
         if (cb && !pb) {
-            leftServo.setPosition(0.006);
-            rightServo.setPosition(0.006);
+            leftServo.setPosition(1.0);
+            rightServo.setPosition(1.0);
         }
 
         py = cy;
         cy = gamepad1.y;
         if (cy && !py) {
-            leftServo.setPosition(1.0);
-            rightServo.setPosition(1.0);
-        }
-        */
-
-        pb = cb;
-        cb = gamepad1.b;
-        if (cb && !pb) {
             leftServo.setPosition(0.006);
             rightServo.setPosition(0.006);
         }
 
-        py = cy;
-        cy = gamepad1.y;
-        if (cy && !py) {
-            leftServo.setPosition(1.0);
-            rightServo.setPosition(1.0);
-        }
 
-
-        double slidePower = Range.clip(gamepad1.right_trigger - gamepad1.left_trigger, -0.75, 0.75);
+        double slidePower = Range.clip(gamepad1.right_trigger - gamepad1.left_trigger, -0.85, 0.85);
         if(Math.abs(slidePower) < arm_deadband) {
             leftSlide.setPower(0);
             rightSlide.setPower(0);
         } else {
-            leftSlide.setPower(slidePower);
-            rightSlide.setPower(slidePower);
+            leftSlide.setPower(-slidePower);
+            rightSlide.setPower(-slidePower);
         }
 
-        drive.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x * 1.1, gamepad1.right_stick_x);
+
+
+
+
         //powerSlides(slidePower);
 
 
@@ -251,8 +323,6 @@ public class Teleop extends OpMode  {
         
 
     }
-
-
 
 
 
