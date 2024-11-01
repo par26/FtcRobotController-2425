@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Config
 @TeleOp(name="PID_Test", group="z")
-public class Motor_Test extends OpMode {
+public class Slide_PID_Test extends OpMode {
     private PIDController liftPID;
 
     private DcMotor motor1;
@@ -32,9 +32,10 @@ public class Motor_Test extends OpMode {
     public void init() {
         liftPID = new PIDController(p, i, d);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        motor1 = hardwareMap.get(DcMotor.class, "motor1");
-        motor2 = hardwareMap.get(DcMotor.class, "motor2");
+        motor1 = hardwareMap.get(DcMotor.class, "leftSlide");
+        motor2 = hardwareMap.get(DcMotor.class, "rightSlide");
         motor1.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor2.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override
@@ -42,7 +43,7 @@ public class Motor_Test extends OpMode {
         liftPID.setPID(p,i,d);
         int pos = motor1.getCurrentPosition();
         double pid = liftPID.calculate(pos, target);
-        double ff = Math.cos(Math.toRadians(target/ticks_in_degrees)) * f;
+        double ff = f;
 
         double power = pid + ff;
 

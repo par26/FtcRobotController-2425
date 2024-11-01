@@ -39,8 +39,23 @@ import java.util.List;
  * @author Harrison Womack - 10158 Scott's Bots
  * @version 1.0, 3/13/2024
  */
+/**
+ * This is the ForwardVelocityTuner autonomous tuning OpMode. This runs the robot forwards at max
+ * power until it reaches some specified distance. It records the most recent velocities, and on
+ * reaching the end of the distance, it averages them and prints out the velocity obtained. It is
+ * recommended to run this multiple times on a full battery to get the best results. What this does
+ * is, when paired with StrafeVelocityTuner, allows FollowerConstants to create a Vector that
+ * empirically represents the direction your mecanum wheels actually prefer to go in, allowing for
+ * more accurate following.
+ * You can adjust the distance the robot will travel on FTC Dashboard: 192/168/43/1:8080/dash
+ *
+ * @author Anyi Lin - 10158 Scott's Bots
+ * @author Aaron Yang - 10158 Scott's Bots
+ * @author Harrison Womack - 10158 Scott's Bots
+ * @version 1.0, 3/13/2024
+ */
 @Config
-@Autonomous (name = "Forward Velocity Tuner", group = "Autonomous Pathing Tuning")
+@Autonomous(name = "Forward Velocity Tuner", group = "Autonomous Pathing Tuning")
 public class ForwardVelocityTuner extends OpMode {
     private ArrayList<Double> velocities = new ArrayList<>();
 
@@ -122,6 +137,10 @@ public class ForwardVelocityTuner extends OpMode {
     @Override
     public void loop() {
         if (gamepad1.cross || gamepad1.a) {
+            for (DcMotorEx motor : motors) {
+                motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                motor.setPower(0);
+            }
             requestOpModeStop();
         }
 
