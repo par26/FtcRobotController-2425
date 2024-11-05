@@ -58,8 +58,8 @@ public class Lift implements Subsystem {
     }
 
     public void read() {
-        currentPos = robot.liftMotor.getCurrentPosition();
-        currentVelocity = robot.liftMotor.getVelocity();
+        currentPos =  leftMotor.getCurrentPosition();
+        currentVelocity = leftMotor.getVelocity();
     }
 
     public void write() {

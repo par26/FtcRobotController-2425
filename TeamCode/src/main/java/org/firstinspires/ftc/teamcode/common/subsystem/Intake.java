@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.common.action.RunAction;
+import org.firstinspires.ftc.teamcode.common.utils.RobotConstants;
 
 public class Intake {
     public enum State{
@@ -22,13 +23,13 @@ public class Intake {
 
     private final double ARM_LOWER, ARM_RETRACT, wristServoPosition;
   //palceholder arm and wrist values
-    public Intake(HardwareMap hardwareMap, State state, double armLower, double armRetract, double wristServoPosition) {
+    public Intake(HardwareMap hardwareMap) {
         spin = hardwareMap.get(CRServo.class, "intakeSpin");
         larmPivot = hardwareMap.get(Servo.class, "leftArmPivot");
         rarmPivot = hardwareMap.get(Servo.class, "rightArmPivot");
         wrist = hardwareMap.get(Servo.class, "intakeWrist");
-        this.state = state;
-        ARM_LOWER = armLower;
+        this.state = State.STOP;
+        ARM_LOWER = RobotConstants.armLower;
         ARM_RETRACT = armRetract;
         this.wristServoPosition = wristServoPosition;
 

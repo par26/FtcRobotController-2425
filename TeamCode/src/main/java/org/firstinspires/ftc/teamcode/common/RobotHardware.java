@@ -13,7 +13,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.common.subsystem.HorizontalSlides;
+import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
+import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
@@ -31,20 +34,12 @@ public class RobotHardware {
     public DcMotorEx dtRightBackMotor;
 
 
-    //linear slides
-    public DcMotorEx liftMotor;
-    public DcMotorEx liftMotor2;
-
-    //horizontal extension slides
-    public DcMotorEx horizontalExtensionMotor;
-
-    //claw
-    public ServoEx outakeClawLeft;
-    public ServoEx outakeClawRight;
-    public ServoEx outakeWrist;
-
     //declare subsystems of the subsystem class
     Lift lift;
+    Intake intake;
+    Outake outake;
+    HorizontalSlides horizontalSlides;
+
 
 
 
@@ -82,13 +77,14 @@ public class RobotHardware {
 
     // initializes subsystems
     public void init(final HardwareMap hardwareMap) {
-        dtLeftBackMotor = hardwareMap.get(DcMotorEx.class, "leftFrontMotor");
-
-
-
-
-
         lift = new Lift(hardwareMap);
+        intake = new Intake(hardwareMap);
+        outake = new Outake(hardwareMap);
+
+
+
+
+
 
     }
 
