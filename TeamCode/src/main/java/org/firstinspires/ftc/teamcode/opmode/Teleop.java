@@ -43,7 +43,7 @@ public class Teleop extends OpMode  {
     DcMotorEx leftSlideMotor;
 
     double clawOpen = 0;
-    double clawClose = 0.2;
+    double clawClose = 0.4;
 
 
     Servo wrist;
@@ -95,7 +95,7 @@ public class Teleop extends OpMode  {
 
 
 
-    public static double leftOpen = 0.0;
+
     public static double rightOpen = 0.0;
 
     public static double leftClose = .2;
@@ -178,7 +178,7 @@ public class Teleop extends OpMode  {
         rightServo.setPosition(0.006); */
 
         claw = hardwareMap.get(ServoImplEx.class, "claw");
-
+        claw.setDirection(Servo.Direction.REVERSE);
 
         leftServo = hardwareMap.get(ServoImplEx.class, "leftServo");
         rightServo = hardwareMap.get(ServoImplEx.class, "rightServo");
@@ -187,7 +187,8 @@ public class Teleop extends OpMode  {
         wrist = hardwareMap.get(ServoImplEx.class, "wrist");
 
 
-        rightServo.setDirection(Servo.Direction.REVERSE);
+
+        leftServo.setDirection(Servo.Direction.REVERSE);
 
 
         leftServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
@@ -248,9 +249,9 @@ public class Teleop extends OpMode  {
         ca = gamepad1.a;
         if (ca && !pa) {
             if(clawClosed) {
-                claw.setPosition(clawOpen);
-            } else {
                 claw.setPosition(clawClose);
+            } else {
+                claw.setPosition(clawOpen);
                 //clawClosed = true;
             }
         }
