@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.common.subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
@@ -41,6 +42,7 @@ public class RobotHardware {
     HorizontalSlides horizontalSlides;
 
 
+    Telemetry telemetry;
 
 
     HardwareMap hardwareMap;
@@ -63,41 +65,36 @@ public class RobotHardware {
     // list of all subsystems
     ArrayList<Subsystem> subsystems;
 
-    public static RobotHardware getInstance() {
-        if(instance == null) {
-            instance = new RobotHardware();
-        }
-        return instance;
-    }
 
-    private RobotHardware(){
+    private RobotHardware(final HardwareMap hardwareMap){
         subsystems = new ArrayList<>();
+        lift = new Lift(hardwareMap,telemetry );
+        intake = new Intake(hardwareMap);
+        outake = new Outake(hardwareMap);
+        horizontalSlides = new HorizontalSlides(hardwareMap, telemetry);
     }
 
 
     // initializes subsystems
-    public void init(final HardwareMap hardwareMap) {
-        lift = new Lift(hardwareMap);
-        intake = new Intake(hardwareMap);
-        outake = new Outake(hardwareMap);
+    public void init() {
 
 
-
-
+        lift.init();
+        //intake.init();
+        outake.init();
+        horizontalSlides.init();
 
 
     }
 
-    public void read() {
+
+    public void start() {
 
     }
 
-    public void write() {
-
-    }
 
 
-    public void periodic() {
+    public void update() {
 
     }
 
