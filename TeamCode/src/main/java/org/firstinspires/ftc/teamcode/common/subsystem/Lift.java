@@ -24,7 +24,7 @@ public class Lift {
     public DcMotorEx liftMotor2;
 
     private int pos, initalPos;
-    public RunAction setPosition; //note that you can make more runactions, very easy
+    public RunAction setPositionLow; //note that you can make more runactions, very easy
     public PIDController liftPID;
     public static int target;
 
@@ -60,7 +60,7 @@ public class Lift {
 
         liftPID = new PIDController(p, i, d);
 
-        setPosition = new RunAction(this::setPosition);
+        setPositionLow = new RunAction(this::setPosition);
     }
 
 
@@ -95,6 +95,7 @@ public class Lift {
         setTarget(0); //this will be used as template to move Lif tto where we want the lift to move
     }
 
+
     public void setPower(double power) {
         power = Range.clip(power, -1, 1);
         // cache motor powers to prevent unnecessary writes
@@ -107,7 +108,7 @@ public class Lift {
 
 
     public void setTargetHeight(double inches) {
-        setPosition(toTicks(inches));
+        setTarget(toTicks(inches));
     }
 
     //util kinda

@@ -91,8 +91,8 @@ public class HorizontalSlides {
         target = b;
     }
 
-    public void setPosition() {
-        setTarget(0); //this will be used as template to move Lif tto where we want the lift to move
+    public void setPosition(int ticks) {
+        setTarget(ticks); //this will be used as template to move Lif tto where we want the lift to move
     }
 
     public void setPower(double power) {
