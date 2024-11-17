@@ -51,12 +51,12 @@ public class Lift {
         liftMotor = hardwareMap.get(DcMotorEx.class, "lift1");
         liftMotor.setDirection(DcMotorEx.Direction.REVERSE);
         liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         liftMotor2 = hardwareMap.get(DcMotorEx.class, "lift2");
         liftMotor2.setDirection(DcMotorEx.Direction.REVERSE);
         liftMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        liftMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         liftPID = new PIDController(p, i, d);
 
@@ -66,9 +66,7 @@ public class Lift {
 
 
     public void updatePID() {
-        liftPID.setP(p);
-        liftPID.setI(i);
-        liftPID.setD(d);
+        setPower(getLiftPID(getCurrentPos(), targetPos));
     }
 
     public double getLiftPID(double currentPos, double targetPos) {
@@ -100,8 +98,11 @@ public class Lift {
         power = Range.clip(power, -1, 1);
         // cache motor powers to prevent unnecessary writes
         if(Math.abs(power - lastPower) > 0.02) {
-            liftMotor.setPower(power);
-            liftMotor2.setPower(power);
+            if(power > 0) {
+                liftMotor.setPower(power);
+            } else {
+                liftMotor2.setPower(Math.abs(power));
+            }
             lastPower = power;
         }
     }

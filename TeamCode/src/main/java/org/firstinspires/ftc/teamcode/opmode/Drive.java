@@ -49,14 +49,14 @@ public class Drive extends OpMode {
     public void loop() {
 
 
-        double y = -gamepad1.right_stick_x; // Remember, this is reversed!
-        double x = gamepad1.left_stick_x; // this is strafing
+        double y = -gamepad1.left_stick_x; // Remember, this is reversed!
+        double x = gamepad1.right_stick_x; // this is strafing
         double rx = gamepad1.left_stick_y;
 
 
         if(Math.abs(y) > 0.04) {
             leftFront.setPower(-y);
-            leftRear.setPower(y);
+            leftRear.setPower(-y);
             rightFront.setPower(-y);
             rightRear.setPower(y);
         } else {
