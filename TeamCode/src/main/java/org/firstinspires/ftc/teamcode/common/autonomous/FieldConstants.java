@@ -4,6 +4,13 @@ import org.firstinspires.ftc.teamcode.common.pedroPathing.localization.Pose;
 
 public class FieldConstants {
 
+    /* Robot Dimensions
+     * Length: 16.562
+     * Width: 14.242
+     * Robot deposits sample in bucket from back
+     * Robot intakes sample from front
+     */
+
     public enum
     RobotStart {
         BLUE_BUCKET,
@@ -24,6 +31,13 @@ public class FieldConstants {
     public static final Pose redBucketPreloadPose = new Pose(144-blueBucketPreloadPose.getX(), blueBucketPreloadPose.getY(), 0);
     public static final Pose redObservationPreloadPose = new Pose(144-blueObservationPreloadPose.getX(), blueObservationPreloadPose.getY(), 0);
 
+    //Bucket Score Poses TODO: adjust accordingly
+    public static final Pose blueBucketScore = new Pose(17.6, 125.3, Math.toRadians(315));
+    public static final Pose redBucketScore = new Pose(144- blueBucketScore.getX(), 144- blueBucketScore.getY(), Math.toRadians(135));
+
+    //Observation Grab Poses
+    public static final Pose blueObservationGrab = new Pose(12.3, 34, Math.toRadians(270));
+    public static final Pose redObservationGrab = new Pose(144- blueObservationGrab.getX(), 144- blueObservationGrab.getY(), Math.toRadians(90));
 
     //BLue Specimen Exact Poses
     //TODO: If changing specific positions, only changing blueSampleTop necessary
@@ -49,10 +63,10 @@ public class FieldConstants {
 
     //Parking Poses
     //TODO: will need adjusting, not minmaxed
-    public static final Pose blueSampleParkingPose  = new Pose(60, 47, 0);
-    public static final Pose redSampleParkingPose   = new Pose(144- blueSampleParkingPose.getX(), 144- blueSampleParkingPose.getY(), 0);
-    public static final Pose blueBucketParkingPose  = new Pose(blueSampleParkingPose.getX(), 144- blueSampleParkingPose.getY(), 0);
-    public static final Pose redBucketParkingPose   = new Pose(144- blueSampleParkingPose.getX(), blueSampleParkingPose.getY(), 0);
+    public static final Pose blueObservationParkPose = new Pose(60, 47, 0);
+    public static final Pose redObservationParkPose = new Pose(144- blueObservationParkPose.getX(), 144- blueObservationParkPose.getY(), 0);
+    public static final Pose blueBucketParkPose = new Pose(blueObservationParkPose.getX(), 144- blueObservationParkPose.getY(), 0);
+    public static final Pose redBucketParkPose = new Pose(144- blueObservationParkPose.getX(), blueObservationParkPose.getY(), 0);
 
 
 }

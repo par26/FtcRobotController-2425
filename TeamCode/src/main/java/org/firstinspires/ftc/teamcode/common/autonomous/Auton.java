@@ -17,7 +17,13 @@ public class Auton {
 
     public Path element1, score1, element2, score2, element3, score3;
     public PathChain pushSamples, depositPreload, specimen1, specimen2, specimen3, grab1, grab2, grab3, park;
-    public Pose startPose, preloadPose, sample1Pose, sample1ControlPose, sample2Pose, sample2ControlPose, sample3Pose, sample3ControlPose, sampleScorePose, parkControlPose, parkPose, grab1Pose, specimen1Pose, grab2Pose, specimen2Pose, grab3Pose, specimen3Pose, specimenSetPose;
+    //Both
+    public Pose spawnPose, preloadPose, parkPose;
+    //Bucket
+    //TODO: we gon need vision for bucket
+    public Pose sample1Pose, sample2Pose, sample3Pose, scorePose;
+    //Observation
+    public Pose grabPose, specimen1Pose, specimen2Pose, specimen3Pose, specimen4Pose;
 
 
     public Auton(RobotStart startLocation) {
@@ -32,34 +38,46 @@ public class Auton {
     }
 
     public void createPoses() {
-        //TODO: For time coming fater 11/18/24, ID the poses we need and make it
-        // (don't follow indubitables they too indubitable [they doing their own thing])
+        //TODO: Need to finish the actual poses, bucket assigning
+        // should be done by now 11/22/24
         switch(startLocation) {
             case BLUE_BUCKET:
-                startPose = blueBucketStartPose;
+                spawnPose = blueBucketStartPose;
                 preloadPose = blueBucketPreloadPose;
                 sample1Pose = blueBucketSampleTopPose;
-
-
-
-
-
-                break;
-            case RED_BUCKET:
-                startPose = redBucketStartPose;
+                sample2Pose = blueBucketSampleMiddlePose;
+                sample3Pose = blueBucketSampleBottomPose;
+                scorePose = blueBucketScore;
+                parkPose = blueBucketParkPose;
 
                 break;
             case BLUE_OBSERVATION:
-                startPose = blueObservationStartPose;
+                spawnPose = blueObservationStartPose;
+                preloadPose = blueObservationPreloadPose;
+                grabPose = blueObservationGrab;
+                parkPose = blueObservationParkPose;
+
+                break;
+            case RED_BUCKET:
+                spawnPose = redBucketStartPose;
+                preloadPose = redBucketPreloadPose;
+                sample1Pose = redBucketSampleTopPose;
+                sample2Pose = redBucketSampleMiddlePose;
+                sample3Pose = redBucketSampleBottomPose;
+                scorePose = redBucketScore;
+                parkPose = redBucketParkPose;
 
                 break;
             case RED_OBSERVATION:
-                startPose = redObservationStartPose;
+                spawnPose = redObservationStartPose;
+                preloadPose = redObservationPreloadPose;
+                grabPose = redObservationGrab;
+                parkPose = redObservationParkPose;
 
                 break;
         }
 
-        follower.setStartingPose(startPose);
+        follower.setStartingPose(spawnPose);
     }
 
     public void buildPaths() {
