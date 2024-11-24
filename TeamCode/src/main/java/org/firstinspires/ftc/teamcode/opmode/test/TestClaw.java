@@ -57,20 +57,18 @@ public class TestClaw extends OpMode {
     public static int rigthReverse = 0;
     @Override
     public void init() {
-        leftClaw = hardwareMap.get(Servo.class, "leftServo");
+        leftClaw = hardwareMap.get(Servo.class, "servo");
 
-        rightClaw = hardwareMap.get(Servo.class, "rightServo");
+        //rightClaw = hardwareMap.get(Servo.class, "rightServo");
 
         if(leftReverse == 1) {
             leftClaw.setDirection(Servo.Direction.REVERSE);
+        } else {
+            leftClaw.setDirection(Servo.Direction.FORWARD);
         }
 
-        if(rigthReverse == 1) {
-            rightClaw.setDirection(Servo.Direction.REVERSE);
-        }
 
         leftClaw.setPosition(0);
-        rightClaw.setPosition(0);
 
 
     }
@@ -90,10 +88,7 @@ public class TestClaw extends OpMode {
             double lpos = leftClaw.getPosition();
             telemetry.addData("Position Left", lpos);
             telemetry.update();
-            rightClaw.setPosition(rightOpen);
-            double rpos = rightClaw.getPosition();
-            telemetry.addData("Position Right:", rpos);
-            telemetry.update();
+
         }
 
         //Close left
@@ -104,14 +99,8 @@ public class TestClaw extends OpMode {
             double pos = leftClaw.getPosition();
             telemetry.addData("Position Left", pos);
             telemetry.update();
-            rightClaw.setPosition(rightClose);
-            double rpos = rightClaw.getPosition();
-            telemetry.addData("Position right", rpos);
-            telemetry.update();
+
         }
-
-
-
 
 
 

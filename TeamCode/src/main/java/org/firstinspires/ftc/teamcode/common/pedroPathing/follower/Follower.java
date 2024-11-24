@@ -138,7 +138,7 @@ public class Follower {
 
     public static boolean drawOnDashboard = true;
     public static boolean useTranslational = true;
-    public static boolean useCentripetal = false;
+    public static boolean useCentripetal = true;
     public static boolean useHeading = true;
     public static boolean useDrive = true;
 
@@ -366,6 +366,25 @@ public class Follower {
     }
 
     /**
+     * This holds a Point.
+     *
+     * @param point   the Point to stay at.
+     * @param heading the heading to face.
+     */
+    public void holdPoint(Point point, double heading) {
+        holdPoint(new BezierPoint(point), heading);
+    }
+
+    /**
+     * This holds a Point.
+     *
+     * @param pose the Point (as a Pose) to stay at.
+     */
+    public void holdPoint(Pose pose) {
+        holdPoint(new Point(pose), pose.getHeading());
+    }
+
+    /**
      * This follows a Path.
      * This also makes the Follower hold the last Point on the Path.
      *
@@ -426,15 +445,22 @@ public class Follower {
     }
 
     /**
-     * This calls an update to the PoseUpdater, which updates the robot's current position estimate.
-     * This also updates all the Follower's PIDFs, which updates the motor powers.
+     * Calls an update to the PoseUpdater, which updates the robot's current position estimate.
      */
-    public void update() {
+    public void updatePose() {
         poseUpdater.update();
 
         if (drawOnDashboard) {
             dashboardPoseTracker.update();
         }
+    }
+
+    /**
+     * This calls an update to the PoseUpdater, which updates the robot's current position estimate.
+     * This also updates all the Follower's PIDFs, which updates the motor powers.
+     */
+    public void update() {
+        updatePose();
 
         if (!teleopDrive) {
             if (currentPath != null) {
@@ -515,7 +541,7 @@ public class Follower {
      *                     movement, this is the x-axis.
      * @param lateralDrive determines the lateral drive vector for the robot in teleop. In field centric
      *                     movement, this is the y-axis.
-     * @param heading determines the heading vector for the robot in teleop.
+     * @param heading      determines the heading vector for the robot in teleop.
      */
     public void setTeleOpMovementVectors(double forwardDrive, double lateralDrive, double heading) {
         setTeleOpMovementVectors(forwardDrive, lateralDrive, heading, true);
@@ -528,7 +554,7 @@ public class Follower {
      *                     movement, this is the x-axis.
      * @param lateralDrive determines the lateral drive vector for the robot in teleop. In field centric
      *                     movement, this is the y-axis.
-     * @param heading determines the heading vector for the robot in teleop.
+     * @param heading      determines the heading vector for the robot in teleop.
      * @param robotCentric sets if the movement will be field or robot centric
      */
     public void setTeleOpMovementVectors(double forwardDrive, double lateralDrive, double heading, boolean robotCentric) {
@@ -719,7 +745,7 @@ public class Follower {
         Vector velocityErrorVector = MathFunctions.addVectors(forwardVelocityError, lateralVelocityError);
 
         previousRawDriveError = rawDriveError;
-        rawDriveError =  velocityErrorVector.getMagnitude() * MathFunctions.getSign(MathFunctions.dotProduct(velocityErrorVector, currentPath.getClosestPointTangentVector()));
+        rawDriveError = velocityErrorVector.getMagnitude() * MathFunctions.getSign(MathFunctions.dotProduct(velocityErrorVector, currentPath.getClosestPointTangentVector()));
 
         double projection = 2 * driveErrors[1] - driveErrors[0];
 

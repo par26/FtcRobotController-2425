@@ -1,109 +1,99 @@
 package org.firstinspires.ftc.teamcode.common.subsystem;
 
-import androidx.annotation.NonNull;
-
-import com.arcrobotics.ftclib.command.Subsystem;
-import com.arcrobotics.ftclib.controller.PDController;
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.common.RobotHardware;
+import org.firstinspires.ftc.teamcode.common.action.RunAction;
+import org.firstinspires.ftc.teamcode.common.utils.RobotConstants;
 
-public class Intake implements Subsystem {
 
-    private final RobotHardware robot;
-
-//    public static double
-    //          kP = 0.0031, kI = 0, kD = 0.0001, kF = 0.00;
-    // PID values
-// used for making sure the active intake does not die immediately
-    // also tune later
-
-    double
-
-    enum State {
-        forward, reverse, stop
+public class Intake {
+    public enum State{
+        FORWARD, REVERSE, STOP
     }
 
-    enum ARM {
-        lower, retract
+    public CRServo spin;
+    private State state;
+    private Servo larmPivot;
+    private Servo rarmPivot;
+
+    public RunAction spinIntake, stopIntake, reverseIntake, lowerArm, retractArm, twistArm;
+    private double spinPower, reversePower, stopPower;
+    //adjust as needed, for the wheel
+
+    private final double ARM_LOWER, ARM_RETRACT;
+  //palceholder arm and wrist values
+    public Intake(HardwareMap hardwareMap) {
+        spin = hardwareMap.get(CRServo.class, "intakeSpin");
+        larmPivot = hardwareMap.get(Servo.class, "leftArmPivot");
+        rarmPivot = hardwareMap.get(Servo.class, "rightArmPivot");
+        this.state = State.STOP;
+        ARM_LOWER = RobotConstants.INTAKE_ARM_LOWER;
+        ARM_RETRACT = RobotConstants.INTAKE_ARM_RETRACT;
+
+
+        spinIntake = new RunAction(this::spinIntake);
+        reverseIntake = new RunAction(this::reverseIntake);
+        stopIntake = new RunAction(this::stopIntake);
+        lowerArm = new RunAction(this::lowerArm);
+        retractArm = new RunAction(this::retractArm);
+
+
     }
-
-
-
-    Intake.State state;
-    PDController intakePID;
-
-    Intake.ARM armState;
-
-    //double PID;
-    double intakeSpeed = 0.8;
-    double power;
-    double lastPower;
-    double wristServoPosition;
-
-    public Intake() {
-        this.robot = RobotHardware.getInstance();
-
-        state = Intake.State.stop;
-        power = 0;
-        lastPower = 0;
-        //clean slate, probably
-
-    }
-
-
-    @Override
-    public void periodic() {
-        switch(state) {
-            case forward:
-                setPower(intakeSpeed);
-            case reverse:
-                setPower(-intakeSpeed);
-            case stop:
-                setPower(0);
+    //okok
+    //spin to win part
+    public void setSpin(State state, boolean onlyChangeState) {
+        if (onlyChangeState) {
+            this.state = state;
+            //we are only changing the state, not actually changing the power
+        } else {
+            if (state == state.FORWARD) {
+                spinIntake();
+            } else if (state == state.REVERSE) {
+                reverseIntake();
+            } else if (state == state.STOP) {
+                stopIntake();
+            }
         }
     }
 
-    public void startIntake() {
-        state = state.forward;
-
-        //pid probably should have  avalue before this starts up
+    public void spinIntake() {
+        spin.setPower(spinPower);
+        this.state = state.FORWARD;
     }
 
     public void reverseIntake() {
-        state = state.reverse;
-        //PID should go in reverse, so yeah also psuedocode
+        spin.setPower(reversePower);
+        this.state = state.REVERSE;
     }
+
     public void stopIntake() {
-        state = state.stop;
-
-        //PID should go in reverse, so yeah also psuedocode
+        spin.setPower(stopPower);
+        this.state = state.STOP;
     }
 
-    /*
-    Gives us the option to implement PID in the future
-     */
-    private void setPower(double power) {
-        robot.intakeWheel.setPower(power);
+    // the arm itself
+
+    public void lowerArm() {
+
+
+        larmPivot.setPosition(ARM_LOWER);
+       rarmPivot.setPosition(ARM_LOWER);
     }
-
-
-    public void lowerIntake() {
-        //there is a wrist
-
-        robot.intakePivotLeft.setPosition(ARM_LOWER);
-        robot.intakePivotRight.setPosition(ARM_LOWER);
-    }
-    public void retractIntake() {
+    public void retractArm() {
         //bw
-        robot.intakePivotLeft.setPosition(ARM_RETRACT);
-        robot.intakePivotRight.setPosition(ARM_RETRACT);
+       larmPivot.setPosition(ARM_RETRACT);
+       rarmPivot.setPosition(ARM_RETRACT);
     }
-    public void twistIntake() {
-        robot.wrist.setPosition(wristServoPosition);
+
+/*
+    public void init() {
+        Actions.runBlocking(new ParallelAction(pivotTransfer, spinStop));
+
     }
+    public void start() {
+        Actions.runBlocking(new ParallelAction(pivotTransfer, spinStop));
+    }
+*/
 }

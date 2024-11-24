@@ -16,15 +16,15 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.common.action.RunAction;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 
-public class Lift {
+public class HorizontalSlides {
 
     private Telemetry telemetry;
 
-    public DcMotorEx liftMotor;
-    public DcMotorEx liftMotor2;
+    public DcMotorEx slideMotor;
+    public DcMotorEx slideMotor2;
 
     private int pos, initalPos;
-    public RunAction setPositionLow; //note that you can make more runactions, very easy
+    public RunAction setPosition; //note that you can make more runactions, very easy
     public PIDController liftPID;
     public static int target;
 
@@ -45,28 +45,30 @@ public class Lift {
     private final double TICKS_PER_REV = 384.5; //ticks
     private final double PULLEY_CIRCUMFERENCE = 4.40945; //inches
 
-    public Lift (HardwareMap hardwareMap, Telemetry telemetry) {
+    public HorizontalSlides (HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        liftMotor = hardwareMap.get(DcMotorEx.class, "lift1");
-        liftMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        slideMotor = hardwareMap.get(DcMotorEx.class, "slide1");
+        slideMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        slideMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        slideMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        liftMotor2 = hardwareMap.get(DcMotorEx.class, "lift2");
-        liftMotor2.setDirection(DcMotorEx.Direction.REVERSE);
-        liftMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        slideMotor2 = hardwareMap.get(DcMotorEx.class, "slide2");
+        slideMotor2.setDirection(DcMotorEx.Direction.REVERSE);
+        slideMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        slideMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         liftPID = new PIDController(p, i, d);
 
-        setPositionLow = new RunAction(this::setPosition);
+        setPosition = new RunAction(this::setPosition);
     }
 
 
 
     public void updatePID() {
-        setPower(getLiftPID(getCurrentPos(), targetPos));
+        liftPID.setP(p);
+        liftPID.setI(i);
+        liftPID.setD(d);
     }
 
     public double getLiftPID(double currentPos, double targetPos) {
@@ -93,16 +95,12 @@ public class Lift {
         setTarget(0); //this will be used as template to move Lif tto where we want the lift to move
     }
 
-
     public void setPower(double power) {
         power = Range.clip(power, -1, 1);
         // cache motor powers to prevent unnecessary writes
         if(Math.abs(power - lastPower) > 0.02) {
-            if(power > 0) {
-                liftMotor.setPower(power);
-            } else {
-                liftMotor2.setPower(Math.abs(power));
-            }
+            slideMotor.setPower(power);
+            slideMotor2.setPower(power);
             lastPower = power;
         }
     }
@@ -135,21 +133,21 @@ public class Lift {
     }
 
     public void resetEncoder() {
-        liftMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        slideMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        slideMotor2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
-        liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        slideMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        slideMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void init() {
         resetEncoder();
         initalPos = currentPos;
-        liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        slideMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        slideMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        liftMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        slideMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        slideMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
     }
 
     public void start() {

@@ -47,8 +47,8 @@ public class TestSlides extends OpMode {
             leftSlides.setPower(minSlidePower);
             rightSlides.setPower(minSlidePower);
         } else {
-            leftSlides.setPower(slidePower);
-            rightSlides.setPower(slidePower);
+            leftSlides.setPower(-slidePower);
+            rightSlides.setPower(-slidePower);
         }
 
     }

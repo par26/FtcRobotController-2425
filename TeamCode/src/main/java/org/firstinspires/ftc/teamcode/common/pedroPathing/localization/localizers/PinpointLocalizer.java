@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.common.pedroPathing.localization.localizers;
 
-
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -16,31 +15,31 @@ import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.Vector;
  * This is the Pinpoint class. This class extends the Localizer superclass and is a
  * localizer that uses the two wheel odometry set up with the IMU to have more accurate heading
  * readings. The diagram below, which is modified from Road Runner, shows a typical set up.
-         *
-         * The view is from the top of the robot looking downwards.
-         *
-         * left on robot is the y positive direction
-         *
-         * forward on robot is the x positive direction
-         *
-         *    /--------------\
-         *    |     ____     |
-         *    |     ----     |
-         *    | ||           |
-         *    | ||           |  ----> left (y positive)
-         *    |              |
-         *    |              |
-         *    \--------------/
-         *           |
-         *           |
-         *           V
-         *    forward (x positive)
-         * With the pinpoint your readings will be used in mm
-         * to use inches ensure to divide your mm value by 25.4
-         * @author Logan Nash
-         * @author Havish Sripada 12808 - RevAmped Robotics
-         * @author Ethan Doak - Gobilda
-         * @version 1.0, 10/2/2024
+ *
+ * The view is from the top of the robot looking downwards.
+ *
+ * left on robot is the y positive direction
+ *
+ * forward on robot is the x positive direction
+ *
+ *    /--------------\
+ *    |     ____     |
+ *    |     ----     |
+ *    | ||           |
+ *    | ||           |  ----> left (y positive)
+ *    |              |
+ *    |              |
+ *    \--------------/
+ *           |
+ *           |
+ *           V
+ *    forward (x positive)
+ * With the pinpoint your readings will be used in mm
+ * to use inches ensure to divide your mm value by 25.4
+ * @author Logan Nash
+ * @author Havish Sripada 12808 - RevAmped Robotics
+ * @author Ethan Doak - Gobilda
+ * @version 1.0, 10/2/2024
  */
 public class PinpointLocalizer extends Localizer {
     private HardwareMap hardwareMap;
@@ -72,10 +71,10 @@ public class PinpointLocalizer extends Localizer {
         //This uses mm, to use inches divide these numbers by 25.4
         odo.setOffsets(-84.0, -168.0); //these are tuned for 3110-0002-0001 Product Insight #1
         //TODO: If you find that the gobilda Yaw Scaling is incorrect you can edit this here
-      //  odo.setYawScalar(1.0);
+        //  odo.setYawScalar(1.0);
         //TODO: Set your encoder resolution here, I have the Gobilda Odometry products already included.
         //TODO: If you would like to use your own odometry pods input the ticks per mm in the commented part below
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
         //odo.setEncoderResolution(13.26291192);
         //TODO: Set encoder directions
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
@@ -96,8 +95,10 @@ public class PinpointLocalizer extends Localizer {
      */
     @Override
     public Pose getPose() {
-        Pose2D pose = odo.getPosition();
-        return new Pose(pose.getX(DistanceUnit.INCH), pose.getY(DistanceUnit.INCH), pose.getHeading(AngleUnit.RADIANS));
+        Pose2D rawPose = odo.getPosition();
+        Pose pose = new Pose(rawPose.getX(DistanceUnit.INCH), rawPose.getY(DistanceUnit.INCH), rawPose.getHeading(AngleUnit.RADIANS));
+
+        return MathFunctions.addPoses(startPose, MathFunctions.rotatePose(pose, startPose.getHeading(), false));
     }
 
     /**
@@ -141,9 +142,9 @@ public class PinpointLocalizer extends Localizer {
      */
     @Override
     public void setPose(Pose setPose) {
-    resetPinpoint();
-    Pose setPinpointPose = MathFunctions.subtractPoses(setPose, startPose);
-    odo.setPosition(new Pose2D(DistanceUnit.INCH, setPinpointPose.getX(), setPinpointPose.getY(), AngleUnit.RADIANS, setPinpointPose.getHeading()));
+        resetPinpoint();
+        Pose setPinpointPose = MathFunctions.subtractPoses(setPose, startPose);
+        odo.setPosition(new Pose2D(DistanceUnit.INCH, setPinpointPose.getX(), setPinpointPose.getY(), AngleUnit.RADIANS, setPinpointPose.getHeading()));
     }
 
     /**
@@ -152,8 +153,8 @@ public class PinpointLocalizer extends Localizer {
     @Override
     public void update() {
         odo.update();
-    totalHeading += MathFunctions.getSmallestAngleDifference(odo.getHeading(),previousHeading);
-    previousHeading = odo.getHeading();
+        totalHeading += MathFunctions.getSmallestAngleDifference(odo.getHeading(),previousHeading);
+        previousHeading = odo.getHeading();
     }
 
     /**
@@ -199,7 +200,7 @@ public class PinpointLocalizer extends Localizer {
      */
     @Override
     public void resetIMU() {
-    odo.recalibrateIMU();
+        odo.recalibrateIMU();
     }
 
     /**

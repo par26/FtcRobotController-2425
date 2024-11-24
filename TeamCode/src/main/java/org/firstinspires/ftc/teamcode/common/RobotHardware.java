@@ -13,7 +13,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.common.subsystem.HorizontalSlides;
+import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
+import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
@@ -31,27 +35,14 @@ public class RobotHardware {
     public DcMotorEx dtRightBackMotor;
 
 
-    //intake
-    public CRServo intakeWheel;
-    public ServoEx intakePivotLeft;
-    public ServoEx intakePivotRight;
-
-
-
-    //linear slides
-    public DcMotorEx liftMotor;
-    public DcMotorEx liftMotor2;
-
-    //horizontal extension slides
-    public DcMotorEx horizontalExtensionMotor;
-
-    //claw
-    public ServoEx outakeClawLeft;
-    public ServoEx outakeClawRight;
-    public ServoEx outakeWrist
-
     //declare subsystems of the subsystem class
     Lift lift;
+    Intake intake;
+    Outake outake;
+    HorizontalSlides horizontalSlides;
+
+
+    Telemetry telemetry;
 
 
     HardwareMap hardwareMap;
@@ -74,45 +65,36 @@ public class RobotHardware {
     // list of all subsystems
     ArrayList<Subsystem> subsystems;
 
-    public static RobotHardware getInstance() {
-        if(instance == null) {
-            instance = new RobotHardware();
-        }
-        return instance;
-    }
 
-    private RobotHardware(){
+    private RobotHardware(final HardwareMap hardwareMap){
         subsystems = new ArrayList<>();
+        lift = new Lift(hardwareMap,telemetry );
+        intake = new Intake(hardwareMap);
+        outake = new Outake(hardwareMap);
+        horizontalSlides = new HorizontalSlides(hardwareMap, telemetry);
     }
 
 
     // initializes subsystems
-    public void init(final HardwareMap hardwareMap) {
-        dtLeftBackMotor = hardwareMap.get(DcMotorEx.class, "leftFrontMotor");
+    public void init() {
 
 
-
-
-
-        lift = new Lift();
-
-
-
-
+        lift.init();
+        //intake.init();
+        outake.init();
+        horizontalSlides.init();
 
 
     }
 
-    public void read() {
+
+    public void start() {
 
     }
 
-    public void write() {
-
-    }
 
 
-    public void periodic() {
+    public void update() {
 
     }
 
