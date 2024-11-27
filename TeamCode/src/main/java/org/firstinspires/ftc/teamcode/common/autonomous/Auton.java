@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.common.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.BezierLine;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.PathChain;
+import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.Point;
 
 public class Auton {
 
@@ -21,7 +22,7 @@ public class Auton {
     public Pose spawnPose, preloadPose, parkPose;
     //Bucket
     //TODO: we gon need vision for bucket
-    public Pose sample1Pose, sample2Pose, sample3Pose, scorePose;
+    public Pose sample1Control, sample1Pose, sample2Pose, sample3Pose, scorePose;
     //Observation
     public Pose grabPose, specimen1Pose, specimen2Pose, specimen3Pose, specimen4Pose;
 
@@ -38,40 +39,42 @@ public class Auton {
     }
 
     public void createPoses() {
-        //TODO: Need to finish the actual poses, bucket assigning
-        // should be done by now 11/22/24
+        //TODO: Need to finish the actual poses,
+        // bucket assigning should be done by now 11/22/24
         switch(startLocation) {
             case BLUE_BUCKET:
                 spawnPose = blueBucketStartPose;
                 preloadPose = blueBucketPreloadPose;
+                sample1Control = blueSample1Control;
                 sample1Pose = blueBucketSampleTopPose;
                 sample2Pose = blueBucketSampleMiddlePose;
                 sample3Pose = blueBucketSampleBottomPose;
-                scorePose = blueBucketScore;
+                scorePose = blueBucketScorePose;
                 parkPose = blueBucketParkPose;
 
                 break;
             case BLUE_OBSERVATION:
                 spawnPose = blueObservationStartPose;
                 preloadPose = blueObservationPreloadPose;
-                grabPose = blueObservationGrab;
+                grabPose = blueObservationGrabPose;
                 parkPose = blueObservationParkPose;
 
                 break;
             case RED_BUCKET:
                 spawnPose = redBucketStartPose;
                 preloadPose = redBucketPreloadPose;
+                sample1Control = redSample1Control;
                 sample1Pose = redBucketSampleTopPose;
                 sample2Pose = redBucketSampleMiddlePose;
                 sample3Pose = redBucketSampleBottomPose;
-                scorePose = redBucketScore;
+                scorePose = redBucketScorePose;
                 parkPose = redBucketParkPose;
 
                 break;
             case RED_OBSERVATION:
                 spawnPose = redObservationStartPose;
                 preloadPose = redObservationPreloadPose;
-                grabPose = redObservationGrab;
+                grabPose = redObservationGrabPose;
                 parkPose = redObservationParkPose;
 
                 break;
@@ -83,11 +86,18 @@ public class Auton {
     public void buildPaths() {
         if (startLocation == RobotStart.RED_BUCKET || startLocation == RobotStart.BLUE_BUCKET) {
             depositPreload = follower.pathBuilder()
-                    .addPath(new BezierLine(new Point )
+                    .addPath(new BezierLine(new Point(spawnPose), new Point(preloadPose)))
+                    .setLinearHeadingInterpolation(spawnPose.getHeading(), preloadPose.getHeading())
+                    .build();
+
+
         }
 
         if (startLocation == RobotStart.RED_OBSERVATION || startLocation == RobotStart.BLUE_OBSERVATION) {
-
+            depositPreload = follower.pathBuilder()
+                    .addPath(new BezierLine(new Point(spawnPose), new Point(preloadPose)))
+                    .setLinearHeadingInterpolation(spawnPose.getHeading(), preloadPose.getHeading())
+                    .build();
         }
     }
 }
