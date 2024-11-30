@@ -3,18 +3,13 @@ package org.firstinspires.ftc.teamcode.common;
 
 import com.arcrobotics.ftclib.command.Subsystem;
 
-import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.common.subsystem.HorizontalSlides;
+import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
 import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
@@ -39,7 +34,7 @@ public class RobotHardware {
     Lift lift;
     Intake intake;
     Outake outake;
-    HorizontalSlides horizontalSlides;
+    Extend horizontalSlides;
 
 
     Telemetry telemetry;
@@ -71,7 +66,7 @@ public class RobotHardware {
         lift = new Lift(hardwareMap,telemetry );
         intake = new Intake(hardwareMap);
         outake = new Outake(hardwareMap);
-        horizontalSlides = new HorizontalSlides(hardwareMap, telemetry);
+        horizontalSlides = new Extend(hardwareMap, telemetry);
     }
 
 

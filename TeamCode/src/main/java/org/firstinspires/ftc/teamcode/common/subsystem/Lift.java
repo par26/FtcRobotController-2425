@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.common.subsystem;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.controller.PDController;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -13,6 +14,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.common.action.Action;
 import org.firstinspires.ftc.teamcode.common.action.RunAction;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 
@@ -20,8 +22,8 @@ public class Lift {
 
     private Telemetry telemetry;
 
-    public DcMotorEx liftMotor;
-    public DcMotorEx liftMotor2;
+    public DcMotorEx rightLift;
+    public DcMotorEx leftLift;
 
     private int pos, initalPos;
     public RunAction setPositionLow; //note that you can make more runactions, very easy
@@ -45,18 +47,16 @@ public class Lift {
     private final double TICKS_PER_REV = 384.5; //ticks
     private final double PULLEY_CIRCUMFERENCE = 4.40945; //inches
 
-    public Lift (HardwareMap hardwareMap, Telemetry telemetry) {
-        this.telemetry = telemetry;
-        this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        liftMotor = hardwareMap.get(DcMotorEx.class, "lift1");
-        liftMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+    public Lift (HardwareMap hardwareMap) {
+        rightLift = hardwareMap.get(DcMotorEx.class, "lift1");
+        rightLift.setDirection(DcMotorEx.Direction.REVERSE);
+        rightLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        rightLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
-        liftMotor2 = hardwareMap.get(DcMotorEx.class, "lift2");
-        liftMotor2.setDirection(DcMotorEx.Direction.REVERSE);
-        liftMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        leftLift = hardwareMap.get(DcMotorEx.class, "lift2");
+        leftLift.setDirection(DcMotorEx.Direction.REVERSE);
+        leftLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        leftLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         liftPID = new PIDController(p, i, d);
 
@@ -64,9 +64,25 @@ public class Lift {
     }
 
 
+    public void update() {
+        if (state == State.PID) {
+            liftPID.setPID(p, i, d);
 
-    public void updatePID() {
-        setPower(getLiftPID(getCurrentPos(), targetPos));
+            rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+            double pid = liftPID.calculate(rightLift.getCurrentPosition(), target);
+            double ticks_in_degrees = 537.7 / 360.0;
+            double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
+            double ffpower = pid + ff;
+
+            setPower(ffpower);
+
+            telemetry.addData("lift pos", rightLift.getCurrentPosition());
+            telemetry.addData("lift target", target);
+        } else {
+            setPower(this.power);
+        }
     }
 
     public double getLiftPID(double currentPos, double targetPos) {
@@ -86,6 +102,7 @@ public class Lift {
     }
 
     public void setTarget(int b) {
+        state = State.MANUAL;
         target = b;
     }
 
@@ -98,11 +115,8 @@ public class Lift {
         power = Range.clip(power, -1, 1);
         // cache motor powers to prevent unnecessary writes
         if(Math.abs(power - lastPower) > 0.02) {
-            if(power > 0) {
-                liftMotor.setPower(power);
-            } else {
-                liftMotor2.setPower(Math.abs(power));
-            }
+            rightLift.setPower(power);
+            leftLift.setPower(power);
             lastPower = power;
         }
     }
@@ -113,6 +127,11 @@ public class Lift {
     }
 
     //util kinda
+    public void updatePIDConstants(double p, double d, double i, double f) {
+        liftPID.setPIDF(p, i, d, f);
+    }
+
+
 
     public int getTargetPos() {
         return targetPos;
@@ -135,26 +154,42 @@ public class Lift {
     }
 
     public void resetEncoder() {
-        liftMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        rightLift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        leftLift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
-        liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        rightLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        leftLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
+
+    public boolean atTarget() {
+        return Math.abs(target - leftLift.getCurrentPosition()) < 10;
+    }
+
 
     public void init() {
         resetEncoder();
         initalPos = currentPos;
-        liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        rightLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
-        liftMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        leftLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        leftLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
     }
 
     public void start() {
         initalPos = currentPos;
-        setTarget(10);
+        setTarget(0);
+    }
+
+
+    public Action waitSlide() {
+        return new Action() {
+            private boolean set = false;
+            @Override
+            public boolean run(TelemetryPacket telemetryPacket) {
+                return atTarget();
+            }
+        };
     }
 
 }

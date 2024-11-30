@@ -2,21 +2,17 @@ package org.firstinspires.ftc.teamcode.common.subsystem;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.controller.PDController;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.common.action.Action;
 import org.firstinspires.ftc.teamcode.common.action.RunAction;
-import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 
-public class HorizontalSlides {
+public class Extend {
 
     private Telemetry telemetry;
 
@@ -45,9 +41,8 @@ public class HorizontalSlides {
     private final double TICKS_PER_REV = 384.5; //ticks
     private final double PULLEY_CIRCUMFERENCE = 4.40945; //inches
 
-    public HorizontalSlides (HardwareMap hardwareMap, Telemetry telemetry) {
-        this.telemetry = telemetry;
-        this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+    public Extend(HardwareMap hardwareMap) {
+
         slideMotor = hardwareMap.get(DcMotorEx.class, "slide1");
         slideMotor.setDirection(DcMotorEx.Direction.REVERSE);
         slideMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
@@ -154,5 +149,20 @@ public class HorizontalSlides {
         initalPos = currentPos;
         setTarget(10);
     }
+
+    public boolean atTarget() {
+        return Math.abs(target - slideMotor.getCurrentPosition()) < 10;
+    }
+
+
+    public Action waitSlide() {
+        return new Action() {
+            @Override
+            public boolean run(TelemetryPacket telemetryPacket) {
+                return atTarget();
+            }
+        };
+    }
+
 
 }

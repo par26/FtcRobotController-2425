@@ -309,10 +309,10 @@ public class Teleop extends OpMode  {
 
 
 
-        double rightSlidePower = Range.clip(gamepad1.right_trigger, 0, 0.85);
+        double rightSlidePower = Range.clip(gamepad1.right_trigger, 0, 1);
         rightSlide.setPower(rightSlidePower);
 
-        double leftSlidePower = Range.clip(gamepad1.left_trigger, 0, 0.85);
+        double leftSlidePower = Range.clip(gamepad1.left_trigger, 0, 1);
         leftSlide.setPower(-leftSlidePower);
 
         //powerSlides(slidePower);

@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.common.action.Actions;
+import org.firstinspires.ftc.teamcode.common.action.ParallelAction;
 import org.firstinspires.ftc.teamcode.common.action.RunAction;
 import org.firstinspires.ftc.teamcode.common.utils.RobotConstants;
 
@@ -87,13 +89,15 @@ public class Intake {
        rarmPivot.setPosition(ARM_RETRACT);
     }
 
-/*
+
     public void init() {
-        Actions.runBlocking(new ParallelAction(pivotTransfer, spinStop));
+        Actions.runBlocking(new ParallelAction(retractArm, stopIntake));
 
     }
     public void start() {
-        Actions.runBlocking(new ParallelAction(pivotTransfer, spinStop));
+        Actions.runBlocking(new ParallelAction(retractArm, stopIntake));
     }
-*/
+
+
+
 }

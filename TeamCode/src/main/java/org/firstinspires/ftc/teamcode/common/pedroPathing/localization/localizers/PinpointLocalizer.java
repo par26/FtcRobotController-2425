@@ -41,9 +41,9 @@ import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.Vector;
  * @author Ethan Doak - Gobilda
  * @version 1.0, 10/2/2024
  */
+
 public class PinpointLocalizer extends Localizer {
     private HardwareMap hardwareMap;
-    private Pose startPose;
     private GoBildaPinpointDriver odo;
     private double previousHeading;
     private double totalHeading;
@@ -74,7 +74,7 @@ public class PinpointLocalizer extends Localizer {
         //  odo.setYawScalar(1.0);
         //TODO: Set your encoder resolution here, I have the Gobilda Odometry products already included.
         //TODO: If you would like to use your own odometry pods input the ticks per mm in the commented part below
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         //odo.setEncoderResolution(13.26291192);
         //TODO: Set encoder directions
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
@@ -83,7 +83,7 @@ public class PinpointLocalizer extends Localizer {
 
         setStartPose(setStartPose);
         totalHeading = 0;
-        previousHeading = startPose.getHeading();
+        previousHeading = setStartPose.getHeading();
 
         resetPinpoint();
     }
@@ -96,9 +96,7 @@ public class PinpointLocalizer extends Localizer {
     @Override
     public Pose getPose() {
         Pose2D rawPose = odo.getPosition();
-        Pose pose = new Pose(rawPose.getX(DistanceUnit.INCH), rawPose.getY(DistanceUnit.INCH), rawPose.getHeading(AngleUnit.RADIANS));
-
-        return MathFunctions.addPoses(startPose, MathFunctions.rotatePose(pose, startPose.getHeading(), false));
+        return new Pose(rawPose.getX(DistanceUnit.INCH), rawPose.getY(DistanceUnit.INCH), rawPose.getHeading(AngleUnit.RADIANS));
     }
 
     /**
@@ -126,13 +124,15 @@ public class PinpointLocalizer extends Localizer {
     }
 
     /**
-     * This sets the start pose. Changing the start pose should move the robot as if all its
-     * previous movements were displacing it from its new start pose.
+     * This sets the start pose. Since nobody should be using this after the robot has begun moving,
+     * and due to issues with the PinpointLocalizer, this is functionally the same as setPose(Pose).
      *
      * @param setStart the new start pose
      */
     @Override
-    public void setStartPose(Pose setStart) {startPose = setStart;}
+    public void setStartPose(Pose setStart) {
+        odo.setPosition(new Pose2D(DistanceUnit.INCH, setStart.getX(), setStart.getY(), AngleUnit.RADIANS, setStart.getHeading()));
+    }
 
     /**
      * This sets the current pose estimate. Changing this should just change the robot's current
@@ -143,8 +143,7 @@ public class PinpointLocalizer extends Localizer {
     @Override
     public void setPose(Pose setPose) {
         resetPinpoint();
-        Pose setPinpointPose = MathFunctions.subtractPoses(setPose, startPose);
-        odo.setPosition(new Pose2D(DistanceUnit.INCH, setPinpointPose.getX(), setPinpointPose.getY(), AngleUnit.RADIANS, setPinpointPose.getHeading()));
+        odo.setPosition(new Pose2D(DistanceUnit.INCH, setPose.getX(), setPose.getY(), AngleUnit.RADIANS, setPose.getHeading()));
     }
 
     /**
@@ -153,8 +152,8 @@ public class PinpointLocalizer extends Localizer {
     @Override
     public void update() {
         odo.update();
-        totalHeading += MathFunctions.getSmallestAngleDifference(odo.getHeading(),previousHeading);
-        previousHeading = odo.getHeading();
+        totalHeading += MathFunctions.getSmallestAngleDifference(MathFunctions.normalizeAngle(odo.getHeading()), previousHeading);
+        previousHeading = MathFunctions.normalizeAngle(odo.getHeading());
     }
 
     /**
