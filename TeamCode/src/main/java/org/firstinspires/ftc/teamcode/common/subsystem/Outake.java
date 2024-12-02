@@ -52,6 +52,9 @@ public class Outake {
         rOutake = hardwareMap.get(ServoImplEx.class, "rightOutake");
         outakeWrist = hardwareMap.get(ServoImplEx.class, "outakeWrist");
 
+        lOutake.setDirection(Servo.Direction.REVERSE);
+
+
         openClaw = new RunAction(this::openClaw);
         closeClaw = new RunAction(this::closeClaw);
         twistOWrist = new RunAction(this::twistOWrist);

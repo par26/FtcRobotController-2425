@@ -26,7 +26,7 @@ public class Lift {
     public DcMotorEx leftLift;
 
     private int pos, initalPos;
-    public RunAction setPositionLow; //note that you can make more runactions, very easy
+    public RunAction setPosition; //note that you can make more runactions, very easy
     public PIDController liftPID;
     public static int target;
 
@@ -60,7 +60,7 @@ public class Lift {
 
         liftPID = new PIDController(p, i, d);
 
-        setPositionLow = new RunAction(this::setPosition);
+        setPosition = new RunAction(this::setPosition);
     }
 
 
