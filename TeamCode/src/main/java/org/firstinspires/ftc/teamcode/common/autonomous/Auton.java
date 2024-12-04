@@ -130,7 +130,26 @@ public class Auton {
             depositPreload.setLinearHeadingInterpolation(spawnPose.getHeading(), preloadPose.getHeading());
 
             pushSamples = follower.pathBuilder()
-                    .addPath(new BezierCurve())
+                    .addPath(new BezierCurve(
+                            new Point(38.250, 60.625, Point.CARTESIAN),
+                            new Point(29.758, 42.437, Point.CARTESIAN),
+                            new Point(59.645, 31.439, Point.CARTESIAN)
+                    )).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(190))
+                    .addPath(new BezierCurve(
+                            new Point(59.645, 31.439, Point.CARTESIAN),
+                            new Point(68.442, 22.900, Point.CARTESIAN),
+                            new Point(16.173, 20.571, Point.CARTESIAN)
+                    )).setLinearHeadingInterpolation(Math.toRadians(190), Math.toRadians(180))
+                    .addPath(new BezierCurve(
+                            new Point(16.173, 20.571, Point.CARTESIAN),
+                            new Point(130.415, 27.558, Point.CARTESIAN),
+                            new Point(20.184, 15.137, Point.CARTESIAN)
+                    )).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(195))
+                    .addPath(new BezierCurve(
+                            new Point(20.184, 15.137, Point.CARTESIAN),
+                            new Point(104.669, 11.127, Point.CARTESIAN),
+                            new Point(18.631, 3.752, Point.CARTESIAN)
+                    )).setLinearHeadingInterpolation(Math.toRadians(195), Math.toRadians(180))
                     .build();
 
             hangSpecimen1 = new Path(new BezierLine(new Point(grabPose), new Point(specimen1Pose)));

@@ -39,7 +39,7 @@ public class FieldConstants {
     public static final Pose redBucketScorePose = new Pose(144- blueBucketScorePose.getX(), 144- blueBucketScorePose.getY(), Math.toRadians(135));
 
     //Observation Grab Poses
-    public static final Pose blueObservationGrabPose = new Pose(12.3, 34, Math.toRadians(270));
+    public static final Pose blueObservationGrabPose = new Pose(12.3, 33, Math.toRadians(270));
     public static final Pose redObservationGrabPose = new Pose(144- blueObservationGrabPose.getX(), 144- blueObservationGrabPose.getY(), Math.toRadians(90));
 
     //Observation Deposit Poses
