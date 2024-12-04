@@ -48,15 +48,16 @@ public class Lift {
     private final double PULLEY_CIRCUMFERENCE = 4.40945; //inches
 
     public Lift (HardwareMap hardwareMap) {
-        rightLift = hardwareMap.get(DcMotorEx.class, "lift1");
+        rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
         rightLift.setDirection(DcMotorEx.Direction.REVERSE);
         rightLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         rightLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
-        leftLift = hardwareMap.get(DcMotorEx.class, "lift2");
+        leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
         leftLift.setDirection(DcMotorEx.Direction.REVERSE);
         leftLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         leftLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        leftLift.setDirection(DcMotorEx.Direction.REVERSE);
 
         liftPID = new PIDController(p, i, d);
 
@@ -115,8 +116,11 @@ public class Lift {
         power = Range.clip(power, -1, 1);
         // cache motor powers to prevent unnecessary writes
         if(Math.abs(power - lastPower) > 0.02) {
-            rightLift.setPower(power);
-            leftLift.setPower(power);
+            if(power > 0) {
+                rightLift.setPower(power);
+            } else {
+                leftLift.setPower(power);
+            }
             lastPower = power;
         }
     }
