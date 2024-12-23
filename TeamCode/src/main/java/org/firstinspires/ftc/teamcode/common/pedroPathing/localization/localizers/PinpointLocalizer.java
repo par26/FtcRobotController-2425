@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.common.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.Vector;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.util.NanoTimer;
-import org.opencv.core.Mat;
+
 
 /**
  * This is the Pinpoint class. This class extends the Localizer superclass and is a
@@ -82,7 +82,7 @@ public class PinpointLocalizer extends Localizer {
         //TODO: Tune urself if needed
 //        odo.setYawScalar(1.0);
 
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
         //odo.setEncoderResolution(13.26291192);
 
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.FORWARD);
