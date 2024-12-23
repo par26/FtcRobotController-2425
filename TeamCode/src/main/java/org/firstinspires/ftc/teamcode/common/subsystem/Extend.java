@@ -95,8 +95,12 @@ public class Extend {
         power = Range.clip(power, -1, 1);
         // cache motor powers to prevent unnecessary writes
         if(Math.abs(power - lastPower) > 0.02) {
-            slideMotor.setPower(power);
-            slideMotor2.setPower(power);
+            if (power > 0) {
+                 slideMotor.setPower(power);
+            } else {
+                slideMotor2.setPower(power);
+            }
+
             lastPower = power;
         }
     }

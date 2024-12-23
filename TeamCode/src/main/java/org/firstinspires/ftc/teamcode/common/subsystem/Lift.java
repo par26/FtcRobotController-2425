@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.controller.PDController;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -16,6 +17,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.common.action.Action;
 import org.firstinspires.ftc.teamcode.common.action.RunAction;
+
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 
 public class Lift {
@@ -27,8 +29,13 @@ public class Lift {
 
     private int pos, initalPos;
     public RunAction setPosition; //note that you can make more runactions, very easy
-    public PIDController liftPID;
+    public PIDFController liftPID;
     public static int target;
+
+
+    private boolean slidesReached;
+
+    private boolean slidesRetracted;
 
     private double power;
     private double lastPower;
@@ -59,7 +66,7 @@ public class Lift {
         leftLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         leftLift.setDirection(DcMotorEx.Direction.REVERSE);
 
-        liftPID = new PIDController(p, i, d);
+        liftPID = new PIDFController(p, i, d, f);
 
         setPosition = new RunAction(this::setPosition);
     }
@@ -67,17 +74,33 @@ public class Lift {
 
     public void update() {
         if (state == State.PID) {
-            liftPID.setPID(p, i, d);
+
+            liftPID.setPIDF(p, i, d, f);
 
             rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-            double pid = liftPID.calculate(rightLift.getCurrentPosition(), target);
-            double ticks_in_degrees = 537.7 / 360.0;
-            double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
-            double ffpower = pid + ff;
 
-            setPower(ffpower);
+            slidesReached = liftPID.atSetPoint();
+            slidesRetracted = (target <= 0) && slidesReached;
+
+
+            double pid = liftPID.calculate(rightLift.getCurrentPosition(), target);
+
+            // Just make sure it gets to fully retracted if target is 0
+            if (target == 0 && !slidesReached) {
+                power -= 0.1;
+            } /*else if (target >= MAX_SLIDES_EXTENSION && !slidesReached) {
+                power += 0.1;
+            } */
+
+            if (slidesRetracted) {
+                resetEncoder();
+                setPower(0);
+            } else {
+                setPower(pid);
+            }
+
 
             telemetry.addData("lift pos", rightLift.getCurrentPosition());
             telemetry.addData("lift target", target);
@@ -103,7 +126,7 @@ public class Lift {
     }
 
     public void setTarget(int b) {
-        state = State.MANUAL;
+        state = State.PID;
         target = b;
     }
 
@@ -113,16 +136,17 @@ public class Lift {
 
 
     public void setPower(double power) {
+
         power = Range.clip(power, -1, 1);
-        // cache motor powers to prevent unnecessary writes
-        if(Math.abs(power - lastPower) > 0.02) {
-            if(power > 0) {
-                rightLift.setPower(power);
-            } else {
-                leftLift.setPower(power);
-            }
-            lastPower = power;
+
+        if(Math.abs(lastPower- power) > 0.01) {
+            leftLift.setPower(power);
+            rightLift.setPower(power);
         }
+
+
+        lastPower = power;
+
     }
 
 
@@ -178,6 +202,9 @@ public class Lift {
 
         leftLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         leftLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+
+        resetEncoder();
+
     }
 
     public void start() {

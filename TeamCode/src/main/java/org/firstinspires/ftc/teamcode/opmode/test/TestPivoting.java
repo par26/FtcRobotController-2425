@@ -32,12 +32,6 @@ public class TestPivoting extends Teleop {
         rightServo = hardwareMap.get(ServoImplEx.class, "rightServo");
 
 
-        leftServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        rightServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
-
-
-
-        timer = new ElapsedTime();
 
         //leftServo.setPwmRange();
         if(rightDirection == 0) {
@@ -47,10 +41,13 @@ public class TestPivoting extends Teleop {
         }
 
         if(leftDirection == 0) {
-            rightServo.setDirection(Servo.Direction.FORWARD);
+            leftServo.setDirection(Servo.Direction.FORWARD);
         } else if(leftDirection == 1) {
-            rightServo.setDirection(Servo.Direction.REVERSE);
+            leftServo.setDirection(Servo.Direction.REVERSE);
         }
+
+        leftServo.setPosition(0);
+        rightServo.setPosition(0);
     }
 
 
@@ -68,8 +65,8 @@ public class TestPivoting extends Teleop {
         pa = ca;
         ca = gamepad1.a;
         if (ca && !pa) {
-            leftServo.setPosition(1.0);
-            rightServo.setPosition(1.0);
+            leftServo.setPosition(leftServoAngle);
+            rightServo.setPosition(rightServoAngle);
         }
     }
 }

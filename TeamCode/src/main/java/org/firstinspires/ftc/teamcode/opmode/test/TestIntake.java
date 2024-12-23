@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.opmode.Teleop;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TestIntake extends Teleop {
 
-    static double leftServoPower = -1;
+    static double leftServoPower = 1;
     static double rightServoPower = 1;
 
     CRServo leftServo, rightServo;
@@ -24,6 +25,8 @@ public class TestIntake extends Teleop {
     public void init() {
         leftServo = hardwareMap.get(CRServo.class, "leftServo");
         rightServo = hardwareMap.get(CRServo.class, "rightServo");
+
+        rightServo.setDirection(CRServo.Direction.REVERSE);
     }
 
 
