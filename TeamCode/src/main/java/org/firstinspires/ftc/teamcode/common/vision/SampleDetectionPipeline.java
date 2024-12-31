@@ -14,6 +14,7 @@ import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 
+
 public class SampleDetectionPipeline extends OpenCvPipeline
 {
     /*
