@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.common.vision;
 
+import android.graphics.Canvas;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.vision.VisionProcessor;
@@ -21,7 +23,7 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-public class SampleDetectionPipelinePNP extends OpenCvPipeline
+public class SampleDetectionProcessor implements VisionProcessor
 {
     /*
      * Our working image buffers
@@ -79,18 +81,6 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
     public double objectWidth = 3.5;  // Replace with your object's width in real-world units (e.g., centimeters)
     public double objectHeight = 1.5;  // Replace with your object's height in real-world units
 
-
-
-
-    static class AnalyzedStone
-    {
-        double angle;
-        String color;
-        Mat rvec;
-        Mat tvec;
-        double dist;
-    }
-
     ArrayList<AnalyzedStone> internalStoneList = new ArrayList<>();
     volatile ArrayList<AnalyzedStone> clientStoneList = new ArrayList<>();
 
@@ -117,8 +107,17 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
     // Keep track of what stage the viewport is showing
     int stageNum = 0;
 
-    public SampleDetectionPipelinePNP(Telemetry telemetry)
+    static class AnalyzedStone
     {
+        double angle;
+        String color;
+        Mat rvec;
+        Mat tvec;
+        double dist;
+    }
+
+    @Override
+    public void init(int width, int height, CameraCalibration calibration) {
         // Initialize camera parameters
         // Replace these values with your actual camera calibration parameters
 
@@ -138,26 +137,27 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
         // If you have calibrated your camera and have these values, use them
         // Otherwise, you can assume zero distortion for simplicity
         distCoeffs = new MatOfDouble(0, 0, 0, 0, 0);
-
-        this.telemetry = telemetry;
-    }
-
-
-    @Override
-    public void onViewportTapped()
-    {
-        int nextStageNum = stageNum + 1;
-
-        if(nextStageNum >= stages.length)
-        {
-            nextStageNum = 0;
-        }
-
-        stageNum = nextStageNum;
     }
 
     @Override
-    public Mat processFrame(Mat input)
+    public Object processFrame(Mat frame, long captureTimeNanos) {
+        Mat initialFrame = processInitialFrame(frame);
+
+
+
+
+        return null;
+    }
+
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
+    }
+
+
+
+
+
+    public Mat processInitialFrame(Mat input)
     {
         // We'll be updating this with new data below
         internalStoneList.clear();
@@ -334,12 +334,12 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
         Mat tvec = new Mat();
 
         boolean success = Calib3d.solvePnP(
-            objectPoints, // Object points in 3D
-            imagePoints,  // Corresponding image points
-            cameraMatrix,
-            distCoeffs,
-            rvec,
-            tvec
+                objectPoints, // Object points in 3D
+                imagePoints,  // Corresponding image points
+                cameraMatrix,
+                distCoeffs,
+                rvec,
+                tvec
         );
 
         if (success) {
@@ -521,61 +521,7 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
         return distance;
     }
 
-     void getStoneCorners(AnalyzedStone stone, Point[] corners) {
-
-        // Project 3D object points to 2D image points
-        MatOfPoint3f objectPoints = new MatOfPoint3f(
-                new Point3(-objectWidth / 2, -objectHeight / 2, 0),
-                new Point3(objectWidth / 2, -objectHeight / 2, 0),
-                new Point3(objectWidth / 2, objectHeight / 2, 0),
-                new Point3(-objectWidth / 2, objectHeight / 2, 0)
-        );
-
-        MatOfPoint2f imagePoints = new MatOfPoint2f();
-        Calib3d.projectPoints(objectPoints,
-                stone.rvec,
-                stone.tvec,
-                cameraMatrix,
-                distCoeffs,
-                imagePoints);
-
-        Point[] points = imagePoints.toArray();
-        System.arraycopy(points, 0, corners, 0, 4);
-    }
-
-
-    void highlightClosestObject(Mat input) {
-        for (AnalyzedStone stone : internalStoneList) {
-            double distance = findDistance(stone);
-
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestStone = stone;
-            }
-        }
-
-        if (closestStone != null) {
-            Point[] rectPoints = new Point[4];
-            getStoneCorners(closestStone, rectPoints);
-
-            for (int i = 0; i < 4; ++i) {
-                Imgproc.line(input,
-                        rectPoints[i],
-                        rectPoints[(i + 1) % 4],
-                        HIGHLIGHT_COLOR,
-                        HIGHLIGHT_THICKNESS);
-            }
-
-            // Draw distance label
-            String distanceText = String.format("%s units", closestDistance);
-            Point textPoint = new Point(rectPoints[0].x, rectPoints[0].y - 10);
-            Imgproc.putText(input,
-                    distanceText,
-                    textPoint,
-                    Imgproc.FONT_HERSHEY_SIMPLEX,
-                    0.5,
-                    HIGHLIGHT_COLOR,
-                    2);
-        }
+    public AnalyzedStone getClosestStone() {
+        return closestStone;
     }
 }
