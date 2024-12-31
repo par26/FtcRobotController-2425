@@ -40,6 +40,11 @@ public class Teleop extends OpMode  {
     private DcMotorEx rightFront;
     private DcMotorEx rightRear;
 
+
+    private int transferState;
+
+
+
     private final double MAX_RETRACT_ANGLE = 200.0/360.0;
 
     boolean clawClosed;
@@ -173,6 +178,10 @@ public class Teleop extends OpMode  {
         //leftElbowServo.scaleRange(0, MAX_RETRACT_ANGLE);
 
 
+
+
+        transferState = 1;
+
         initSubsystems();
         startSubsystems();
 
@@ -235,6 +244,39 @@ public class Teleop extends OpMode  {
             intake.setPower(0);
             intake.setSpin(Intake.State.FORWARD, true);
         }
+
+
+
+
+        switch(transferState) {
+            case 0:
+                intake.lowerArm();
+                outake.toTransfer();
+                transferState = 1;
+                break;
+            case 1:
+                intake.retractArm();
+                transferState = 2;
+                break;
+            case 2:
+                if(currentGamepad1.x && !previousGamepad1.x) {
+                    outake.closeClaw();
+                }
+                transferState = 3;
+                break;
+            case 3:
+                outake.toBucket();
+                break;
+            default:
+                transferState = 0;
+
+        }
+
+
+        if(currentGamepad1.y && !previousGamepad1.y) {
+            transferState = 0;
+        }
+
 
 
 

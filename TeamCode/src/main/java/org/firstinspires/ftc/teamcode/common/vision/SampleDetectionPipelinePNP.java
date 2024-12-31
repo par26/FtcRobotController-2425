@@ -22,6 +22,26 @@ import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.openftc.easyopencv.OpenCvPipeline;
+import java.util.ArrayList;
+
+import org.opencv.calib3d.Calib3d;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfDouble;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.MatOfPoint3f;
+import org.opencv.core.Point3;
+import org.opencv.core.Point;
+import org.opencv.core.RotatedRect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
 public class SampleDetectionPipelinePNP extends OpenCvPipeline
 {
     /*
@@ -68,12 +88,25 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
 
     static final int CONTOUR_LINE_THICKNESS = 2;
 
+    // new fields for tracking closest object
+    private AnalyzedStone closestStone = null;
+    private double closestDistance = Double.MAX_VALUE;
+
+    //highlight color for closest object
+    static final Scalar HIGHLIGHT_COLOR = new Scalar(0, 255, 0); // Bright green
+    static final int HIGHLIGHT_THICKNESS = 3;
+
+    // Assuming the object is a rectangle with known dimensions
+    public double objectWidth = 3.5;  // Replace with your object's width in real-world units (e.g., centimeters)
+    public double objectHeight = 1.5;  // Replace with your object's height in real-world units
+
     static class AnalyzedStone
     {
         double angle;
         String color;
         Mat rvec;
         Mat tvec;
+        double dist;
     }
 
     ArrayList<AnalyzedStone> internalStoneList = new ArrayList<>();
@@ -151,13 +184,12 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
          */
         findContours(input);
 
+        //print dist of closest stone and highlight
+        telemetry.addLine("Closest Dist: " + closestStone.dist);
+        drawAxis(input, closestStone.rvec, closestStone.tvec, cameraMatrix, distCoeffs);
+        closestDistance = Double.MAX_VALUE;
+
         clientStoneList = new ArrayList<>(internalStoneList);
-
-        for (AnalyzedStone stone : clientStoneList){
-            double dist = findDistance(stone);
-            telemetry.addLine(String.valueOf(dist));
-
-        }
 
         telemetry.update();
 
@@ -287,23 +319,16 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
             drawRotatedRect(rotatedRectFitToContour, input, color);
         }
 
-
         // The angle OpenCV gives us can be ambiguous, so look at the shape of
         // the rectangle to fix that.
         double rotRectAngle = rotatedRectFitToContour.angle;
-        if (rotatedRectFitToContour.size.width < rotatedRectFitToContour.size.height)
-        {
+        if (rotatedRectFitToContour.size.width < rotatedRectFitToContour.size.height) {
             rotRectAngle += 90;
         }
 
         // Compute the angle and store it
         double angle = -(rotRectAngle - 180);
         drawTagText(rotatedRectFitToContour, Integer.toString((int) Math.round(angle)) + " deg", input, color);
-
-        // Prepare object points and image points for solvePnP
-        // Assuming the object is a rectangle with known dimensions
-        double objectWidth = 3.5;  // Replace with your object's width in real-world units (e.g., centimeters)
-        double objectHeight = 1.5;  // Replace with your object's height in real-world units
 
         // Define the 3D coordinates of the object corners in the object coordinate space
         MatOfPoint3f objectPoints = new MatOfPoint3f(
@@ -335,13 +360,7 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
                 tvec
         );
 
-
-
-
-        if (success)
-        {
-
-            // Draw the coordinate axes on the image
+        if (success) {
             drawAxis(input, rvec, tvec, cameraMatrix, distCoeffs);
 
             // Store the pose information
@@ -350,10 +369,15 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
             analyzedStone.color = color;
             analyzedStone.rvec = rvec;
             analyzedStone.tvec = tvec;
+            analyzedStone.dist = findDistance(analyzedStone);
             internalStoneList.add(analyzedStone);
+            telemetry.addLine(String.valueOf(analyzedStone.dist));
+
+            if (analyzedStone.dist < closestDistance){
+                closestDistance = analyzedStone.dist;
+                closestStone = analyzedStone;
+            }
         }
-
-
     }
 
     void drawAxis(Mat img, Mat rvec, Mat tvec, Mat cameraMatrix, MatOfDouble distCoeffs)
@@ -493,7 +517,6 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
         }
     }
 
-
     double findAspectRatio(Size sample) {
         double height = sample.height;
         double width = sample.width;
@@ -506,9 +529,7 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
         return (height / width);
     }
 
-
     double findDistance(AnalyzedStone stone) {
-
         double distance = Math.sqrt(
                 Math.pow(stone.tvec.get(0, 0)[0], 2) +  // tvec_x
                         Math.pow(stone.tvec.get(1, 0)[0], 2) +  // tvec_y
@@ -516,6 +537,63 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
         );
 
         return distance;
+    }
 
+    void getStoneCorners(AnalyzedStone stone, Point[] corners) {
+
+        // Project 3D object points to 2D image points
+        MatOfPoint3f objectPoints = new MatOfPoint3f(
+                new Point3(-objectWidth / 2, -objectHeight / 2, 0),
+                new Point3(objectWidth / 2, -objectHeight / 2, 0),
+                new Point3(objectWidth / 2, objectHeight / 2, 0),
+                new Point3(-objectWidth / 2, objectHeight / 2, 0)
+        );
+
+        MatOfPoint2f imagePoints = new MatOfPoint2f();
+        Calib3d.projectPoints(objectPoints,
+                stone.rvec,
+                stone.tvec,
+                cameraMatrix,
+                distCoeffs,
+                imagePoints);
+
+        Point[] points = imagePoints.toArray();
+        System.arraycopy(points, 0, corners, 0, 4);
+    }
+
+
+    void highlightClosestObject(Mat input) {
+        for (AnalyzedStone stone : internalStoneList) {
+            double distance = findDistance(stone);
+
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestStone = stone;
+            }
+        }
+
+        if (closestStone != null) {
+            Point[] rectPoints = new Point[4];
+            getStoneCorners(closestStone, rectPoints);
+
+            for (int i = 0; i < 4; ++i) {
+                Imgproc.line(input,
+                        rectPoints[i],
+                        rectPoints[(i + 1) % 4],
+                        HIGHLIGHT_COLOR,
+                        HIGHLIGHT_THICKNESS);
+            }
+
+            // Draw distance label
+            String distanceText = String.format("%s units", closestDistance);
+            Point textPoint = new Point(rectPoints[0].x, rectPoints[0].y - 10);
+            Imgproc.putText(input,
+                    distanceText,
+                    textPoint,
+                    Imgproc.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    HIGHLIGHT_COLOR,
+                    2);
+        }
     }
 }

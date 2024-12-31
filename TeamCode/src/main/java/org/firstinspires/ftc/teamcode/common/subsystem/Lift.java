@@ -59,12 +59,14 @@ public class Lift {
         rightLift.setDirection(DcMotorEx.Direction.REVERSE);
         rightLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         rightLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        rightLift.setDirection(DcMotorEx.Direction.REVERSE);
+
 
         leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
-        leftLift.setDirection(DcMotorEx.Direction.REVERSE);
+
         leftLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         leftLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        leftLift.setDirection(DcMotorEx.Direction.REVERSE);
+        //leftLift.setDirection(DcMotorEx.Direction.REVERSE);
 
         liftPID = new PIDFController(p, i, d, f);
 
