@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.common.autonomous;
 
 import org.firstinspires.ftc.teamcode.common.pedroPathing.localization.Pose;
+import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.Point;
 
 public class FieldConstants {
 
     /* Robot Dimensions
-     * Length: 16.562
-     * Width: 14.242
+     * 12/30/24
+     * Length: 16.5
+     * Width: 16.5
      * Robot deposits sample in bucket from back
      * Robot intakes sample from front
      *
@@ -67,6 +69,26 @@ public class FieldConstants {
     public static final Pose redBucketSampleTopPose = new Pose(144- blueBucketSampleTopPose.getX(), blueBucketSampleTopPose.getY(), Math.toRadians(180));
     public static final Pose redBucketSampleMiddlePose = new Pose(144- blueBucketSampleMiddlePose.getX(), 144- blueBucketSampleMiddlePose.getY(), Math.toRadians(180));
     public static final Pose redBucketSampleBottomPose = new Pose(144- blueBucketSampleBottomPose.getX(), 144- blueBucketSampleBottomPose.getY(), Math.toRadians(240));
+
+    //Push Points (im gonna cray cray)
+    public static final Pose bluePushSeg1Pose = new Pose(59.64,31.44, Math.toRadians(190));
+    public static final Pose bluePushSeg1Control = new Pose(29.758, 42.437);
+    public static final Pose bluePushSeg2Pose = new Pose(15.78, 23.03, Math.toRadians(180));
+    public static final Pose bluePushSeg2Control = new Pose(68.18, 25.23);
+    public static final Pose bluePushSeg3Pose = new Pose(19.8, 14.49, Math.toRadians(195));
+    public static final Pose bluePushSeg3Control = new Pose(129.38, 27.04);
+    public static final Pose bluePushSeg4Pose = new Pose(20.05, 6.08, Math.toRadians(180));
+    public static final Pose bluePushSeg4Control = new Pose(107.51, 13.33);
+
+    public static final Pose redPushSeg1Pose = new Pose(144-bluePushSeg1Pose.getX(),144-bluePushSeg1Pose.getY(), Math.toRadians(10));
+    public static final Pose redPushSeg1Control = new Pose(144-bluePushSeg1Control.getY(), 144-bluePushSeg1Control.getY());
+    public static final Pose redPushSeg2Pose = new Pose(144-bluePushSeg2Pose.getX(), 144- bluePushSeg2Pose.getY(), 0);
+    public static final Pose redPushSeg2Control = new Pose(144-bluePushSeg2Control.getX(), 144- bluePushSeg2Control.getY());
+    public static final Pose redPushSeg3Pose = new Pose(144-bluePushSeg3Pose.getX(), 144- bluePushSeg3Pose.getY(), 15);
+    public static final Pose redPushSeg3Control = new Pose(144- bluePushSeg3Control.getX(), 144- bluePushSeg3Control.getY());
+    public static final Pose redPushSeg4Pose = new Pose(144- bluePushSeg4Pose.getX(), 144- bluePushSeg4Pose.getY(),0);
+    public static final Pose redPushSeg4Control = new Pose(144- bluePushSeg4Control.getX(), 144- bluePushSeg4Control.getY());
+
 
     /*
     //Sample Exact Poses
