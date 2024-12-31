@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import static org.firstinspires.ftc.teamcode.common.pedroPathing.tuning.FollowerConstants.leftFrontMotorName;
-import static org.firstinspires.ftc.teamcode.common.pedroPathing.tuning.FollowerConstants.leftRearMotorName;
-import static org.firstinspires.ftc.teamcode.common.pedroPathing.tuning.FollowerConstants.rightFrontMotorName;
-import static org.firstinspires.ftc.teamcode.common.pedroPathing.tuning.FollowerConstants.rightRearMotorName;
+
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -20,7 +17,7 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.common.action.Actions;
-import org.firstinspires.ftc.teamcode.common.pedroPathing.follower.Follower;
+
 import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
@@ -139,10 +136,7 @@ public class Teleop extends OpMode  {
 
         //follower.initialize();
 
-        leftFront = hardwareMap.get(DcMotorEx.class, leftFrontMotorName);
-        leftRear = hardwareMap.get(DcMotorEx.class, leftRearMotorName);
-        rightRear = hardwareMap.get(DcMotorEx.class, rightRearMotorName);
-        rightFront = hardwareMap.get(DcMotorEx.class, rightFrontMotorName);
+
 
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
