@@ -9,46 +9,60 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
 
 
 @Config
 @TeleOp(name="PID_Test", group="z")
 public class Slide_PID_Test extends OpMode {
-    private PIDController liftPID;
-
-    private DcMotor motor1;
-    private DcMotor motor2;
-    private int pos;
+    Lift lift;
 
     public static double p = 0, i = 0, d = 0;
     public static double f = 0;
-    public static int target;
+    public static int target = 200;
 
 
 
     private final double ticks_in_degrees = 537.7 / 360.0;
 
+    Gamepad lastGamepad1 = new Gamepad();
+
+
+    private boolean usePIDF = false;
+
     @Override
     public void init() {
-        liftPID = new PIDController(p, i, d);
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        motor1 = hardwareMap.get(DcMotor.class, "leftSlide");
-        motor2 = hardwareMap.get(DcMotor.class, "rightSlide");
-        motor1.setDirection(DcMotorSimple.Direction.REVERSE);
-        motor2.setDirection(DcMotorSimple.Direction.REVERSE);
+       lift = new Lift(hardwareMap);
     }
 
     @Override
     public void loop() {
-        liftPID.setPID(p,i,d);
-        int pos = motor1.getCurrentPosition();
-        double pid = liftPID.calculate(pos, target);
-        double ff = f;
+      lift.updatePIDConstants(p, i, d, f);
 
-        double power = pid + ff;
 
-        motor1.setPower(power);
-        telemetry.addData("lift pos", pos);
-        telemetry.addData("lift target", target);
+        // This is a rising-edge detector that runs if and only if "a" was pressed this loop.
+        if (gamepad1.a && !lastGamepad1.a) {
+            usePIDF = true;
+        }
+
+
+        if (gamepad1.left_trigger > 0) {
+            lift.setManualPower(-gamepad1.left_trigger);
+
+            // If we get any sort of manual input, turn PIDF off.
+            usePIDF = false;
+        } else if (gamepad1.right_trigger > 0) {
+            lift.setManualPower(gamepad1.right_trigger);
+
+            // If we get any sort of manual input, turn PIDF off.
+            usePIDF = false;
+        } else if (usePIDF) {
+            // Sets the slide motor power according to the PIDF output.
+            lift.setTarget(target);
+        }
+      lift.update();
     }
 }

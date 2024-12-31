@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration;
 
-
 import androidx.annotation.NonNull;
 
 import org.firstinspires.ftc.teamcode.common.pedroPathing.localization.Pose;

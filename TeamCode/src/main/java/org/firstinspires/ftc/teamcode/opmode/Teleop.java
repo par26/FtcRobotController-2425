@@ -8,15 +8,26 @@ import static org.firstinspires.ftc.teamcode.common.pedroPathing.tuning.Follower
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.common.action.Actions;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.follower.Follower;
+import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
+import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
+import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
+import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 @Config
@@ -43,13 +54,18 @@ public class Teleop extends OpMode  {
     DcMotorEx leftSlideMotor;
 
     double clawOpen = 0;
-    double clawClose = 0.2;
-
+    double clawClose = 0.4;
 
     Servo wrist;
 
     DcMotorEx rightSlideMotor;
 
+
+
+    Lift lift;
+    //Extend extend;
+    Outake outake;
+    Intake intake;
 
     //ServoImplEx leftElbowServo;
     //ServoImplEx rightElbowServo;
@@ -67,6 +83,7 @@ public class Teleop extends OpMode  {
 
     //rising edge for the y button
     boolean py, cy = false;
+
 
     //rising edge for left trigger
     boolean plt, clt = false;
@@ -86,6 +103,8 @@ public class Teleop extends OpMode  {
     //rising edge for start button
     boolean psb, csb = false;
 
+    private List<DcMotorEx> motors;
+
     Servo claw;
     Servo rightClaw;
 
@@ -93,10 +112,17 @@ public class Teleop extends OpMode  {
     DcMotorEx rightSlide;
 
 
+    Gamepad currentGamepad1 = new Gamepad();
+    Gamepad currentGamepad2 = new Gamepad();
 
+    Gamepad previousGamepad1 = new Gamepad();
+    Gamepad previousGamepad2 = new Gamepad();
 
-    public static double leftOpen = 0.0;
-    public static double rightOpen = 0.0;
+    Intake.State teleopState;
+
+    double intakePower = 0;
+
+    public static double rightOpen = 0.5;
 
     public static double leftClose = .2;
 
@@ -113,19 +139,29 @@ public class Teleop extends OpMode  {
         rightRear = hardwareMap.get(DcMotorEx.class, rightRearMotorName);
         rightFront = hardwareMap.get(DcMotorEx.class, rightFrontMotorName);
 
-        leftFront.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        rightFront.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        leftRear.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        rightFront.setDirection(DcMotorEx.Direction.REVERSE);
-        //rightRear.setDirection(DcMotorEx.Direction.REVERSE);
-        //leftRear.setDirection(DcMotorEx.Direction.REVERSE);
+        motors = Arrays.asList(leftFront, leftRear, rightFront, rightRear);
 
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        for (DcMotorEx motor : motors) {
+            MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
+            motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
+            motor.setMotorType(motorConfigurationType);
+        }
+
+        for (DcMotorEx motor : motors) {
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
+
+        teleopState = Intake.State.STOP;
+
+        lift = new Lift(hardwareMap);
+        //extend = new Extend(hardwareMap);
+        outake = new Outake(hardwareMap);
+        intake = new Intake(hardwareMap);
+
 
         //leftRear.setDirection(DcMotorEx.Direction.REVERSE);
 
@@ -136,183 +172,129 @@ public class Teleop extends OpMode  {
         //rightElbowServo.scaleRange(0, MAX_RETRACT_ANGLE);
         //leftElbowServo.scaleRange(0, MAX_RETRACT_ANGLE);
 
-        leftSlide = hardwareMap.get(DcMotorEx.class, "leftSlide");
-        rightSlide = hardwareMap.get(DcMotorEx.class, "rightSlide");
 
-        leftSlide.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        rightSlide.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        initSubsystems();
+        startSubsystems();
 
 
-        leftSlide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        rightSlide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        intake.zeroArm();
+
+    }
 
 
+    private void initSubsystems() {
+        lift.init();
+        //extend.init();
+        outake.init();
+        intake.init();
+    }
 
-        rightSlide.setDirection(DcMotorEx.Direction.REVERSE);
-
-        /*eftClaw = hardwareMap.get(Servo.class, "leftClaw");
-
-        rightClaw = hardwareMap.get(Servo.class, "rightClaw");
-
-        leftClaw.setDirection(Servo.Direction.REVERSE);
-
-        leftClaw.setPosition(1);
-        rightClaw.setPosition(1);
-
-        clawClosed = false;
-
-        leftServo = hardwareMap.get(ServoImplEx.class, "leftServo");
-        rightServo = hardwareMap.get(ServoImplEx.class, "rightServo");
-
-
-
-
-        leftServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        rightServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
-
-
-        //+rightServo.setDirection(Servo.Direction.REVERSE);
-        leftServo.setDirection(Servo.Direction.REVERSE);
-
-        leftServo.setPosition(0.006);
-        rightServo.setPosition(0.006); */
-
-        claw = hardwareMap.get(ServoImplEx.class, "claw");
-
-
-        leftServo = hardwareMap.get(ServoImplEx.class, "leftServo");
-        rightServo = hardwareMap.get(ServoImplEx.class, "rightServo");
-
-
-        wrist = hardwareMap.get(ServoImplEx.class, "wrist");
-
-
-        rightServo.setDirection(Servo.Direction.REVERSE);
-
-
-        leftServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        rightServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
-
-
-        //leftServo.setDirection(Servo.Direction.REVERSE);
-        leftServo.setPosition(1);
-        rightServo.setPosition(1);
-
-        wrist.setPosition(0);
+    private void startSubsystems() {
+        lift.start();
+        //extend.start();
+        outake.start();
+        intake.start();
     }
 
     @Override
     public void loop() {
 
 
-        double y = -gamepad1.right_stick_x; // Remember, this is reversed!
-        double x = gamepad1.left_stick_x; // this is strafing
-        double rx = gamepad1.left_stick_y;
+        previousGamepad1.copy(currentGamepad1);
+        previousGamepad2.copy(currentGamepad2);
+
+        currentGamepad1.copy(gamepad1);
+        currentGamepad2.copy(gamepad2);
+
+        double y = -gamepad2.left_stick_y; // Remember, this is reversed!
+        double x = gamepad2.left_stick_x; // this is strafing
+        double rx = gamepad2.right_stick_x;
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio, but only when
+        // at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 0.85);
+        double leftFrontPower = (y + x + rx) / denominator;
+        double leftRearPower = (y - x + rx) / denominator;
+        double rightFrontPower = (y - x - rx) / denominator;
+        double rightRearPower = (y + x - rx) / denominator;
 
 
-        if(Math.abs(y) > 0.04) {
-            leftFront.setPower(-y);
-            leftRear.setPower(y);
-            rightFront.setPower(-y);
-            rightRear.setPower(y);
+
+        if(currentGamepad1.dpad_up && !previousGamepad1.dpad_up)  {
+            intake.setPower(1);
+            intake.setSpin(Intake.State.FORWARD, true);
+        }
+
+        if(currentGamepad1.dpad_down && !previousGamepad1.dpad_down)  {
+            intake.setPower(-1);
+            intake.setSpin(Intake.State.REVERSE, true);
+        }
+
+        if(currentGamepad1.dpad_left && !previousGamepad1.dpad_left) {
+            intake.setPower(0);
+            intake.setSpin(Intake.State.FORWARD, true);
+        }
+
+
+
+
+        if(currentGamepad1.x && previousGamepad1.x) {
+            outake.toTransfer();
+        }
+
+
+        if(currentGamepad1.y && previousGamepad1.y) {
+            outake.toBucket();
+        }
+
+
+
+        if (currentGamepad2.a && !previousGamepad1.a) {
+           outake.switchClawState();
+        }
+
+
+//        //Open left
+//        if (currentGamepad1.x && !previousGamepad1.x) {
+//            outake.switchWristState();
+//        }
+
+
+
+        if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+            //extend.setManualPower(0.7);
+            intake.retractArm();
+        }
+
+        if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
+            //extend.setManualPower(-0.7);
+            intake.lowerArm();
+        }
+
+
+
+
+
+
+
+        double slidePower = gamepad1.right_trigger - gamepad1.left_trigger;
+
+        if(Math.abs(slidePower) > arm_deadband) {
+            lift.setPower(slidePower);
         } else {
-
-            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 0.85);
-            double leftFrontPower = (y + x + rx) / denominator;
-            double leftRearPower = (y - x + rx) / denominator;
-            double rightFrontPower = (-y - x - rx) / denominator;
-            double rightRearPower = (-y + x - rx) / denominator;
-
-            leftFront.setPower(leftFrontPower);
-            leftRear.setPower(leftRearPower);
-            rightFront.setPower(rightFrontPower);
-            rightRear.setPower(rightRearPower);
+            lift.setPower(.1);
         }
-
-
-        if(Math.abs(claw.getPosition() - clawClose) < .01) {
-            clawClosed = true;
-        } else {
-            clawClosed = false;
-        }
-
-        if(Math.abs(wrist.getPosition()- 0.666) < .02) {
-            wristTwisted = true;
-        } else {
-            wristTwisted = false;
-        }
-
-
-        //Open left
-        pa = ca;
-        ca = gamepad1.a;
-        if (ca && !pa) {
-            if(clawClosed) {
-                claw.setPosition(clawOpen);
-            } else {
-                claw.setPosition(clawClose);
-                //clawClosed = true;
-            }
-        }
-
-
-        //Open left
-        px = cx;
-        cx = gamepad1.x;
-        if (cx && !px) {
-            if(wristTwisted) {
-                wrist.setPosition(0.0);
-            } else {
-                wrist.setPosition(.666666);
-                //clawClosed = true;
-            }
-        }
-
-
-        pa = ca;
-        ca = gamepad1.a;
-        if (ca && !pa) {
-            claw.setPosition(rightOpen);
-
-
-
-        }
-
-
-
-
-        pb = cb;
-        cb = gamepad1.b;
-        if (cb && !pb) {
-            leftServo.setPosition(1.0);
-            rightServo.setPosition(1.0);
-        }
-
-        py = cy;
-        cy = gamepad1.y;
-        if (cy && !py) {
-            leftServo.setPosition(0.006);
-            rightServo.setPosition(0.006);
-        }
-
-
-        double slidePower = Range.clip(gamepad1.right_trigger - gamepad1.left_trigger, -0.85, 0.85);
-        if(Math.abs(slidePower) < arm_deadband) {
-            leftSlide.setPower(0);
-            rightSlide.setPower(0);
-        } else {
-            leftSlide.setPower(-slidePower);
-            rightSlide.setPower(-slidePower);
-        }
-
-
 
 
 
         //powerSlides(slidePower);
+        leftFront.setPower(leftFrontPower);
+        leftRear.setPower(leftRearPower);
+        rightFront.setPower(rightFrontPower);
+        rightRear.setPower(rightRearPower);
 
-
-       // telemetry.addData("Claw close value", clawClosed);
+        // telemetry.addData("Claw close value", clawClosed);
         telemetry.update();
 
     }

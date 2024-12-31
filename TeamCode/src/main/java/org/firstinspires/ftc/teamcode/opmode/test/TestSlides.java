@@ -41,15 +41,13 @@ public class TestSlides extends OpMode {
     @Override
     public void loop() {
 
-        double slidePower = Range.clip(gamepad1.right_trigger - gamepad1.left_trigger, -0.85, 0.85);
+        double slidePower = Range.clip(gamepad1.right_trigger - gamepad1.left_trigger, -1, 1);
 
-        if(Math.abs(slidePower) < arm_deadband) {
-            leftSlides.setPower(minSlidePower);
-            rightSlides.setPower(minSlidePower);
-        } else {
-            leftSlides.setPower(-slidePower);
-            rightSlides.setPower(-slidePower);
-        }
+        double rightSlidePower = Range.clip(gamepad1.right_trigger, 0, 1);
+        rightSlides.setPower(rightSlidePower);
+
+        double leftSlidePower = Range.clip(gamepad1.left_trigger, 0, 1);
+        leftSlides.setPower(-leftSlidePower);
 
     }
 }
