@@ -1,21 +1,28 @@
 //package org.firstinspires.ftc.teamcode.common;
 //
 //
+//import static org.firstinspires.ftc.teamcode.common.autonomous.FieldConstants.blueBucketPreloadPose;
+//import static org.firstinspires.ftc.teamcode.common.autonomous.FieldConstants.blueBucketStartPose;
+//import static org.firstinspires.ftc.teamcode.common.autonomous.FieldConstants.blueObservationStartPose;
+//
+//import com.pedropathing.follower.Follower;
+//import com.pedropathing.localization.Pose;
+//import com.pedropathing.pathgen.BezierCurve;
+//import com.pedropathing.pathgen.BezierLine;
+//import com.pedropathing.pathgen.Path;
+//import com.pedropathing.pathgen.PathChain;
+//import com.pedropathing.pathgen.Point;
+//import com.pedropathing.util.Timer;
 //import com.qualcomm.robotcore.hardware.HardwareMap;
 //
 //import org.firstinspires.ftc.robotcore.external.Telemetry;
-//import org.firstinspires.ftc.teamcode.common.pedroPathing.follower.Follower;
-//import org.firstinspires.ftc.teamcode.common.pedroPathing.localization.Pose;
-//import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.BezierCurve;
-//import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.BezierLine;
-//import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.Path;
-//import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.PathChain;
-//import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.Point;
-//import org.firstinspires.ftc.teamcode.common.pedroPathing.util.Timer;
+//
 //import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
 //import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 //import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
 //import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
+//
+//import org.firstinspires.ftc.teamcode.common.autonomous.FieldConstants.*;
 //
 //public class Auto {
 //
@@ -42,8 +49,8 @@
 //
 //    public Auto(HardwareMap hardwareMap, Telemetry telemetry, Follower follower, boolean isBlue, boolean isBucket) {
 //        claw = new Outake(hardwareMap);
-//        lift = new Lift(hardwareMap, telemetry);
-//        extend = new Extend(hardwareMap, telemetry);
+//        lift = new Lift(hardwareMap);
+//        extend = new Extend(hardwareMap);
 //        intake = new Intake(hardwareMap);
 //
 //
@@ -64,7 +71,7 @@
 //        claw.init();
 //        claw.openClaw();
 //        lift.init();
-//        extend.toZero();
+//        //extend.toZero();
 //        intake.init();
 //        telemetryUpdate();
 //    }

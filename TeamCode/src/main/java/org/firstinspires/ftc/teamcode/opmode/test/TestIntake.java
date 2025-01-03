@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.opmode.Teleop;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TestIntake extends Teleop {
 
-    static double leftServoPower = 1;
-    static double rightServoPower = 1;
+    public static double leftServoPower = 1;
+    public static double rightServoPower = 1;
 
     CRServo leftServo, rightServo;
 

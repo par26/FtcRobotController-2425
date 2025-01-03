@@ -1,14 +1,30 @@
 package org.firstinspires.ftc.teamcode.common.pedroPathing.constants;
 
+import com.pedropathing.localization.GoBildaPinpointDriver;
 import com.pedropathing.localization.Localizers;
 import com.pedropathing.follower.FollowerConstants;
+import com.pedropathing.localization.constants.PinpointConstants;
 import com.pedropathing.util.CustomFilteredPIDFCoefficients;
 import com.pedropathing.util.CustomPIDFCoefficients;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 public class FConstants {
     static {
         FollowerConstants.localizers = Localizers.PINPOINT;
+
+        PinpointConstants.forwardY = 1;
+        PinpointConstants.strafeX = -2.5;
+        PinpointConstants.distanceUnit = DistanceUnit.INCH;
+        PinpointConstants.hardwareMapName = "pinpoint";
+        PinpointConstants.useYawScalar = false;
+        PinpointConstants.yawScalar = 1.0;
+        PinpointConstants.useCustomEncoderResolution = false;
+        PinpointConstants.encoderResolution = GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD;
+        PinpointConstants.customEncoderResolution = 13.26291192;
+        PinpointConstants.forwardEncoderDirection = GoBildaPinpointDriver.EncoderDirection.REVERSED;
+        PinpointConstants.strafeEncoderDirection = GoBildaPinpointDriver.EncoderDirection.FORWARD;
 
         FollowerConstants.leftFrontMotorName = "leftFront";
         FollowerConstants.leftRearMotorName = "leftRear";
@@ -16,7 +32,7 @@ public class FConstants {
         FollowerConstants.rightRearMotorName = "rightRear";
 
         FollowerConstants.leftFrontMotorDirection = DcMotorSimple.Direction.REVERSE;
-        FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.REVERSE;
+        //FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.REVERSE;
         FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
         FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.FORWARD;
 

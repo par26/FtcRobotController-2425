@@ -8,6 +8,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -18,7 +19,9 @@ import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
 @Config
 @TeleOp(name="PID_Test", group="z")
 public class Slide_PID_Test extends OpMode {
-    Lift lift;
+
+
+    DcMotorEx rightMotor, leftMotor;
 
     public static double p = 0, i = 0, d = 0;
     public static double f = 0;
@@ -35,12 +38,30 @@ public class Slide_PID_Test extends OpMode {
 
     @Override
     public void init() {
-       lift = new Lift(hardwareMap);
+
+        rightMotor = hardwareMap.get(DcMotorEx.class, "rightExtend");
+        //rightMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+
+        leftMotor = hardwareMap.get(DcMotorEx.class, "leftExtend");
+
+        leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
     }
 
     @Override
     public void loop() {
-      lift.updatePIDConstants(p, i, d, f);
+
+        rightMotor = hardwareMap.get(DcMotorEx.class, "rightExtend");
+        //rightMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+
+        leftMotor = hardwareMap.get(DcMotorEx.class, "leftExtend");
+
+        leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
 
         // This is a rising-edge detector that runs if and only if "a" was pressed this loop.
@@ -50,19 +71,15 @@ public class Slide_PID_Test extends OpMode {
 
 
         if (gamepad1.left_trigger > 0) {
-            lift.setManualPower(-gamepad1.left_trigger);
+            rightMotor.setPower(-gamepad1.left_trigger);
 
             // If we get any sort of manual input, turn PIDF off.
             usePIDF = false;
         } else if (gamepad1.right_trigger > 0) {
-            lift.setManualPower(gamepad1.right_trigger);
+            leftMotor.setPower(gamepad1.right_trigger);
 
             // If we get any sort of manual input, turn PIDF off.
             usePIDF = false;
-        } else if (usePIDF) {
-            // Sets the slide motor power according to the PIDF output.
-            lift.setTarget(target);
         }
-      lift.update();
     }
 }

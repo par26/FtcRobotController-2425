@@ -2,13 +2,14 @@ package org.firstinspires.ftc.teamcode.common.autonomous;
 
 import static org.firstinspires.ftc.teamcode.common.autonomous.FieldConstants.*;
 
-import org.firstinspires.ftc.teamcode.common.pedroPathing.follower.Follower;
-import org.firstinspires.ftc.teamcode.common.pedroPathing.localization.Pose;
-import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.BezierCurve;
-import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.BezierLine;
-import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.Path;
-import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.PathChain;
-import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.Point;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierCurve;
+import com.pedropathing.pathgen.BezierLine;
+import com.pedropathing.pathgen.Path;
+import com.pedropathing.pathgen.PathChain;
+import com.pedropathing.follower.*;
+import com.pedropathing.pathgen.Point;
+
 
 public class Auton {
 
@@ -16,6 +17,7 @@ public class Auton {
     private RobotStart startLocation;
 
     public Follower follower;
+
 
     //public Path element1, score1, element2, score2, element3, score3;
     //public PathChain pushSamples, depositPreload, specimen1, specimen2, specimen3, grab1, grab2, grab3, park;

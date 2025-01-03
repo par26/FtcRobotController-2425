@@ -16,8 +16,8 @@ public class Extend {
 
     private Telemetry telemetry;
 
-    public DcMotorEx slideMotor;
-    public DcMotorEx slideMotor2;
+    public DcMotorEx rightMotor;
+    public DcMotorEx leftMotor;
 
     private int pos, initalPos;
     public RunAction setPosition; //note that you can make more runactions, very easy
@@ -44,15 +44,15 @@ public class Extend {
 
     public Extend(HardwareMap hardwareMap) {
 
-        slideMotor = hardwareMap.get(DcMotorEx.class, "slide1");
-        slideMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        slideMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        slideMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightMotor = hardwareMap.get(DcMotorEx.class, "rightExtend");
+        rightMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        slideMotor2 = hardwareMap.get(DcMotorEx.class, "slide2");
-        slideMotor2.setDirection(DcMotorEx.Direction.REVERSE);
-        slideMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        slideMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        leftMotor = hardwareMap.get(DcMotorEx.class, "leftExtend");
+        leftMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         liftPID = new PIDController(p, i, d);
 
@@ -96,9 +96,9 @@ public class Extend {
         // cache motor powers to prevent unnecessary writes
         if(Math.abs(power - lastPower) > 0.02) {
             if (power > 0) {
-                 slideMotor.setPower(power);
+                 rightMotor.setPower(power);
             } else {
-                slideMotor2.setPower(power);
+                leftMotor.setPower(power);
             }
 
             lastPower = power;
@@ -133,21 +133,21 @@ public class Extend {
     }
 
     public void resetEncoder() {
-        slideMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        slideMotor2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        rightMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        leftMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
-        slideMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        slideMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void init() {
         resetEncoder();
         initalPos = currentPos;
-        slideMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        slideMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        slideMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        slideMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
     }
 
     public void start() {
@@ -156,7 +156,7 @@ public class Extend {
     }
 
     public boolean atTarget() {
-        return Math.abs(target - slideMotor.getCurrentPosition()) < 10;
+        return Math.abs(target - rightMotor.getCurrentPosition()) < 10;
     }
 
 

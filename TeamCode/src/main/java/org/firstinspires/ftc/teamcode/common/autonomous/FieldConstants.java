@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.common.autonomous;
 
-import org.firstinspires.ftc.teamcode.common.pedroPathing.localization.Pose;
-import org.firstinspires.ftc.teamcode.common.pedroPathing.pathGeneration.Point;
+
+import com.pedropathing.localization.Pose;
 
 public class FieldConstants {
 
