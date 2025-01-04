@@ -14,8 +14,8 @@ public class FConstants {
     static {
         FollowerConstants.localizers = Localizers.PINPOINT;
 
-        PinpointConstants.forwardY = 1;
-        PinpointConstants.strafeX = -2.5;
+        PinpointConstants.forwardY = 0.94;
+        PinpointConstants.strafeX = 0.39;
         PinpointConstants.distanceUnit = DistanceUnit.INCH;
         PinpointConstants.hardwareMapName = "pinpoint";
         PinpointConstants.useYawScalar = false;
@@ -24,7 +24,7 @@ public class FConstants {
         PinpointConstants.encoderResolution = GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD;
         PinpointConstants.customEncoderResolution = 13.26291192;
         PinpointConstants.forwardEncoderDirection = GoBildaPinpointDriver.EncoderDirection.REVERSED;
-        PinpointConstants.strafeEncoderDirection = GoBildaPinpointDriver.EncoderDirection.FORWARD;
+        PinpointConstants.strafeEncoderDirection = GoBildaPinpointDriver.EncoderDirection.REVERSED;
 
         FollowerConstants.leftFrontMotorName = "leftFront";
         FollowerConstants.leftRearMotorName = "leftRear";
@@ -36,10 +36,10 @@ public class FConstants {
         FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
         FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.FORWARD;
 
-        FollowerConstants.mass = 13;
+        FollowerConstants.mass = 14.15;
 
-        FollowerConstants.xMovement = 57.8741;
-        FollowerConstants.yMovement = 52.295;
+        FollowerConstants.xMovement = 59;
+        FollowerConstants.yMovement = 42;
 
         FollowerConstants.forwardZeroPowerAcceleration = -41.278;
         FollowerConstants.lateralZeroPowerAcceleration = -59.7819;
@@ -64,5 +64,6 @@ public class FConstants {
         FollowerConstants.pathEndVelocityConstraint = 0.1;
         FollowerConstants.pathEndTranslationalConstraint = 0.1;
         FollowerConstants.pathEndHeadingConstraint = 0.007;
+
     }
 }
