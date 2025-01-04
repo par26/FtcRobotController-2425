@@ -28,12 +28,13 @@ public class TestPivoting extends Teleop {
 
     @Override
     public void init() {
-        leftServo = hardwareMap.get(ServoImplEx.class, "leftServo");
-        rightServo = hardwareMap.get(ServoImplEx.class, "rightServo");
+        leftServo = hardwareMap.get(ServoImplEx.class, "leftArmPivot");
+        rightServo = hardwareMap.get(ServoImplEx.class, "rightArmPivot");
 
 
 
-        //leftServo.setPwmRange();
+        leftServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        rightServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
         if(rightDirection == 0) {
             rightServo.setDirection(Servo.Direction.FORWARD);
         } else if(rightDirection == 1) {
