@@ -15,7 +15,7 @@ public class FConstants {
         FollowerConstants.localizers = Localizers.PINPOINT;
 
         PinpointConstants.forwardY = 0.94;
-        PinpointConstants.strafeX = 0.39;
+        PinpointConstants.strafeX = -2.185;
         PinpointConstants.distanceUnit = DistanceUnit.INCH;
         PinpointConstants.hardwareMapName = "pinpoint";
         PinpointConstants.useYawScalar = false;
@@ -38,10 +38,10 @@ public class FConstants {
 
         FollowerConstants.mass = 14.15;
 
-        FollowerConstants.xMovement = 59;
-        FollowerConstants.yMovement = 42;
+        FollowerConstants.xMovement = 63.4;
+        FollowerConstants.yMovement = 48.28;
 
-        FollowerConstants.forwardZeroPowerAcceleration = -41.278;
+        FollowerConstants.forwardZeroPowerAcceleration = -40.9361;
         FollowerConstants.lateralZeroPowerAcceleration = -59.7819;
 
         FollowerConstants.translationalPIDFCoefficients = new CustomPIDFCoefficients(0.1,0,0.01,0);
