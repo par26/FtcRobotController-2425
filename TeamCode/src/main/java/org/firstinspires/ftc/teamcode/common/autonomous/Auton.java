@@ -9,6 +9,16 @@ import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.follower.*;
 import com.pedropathing.pathgen.Point;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
+import org.firstinspires.ftc.teamcode.common.action.Action;
+import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
+import org.firstinspires.ftc.teamcode.common.pedroPathing.FollowPathAction;
+import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
+import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
+import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
+import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
 
 
 public class Auton {
@@ -17,6 +27,11 @@ public class Auton {
     private RobotStart startLocation;
 
     public Follower follower;
+    public Extend extend;
+    public Intake intake;
+    public Lift lift;
+    public Outake outake;
+
 
 
     //public Path element1, score1, element2, score2, element3, score3;
@@ -24,6 +39,7 @@ public class Auton {
     //Paths & Pathchains
     public Path depositPreload, sample1, score1, sample2, score2, sample3, score3;
     public Path hangSpecimen1, grabSpecimen2, hangSpecimen2, grabSpecimen3, hangSpecimen3, grabSpecimen4, hangSpecimen4, grabSpecimen5, hangSpecimen5;
+    public Path park;
     public PathChain pushSamples;
     //Poses
     //Both
@@ -36,13 +52,20 @@ public class Auton {
     //Push
     public Pose pushSeg1Pose, pushSeg1Control, pushSeg2Pose, pushSeg2Control, pushSeg3Pose, pushSeg3Control, pushSeg4Pose, pushSeg4Control;
 
-    public Auton(RobotStart startLocation) {
+    public Auton(HardwareMap hardwareMap, RobotStart startLocation, Follower follower) {
         //TODO: add subsystems when they're done
 
         this.startLocation = startLocation;
+        this.follower = this.follower;
+        this.startLocation = startLocation;
+        this.extend = new Extend(BlocksOpModeCompanion.hardwareMap);
+        this.intake = new Intake(BlocksOpModeCompanion.hardwareMap);
+        this.lift = new Lift(BlocksOpModeCompanion.hardwareMap);
+        this.outake = new Outake(BlocksOpModeCompanion.hardwareMap);
 
         buildPaths();
         createPoses();
+
     }
 
     public void createPoses() {
@@ -140,6 +163,8 @@ public class Auton {
             score3 = new Path(new BezierLine(new Point(sample3Pose), new Point(scorePose)));
             score3.setLinearHeadingInterpolation(sample3Pose.getHeading(), scorePose.getHeading());
 
+            park = new Path(new BezierLine(new Point(scorePose), new Point(parkPose)));
+            park.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading());
 
         }
 
@@ -196,6 +221,42 @@ public class Auton {
 
             hangSpecimen5 = new Path(new BezierLine(new Point(grabPose), new Point(specimen5Pose)));
             hangSpecimen5.setLinearHeadingInterpolation(grabPose.getHeading(), specimen5Pose.getHeading());
+
+            park = new Path(new BezierLine(new Point(scorePose), new Point(parkPose)));
+            park.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading());
         }
+    }
+
+    public Action depositPreload() {
+        return new SequentialAction(
+                //TODO: Add subsystem actions
+                new FollowPathAction(follower, depositPreload)
+        );
+    }
+
+    public Action depositBucket() {
+        return new SequentialAction(
+                //TODO: Add subsystem actions
+                new FollowPathAction(follower, sample1),
+                new FollowPathAction(follower, score1),
+                new FollowPathAction(follower, sample2),
+                new FollowPathAction(follower, score2),
+                new FollowPathAction(follower, sample3),
+                new FollowPathAction(follower, score3)
+
+        );
+    }
+
+    public Action hangSpecimen() {
+        return new SequentialAction(
+          //TODO: Implement outake actions
+
+        );
+    }
+
+    public Action park() {
+        return new SequentialAction(
+            new FollowPathAction(follower, park)
+        );
     }
 }
