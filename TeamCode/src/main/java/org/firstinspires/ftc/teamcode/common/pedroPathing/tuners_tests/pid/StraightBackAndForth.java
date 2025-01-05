@@ -86,7 +86,7 @@ public class StraightBackAndForth extends OpMode {
             }
         }
 
-        telemetryA.addData("going forward", forward);
+//        telemetryA.addData("going forward", forward);
         telemetryA.addData("timeout constraint", FollowerConstants.pathEndTimeoutConstraint);
         follower.telemetryDebug(telemetryA);
 
