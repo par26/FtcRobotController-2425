@@ -244,6 +244,7 @@ public class Teleop extends OpMode  {
 
         switch(transferState) {
             case 0:
+
                 intake.lowerArm();
                 outake.toTransfer();
                 transferState = 1;

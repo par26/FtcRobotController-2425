@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
@@ -21,8 +22,12 @@ public class Extend {
 
     private int pos, initalPos;
     public RunAction setPosition; //note that you can make more runactions, very easy
-    public PIDController liftPID;
+    public PIDController ExtendPID;
     public static int target;
+
+    private boolean slidesReached;
+
+    private boolean slidesRetracted;
 
     private double power;
     private double lastPower;
@@ -35,6 +40,7 @@ public class Extend {
         PID, MANUAL
     }
 
+
     State state;
 
     public static double p = 0.04, i = 0, d = 0.000001, f = 0.01;
@@ -44,65 +50,96 @@ public class Extend {
 
     public Extend(HardwareMap hardwareMap) {
 
-        rightMotor = hardwareMap.get(DcMotorEx.class, "rightExtend");
+        rightMotor = hardwareMap.get(DcMotorEx.class, "rightMotor");
         rightMotor.setDirection(DcMotorEx.Direction.REVERSE);
         rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        leftMotor = hardwareMap.get(DcMotorEx.class, "leftExtend");
+        leftMotor = hardwareMap.get(DcMotorEx.class, "leftMotor");
         leftMotor.setDirection(DcMotorEx.Direction.REVERSE);
         leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        liftPID = new PIDController(p, i, d);
+        ExtendPID = new PIDController(p, i, d);
 
         setPosition = new RunAction(this::setPosition);
     }
+    public void update() {
+        if (state == Extend.State.PID) {
+
+            ExtendPID.setPIDF(p, i, d, f);
+
+            rightMotor
+.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
+            slidesReached = ExtendPID.atSetPoint();
+            slidesRetracted = (target <= 0) && slidesReached;
 
-    public void updatePID() {
-        liftPID.setP(p);
-        liftPID.setI(i);
-        liftPID.setD(d);
+
+            double pid = ExtendPID.calculate(rightMotor.getCurrentPosition(), target);
+
+            // Just make sure it gets to fully retracted if target is 0
+            if (target == 0 && !slidesReached) {
+                power -= 0.1;
+            } /*else if (target >= MAX_SLIDES_EXTENSION && !slidesReached) {
+                power += 0.1;
+            } */
+
+            if (slidesRetracted) {
+                resetEncoder();
+                setPower(0);
+            } else {
+                setPower(pid);
+            }
+
+
+            telemetry.addData("Extend pos", rightMotor.getCurrentPosition());
+            telemetry.addData("Extend target", target);
+        } else {
+            setPower(this.power);
+        }
     }
 
-    public double getLiftPID(double currentPos, double targetPos) {
-        return Range.clip(liftPID.calculate(currentPos, targetPos), MAX_DOWN_POWER, MAX_UP_POWER);
+    public double getExtendPID(double currentPos, double targetPos) {
+        return Range.clip(ExtendPID.calculate(currentPos, targetPos), MAX_DOWN_POWER, MAX_UP_POWER);
     }
 
 
 
     public void setManualPower(double power) {
-        state = State.MANUAL;
+        state = Extend.State.MANUAL;
         this.power = power;
     }
 
     public void stopManual() {
-        state = State.PID;
+        state = Extend.State.PID;
         this.power = 0;
     }
 
     public void setTarget(int b) {
+        state = Extend.State.PID;
         target = b;
     }
 
     public void setPosition() {
-        setTarget(0); //this will be used as template to move Lif tto where we want the lift to move
+        setTarget(0); //this will be used as template to move Lif tto where we want the Extend to move
     }
 
-    public void setPower(double power) {
-        power = Range.clip(power, -1, 1);
-        // cache motor powers to prevent unnecessary writes
-        if(Math.abs(power - lastPower) > 0.02) {
-            if (power > 0) {
-                 rightMotor.setPower(power);
-            } else {
-                leftMotor.setPower(power);
-            }
 
-            lastPower = power;
+    public void setPower(double power) {
+
+        power = Range.clip(power, -1, 1);
+
+        if(Math.abs(lastPower- power) > 0.01) {
+            leftMotor.setPower(power);
+            rightMotor.setPower(power);
         }
+
+
+        lastPower = power;
+
     }
 
 
@@ -111,6 +148,11 @@ public class Extend {
     }
 
     //util kinda
+    public void updatePIDConstants(double p, double d, double i, double f) {
+        ExtendPID.setPIDF(p, i, d, f);
+    }
+
+
 
     public int getTargetPos() {
         return targetPos;
@@ -140,28 +182,33 @@ public class Extend {
         leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+    public boolean atTarget() {
+        return Math.abs(target - leftMotor.getCurrentPosition()) < 10;
+    }
+
+
     public void init() {
         resetEncoder();
         initalPos = currentPos;
         rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+
+        resetEncoder();
+
     }
 
     public void start() {
         initalPos = currentPos;
-        setTarget(10);
-    }
-
-    public boolean atTarget() {
-        return Math.abs(target - rightMotor.getCurrentPosition()) < 10;
+        setTarget(0);
     }
 
 
     public Action waitSlide() {
         return new Action() {
+            private boolean set = false;
             @Override
             public boolean run(TelemetryPacket telemetryPacket) {
                 return atTarget();

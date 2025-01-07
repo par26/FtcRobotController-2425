@@ -9,12 +9,15 @@ import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.follower.*;
 import com.pedropathing.pathgen.Point;
+import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.teamcode.common.action.Action;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.FollowPathAction;
+import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.LConstants;
 import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
@@ -56,15 +59,20 @@ public class Auton {
         //TODO: add subsystems when they're done
 
         this.startLocation = startLocation;
-        this.follower = this.follower;
+        this.follower = follower;
         this.startLocation = startLocation;
-        this.extend = new Extend(BlocksOpModeCompanion.hardwareMap);
-        this.intake = new Intake(BlocksOpModeCompanion.hardwareMap);
-        this.lift = new Lift(BlocksOpModeCompanion.hardwareMap);
-        this.outake = new Outake(BlocksOpModeCompanion.hardwareMap);
+//        this.extend = new Extend(BlocksOpModeCompanion.hardwareMap);
+//        this.intake = new Intake(BlocksOpModeCompanion.hardwareMap);
+//        this.lift = new Lift(BlocksOpModeCompanion.hardwareMap);
+//        this.outake = new Outake(BlocksOpModeCompanion.hardwareMap);
+
+        createPoses();
+
+        follower.setMaxPower(.85);
+
 
         buildPaths();
-        createPoses();
+
 
     }
 

@@ -24,8 +24,8 @@ public class TestSlides extends OpMode {
     public static double RightDirection;
     @Override
     public void init() {
-        leftSlides = hardwareMap.get(DcMotorEx.class, "leftSlide");
-        rightSlides = hardwareMap.get(DcMotorEx.class, "rightSlide");
+        leftSlides = hardwareMap.get(DcMotorEx.class, "leftExtend");
+        rightSlides = hardwareMap.get(DcMotorEx.class, "rightExtend");
 
         //telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
