@@ -83,7 +83,6 @@ public class Auton {
             case BLUE_BUCKET:
                 spawnPose = blueBucketStartPose;
                 preloadPose = blueBucketPreloadPose;
-                sample1Control = blueSample1Control;
                 sample1Pose = blueBucketSampleTopPose;
                 sample2Pose = blueBucketSampleMiddlePose;
                 sample3Pose = blueBucketSampleBottomPose;
@@ -115,7 +114,6 @@ public class Auton {
             case RED_BUCKET:
                 spawnPose = redBucketStartPose;
                 preloadPose = redBucketPreloadPose;
-                sample1Control = redSample1Control;
                 sample1Pose = redBucketSampleTopPose;
                 sample2Pose = redBucketSampleMiddlePose;
                 sample3Pose = redBucketSampleBottomPose;

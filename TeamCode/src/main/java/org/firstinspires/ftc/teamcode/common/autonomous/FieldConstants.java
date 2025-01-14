@@ -16,6 +16,9 @@ public class FieldConstants {
      * Specimen gap: 3.5
      */
 
+    //TODO: Change bluebucket accordingly for meet
+    //for the record, only changed blue bucket so far for upgraded but no extension bot
+
     public enum
     RobotStart {
         BLUE_BUCKET,
@@ -24,20 +27,20 @@ public class FieldConstants {
         RED_OBSERVATION
     }
 
-    public static final Pose blueBucketStartPose = new Pose(9.5, 84, Math.toRadians(180));
+    public static final Pose blueBucketStartPose = new Pose(7.375, 85.13, Math.toRadians(270));
     public static final Pose blueObservationStartPose = new Pose(9.5, 65.25, Math.toRadians(180));
     public static final Pose redBucketStartPose = new Pose(144-blueBucketStartPose.getX(), blueBucketStartPose.getY(), 0);
     public static final Pose redObservationStartPose = new Pose(144-blueObservationStartPose.getX(), blueObservationStartPose.getY(), 0);
 
     // Preload Poses
     // TODO: Adjust accordingly how far robot can reach
-    public static final Pose blueBucketPreloadPose = new Pose(38.25, 78.375, Math.toRadians(180));
+    public static final Pose blueBucketPreloadPose = new Pose(16.3, 127.31, Math.toRadians(315));
     public static final Pose blueObservationPreloadPose = new Pose(38.25, 60.625, Math.toRadians(180));
     public static final Pose redBucketPreloadPose = new Pose(144-blueBucketPreloadPose.getX(), blueBucketPreloadPose.getY(), 0);
     public static final Pose redObservationPreloadPose = new Pose(144-blueObservationPreloadPose.getX(), blueObservationPreloadPose.getY(), 0);
 
     //Bucket Score Poses TODO: adjust accordingly
-    public static final Pose blueBucketScorePose = new Pose(17.6, 125.3, Math.toRadians(315));
+    public static final Pose blueBucketScorePose = new Pose(16.3, 127.31, Math.toRadians(315));
     public static final Pose redBucketScorePose = new Pose(144- blueBucketScorePose.getX(), 144- blueBucketScorePose.getY(), Math.toRadians(135));
 
     //Observation Grab Poses
@@ -58,9 +61,7 @@ public class FieldConstants {
     public static final Pose redSpecimen4Pose = new Pose(redSpecimen3Pose.getX(), redSpecimen3Pose.getY()+3.5, 0);
     public static final Pose redSpecimen5Pose = new Pose(redSpecimen4Pose.getX(),redSpecimen4Pose.getY()+3.5, 0);
 
-    //Sample Action Poses
-    public static final Pose blueSample1Control = new Pose(30.5, 87);
-    public static final Pose redSample1Control = new Pose(144- blueSample1Control.getX(), 144- blueSample1Control.getY());
+    //Bucket Sample Action Poses
 
     public static final Pose blueBucketSampleTopPose = new Pose(35, 121.5, 0);
     public static final Pose blueBucketSampleMiddlePose = new Pose(35, 132, 0);
@@ -117,7 +118,7 @@ public class FieldConstants {
     //TODO: will need adjusting, not minmaxed
     public static final Pose blueObservationParkPose = new Pose(60, 47, 0);
     public static final Pose redObservationParkPose = new Pose(144- blueObservationParkPose.getX(), 144- blueObservationParkPose.getY(), 0);
-    public static final Pose blueBucketParkPose = new Pose(blueObservationParkPose.getX(), 144- blueObservationParkPose.getY(), 0);
+    public static final Pose blueBucketParkPose = new Pose(59, 96, Math.toRadians(90));
     public static final Pose redBucketParkPose = new Pose(144- blueObservationParkPose.getX(), blueObservationParkPose.getY(), 0);
 
 
