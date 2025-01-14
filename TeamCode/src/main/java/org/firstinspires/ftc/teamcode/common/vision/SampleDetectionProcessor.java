@@ -1,535 +1,491 @@
-//package org.firstinspires.ftc.teamcode.common.vision;
-//
-//import android.graphics.Canvas;
-//
-//import com.acmerobotics.dashboard.config.Config;
-//
-//import org.firstinspires.ftc.robotcore.external.Telemetry;
-//import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
-//import org.firstinspires.ftc.vision.VisionProcessor;
-//import org.openftc.easyopencv.OpenCvPipeline;
-//import java.util.ArrayList;
-//
-//import org.opencv.calib3d.Calib3d;
-//import org.opencv.core.Core;
-//import org.opencv.core.CvType;
-//import org.opencv.core.Mat;
-//import org.opencv.core.MatOfDouble;
-//import org.opencv.core.MatOfPoint;
-//import org.opencv.core.MatOfPoint2f;
-//import org.opencv.core.MatOfPoint3f;
-//import org.opencv.core.Point3;
-//import org.opencv.core.Point;
-//import org.opencv.core.RotatedRect;
-//import org.opencv.core.Scalar;
-//import org.opencv.core.Size;
-//import org.opencv.imgproc.Imgproc;
-//
-//
-//@Config
-//public class SampleDetectionProcessor implements VisionProcessor
-//{
-//    /*
-//     * Our working image buffers
-//     */
-//    Mat ycrcbMat = new Mat();
-//    Mat crMat = new Mat();
-//    Mat cbMat = new Mat();
-//
-//    Mat blueThresholdMat = new Mat();
-//    Mat redThresholdMat = new Mat();
-//    Mat yellowThresholdMat = new Mat();
-//
-//    Mat morphedBlueThreshold = new Mat();
-//    Mat morphedRedThreshold = new Mat();
-//    Mat morphedYellowThreshold = new Mat();
-//
-//    Mat contoursOnPlainImageMat = new Mat();
-//
-//   private double output = 0.0;
-//
-//    public double minArea = 40;
-//
-//    public double aspectRatioThresh = 0.5;
-//    /*
-//     * Threshold values
-//     */
-//    public int YELLOW_MASK_THRESHOLD = 57;
-//    static final int BLUE_MASK_THRESHOLD = 150;
-//    static final int RED_MASK_THRESHOLD = 198;
-//
-//    /*
-//     * The elements we use for noise reduction
-//     */
-//    Mat erodeElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3.5, 3.5));
-//    Mat dilateElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3.5, 3.5));
-//
-//    /*
-//     * Colors
-//     */
-//    static final Scalar RED = new Scalar(255, 0, 0);
-//    static final Scalar BLUE = new Scalar(0, 0, 255);
-//    static final Scalar YELLOW = new Scalar(255, 255, 0);
-//
-//    static final int CONTOUR_LINE_THICKNESS = 2;
-//
-//    // new fields for tracking closest object
-//    private AnalyzedStone closestStone = null;
-//    private double closestDistance = Double.MAX_VALUE;
-//
-//    //highlight color for closest object
-//    static final Scalar HIGHLIGHT_COLOR = new Scalar(0, 255, 0); // Bright green
-//    static final int HIGHLIGHT_THICKNESS = 3;
-//
-//    // Assuming the object is a rectangle with known dimensions
-//    public double objectWidth = 3.5;  // Replace with your object's width in real-world units (e.g., centimeters)
-//    public double objectHeight = 1.5;  // Replace with your object's height in real-world units
-//
-//    ArrayList<AnalyzedStone> internalStoneList = new ArrayList<>();
-//    volatile ArrayList<AnalyzedStone> clientStoneList = new ArrayList<>();
-//
-//    /*
-//     * Camera Calibration Parameters
-//     */
-//    Mat cameraMatrix = new Mat(3, 3, CvType.CV_64FC1);
-//    MatOfDouble distCoeffs = new MatOfDouble();
-//
-//    /*
-//     * Some stuff to handle returning our various buffers
-//     */
-//    enum Stage
-//    {
-//        FINAL,
-//        YCrCb,
-//        MASKS,
-//        MASKS_NR,
-//        CONTOURS;
-//    }
-//
-//    Stage[] stages = Stage.values();
-//
-//    // Keep track of what stage the viewport is showing
-//    int stageNum = 0;
-//
-//    static class AnalyzedStone
-//    {
-//        double angle;
-//        String color;
-//        Mat rvec;
-//        Mat tvec;
-//        double dist;
-//    }
-//
-//    @Override
-//    public void init(int width, int height, CameraCalibration calibration) {
-//        // Initialize camera parameters
-//        // Replace these values with your actual camera calibration parameters
-//
-//        // Focal lengths (fx, fy) and principal point (cx, cy)
-//        double fx = 800; // Replace with your camera's focal length in pixels
-//        double fy = 800;
-//        double cx = 320; // Replace with your camera's principal point x-coordinate (usually image width / 2)
-//        double cy = 240; // Replace with your camera's principal point y-coordinate (usually image height / 2)
-//
-//
-//        cameraMatrix.put(0, 0,
-//                fx, 0, cx,
-//                0, fy, cy,
-//                0, 0, 1);
-//
-//        // Distortion coefficients (k1, k2, p1, p2, k3)
-//        // If you have calibrated your camera and have these values, use them
-//        // Otherwise, you can assume zero distortion for simplicity
-//        distCoeffs = new MatOfDouble(0, 0, 0, 0, 0);
-//    }
-//
-//    @Override
-//    public Object processFrame(Mat frame, long captureTimeNanos) {
-//        Mat initialFrame = processInitialFrame(frame);
-//
-//
-//
-//
-//        return null;
-//    }
-//
-//    @Override
-//    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
-//    }
-//
-//
-//
-//
-//
-//    public Mat processInitialFrame(Mat input)
-//    {
-//        // We'll be updating this with new data below
-//        internalStoneList.clear();
-//
-//        /*
-//         * Run the image processing
-//         */
-//        findContours(input);
-//
-//        //print dist of closest stone and highlight
-//
-//        output = closestStone.dist;
-//        drawAxis(input, closestStone.rvec, closestStone.tvec, cameraMatrix, distCoeffs);
-//        closestDistance = Double.MAX_VALUE;
-//
-//        clientStoneList = new ArrayList<>(internalStoneList);
-//
-//
-//
-//        /*
-//         * Decide which buffer to send to the viewport
-//         */
-//        switch (stages[stageNum])
-//        {
-//            case YCrCb:
-//            {
-//                return ycrcbMat;
-//            }
-//
-//            case FINAL:
-//            {
-//
-//                return input;
-//            }
-//
-//            case MASKS:
-//            {
-//                Mat masks = new Mat();
-//                Core.addWeighted(yellowThresholdMat, 1.0, redThresholdMat, 1.0, 0.0, masks);
-//                Core.addWeighted(masks, 1.0, blueThresholdMat, 1.0, 0.0, masks);
-//                return masks;
-//            }
-//
-//            case MASKS_NR:
-//            {
-//                Mat masksNR = new Mat();
-//                Core.addWeighted(morphedYellowThreshold, 1.0, morphedRedThreshold, 1.0, 0.0, masksNR);
-//                Core.addWeighted(masksNR, 1.0, morphedBlueThreshold, 1.0, 0.0, masksNR);
-//                return masksNR;
-//            }
-//
-//            case CONTOURS:
-//            {
-//                return contoursOnPlainImageMat;
-//            }
-//        }
-//
-//
-//        return input;
-//    }
-//
-//    public ArrayList<AnalyzedStone> getDetectedStones()
-//    {
-//        return clientStoneList;
-//    }
-//
-//    void findContours(Mat input)
-//    {
-//        // Convert the input image to YCrCb color space
-//        Imgproc.cvtColor(input, ycrcbMat, Imgproc.COLOR_RGB2YCrCb);
-//
-//        // Extract the Cb channel for blue detection
-//        Core.extractChannel(ycrcbMat, cbMat, 2); // Cb channel index is 2
-//
-//        // Extract the Cr channel for red detection
-//        Core.extractChannel(ycrcbMat, crMat, 1); // Cr channel index is 1
-//
-//        // Threshold the Cb channel to form a mask for blue
-//        Imgproc.threshold(cbMat, blueThresholdMat, BLUE_MASK_THRESHOLD, 255, Imgproc.THRESH_BINARY);
-//
-//        // Threshold the Cr channel to form a mask for red
-//        Imgproc.threshold(crMat, redThresholdMat, RED_MASK_THRESHOLD, 255, Imgproc.THRESH_BINARY);
-//
-//        // Threshold the Cb channel to form a mask for yellow
-//        Imgproc.threshold(cbMat, yellowThresholdMat, YELLOW_MASK_THRESHOLD, 255, Imgproc.THRESH_BINARY_INV);
-//
-//        // Apply morphology to the masks
-//        morphMask(blueThresholdMat, morphedBlueThreshold);
-//        morphMask(redThresholdMat, morphedRedThreshold);
-//        morphMask(yellowThresholdMat, morphedYellowThreshold);
-//
-//        // Find contours in the masks
-//        ArrayList<MatOfPoint> blueContoursList = new ArrayList<>();
-//        Imgproc.findContours(morphedBlueThreshold, blueContoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
-//
-//        ArrayList<MatOfPoint> redContoursList = new ArrayList<>();
-//        Imgproc.findContours(morphedRedThreshold, redContoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
-//
-//        ArrayList<MatOfPoint> yellowContoursList = new ArrayList<>();
-//        Imgproc.findContours(morphedYellowThreshold, yellowContoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
-//
-//        // Now analyze the contours
-//        for(MatOfPoint contour : blueContoursList)
-//        {
-//            analyzeContour(contour, input, "Blue");
-//        }
-//
-//        for(MatOfPoint contour : redContoursList)
-//        {
-//            analyzeContour(contour, input, "Red");
-//        }
-//
-//        for(MatOfPoint contour : yellowContoursList)
-//        {
-//            analyzeContour(contour, input, "Yellow");
-//        }
-//    }
-//
-//    void morphMask(Mat input, Mat output)
-//    {
-//        /*
-//         * Apply some erosion and dilation for noise reduction
-//         */
-//
-//        Imgproc.erode(input, output, erodeElement);
-//        Imgproc.erode(output, output, erodeElement);
-//
-//        Imgproc.dilate(output, output, dilateElement);
-//        Imgproc.dilate(output, output, dilateElement);
-//    }
-//
-//    void analyzeContour(MatOfPoint contour, Mat input, String color)
-//    {
-//        // Transform the contour to a different format
-//        Point[] points = contour.toArray();
-//        MatOfPoint2f contour2f = new MatOfPoint2f(points);
-//
-//        // Do a rect fit to the contour, and draw it on the screen
-//        RotatedRect rotatedRectFitToContour = Imgproc.minAreaRect(contour2f);
-//        if((rotatedRectFitToContour.size.width *  rotatedRectFitToContour.size.height) > minArea &&
-//                Math.abs(findAspectRatio(rotatedRectFitToContour.size) - (8.9/3.8)) > aspectRatioThresh) {
-//            drawRotatedRect(rotatedRectFitToContour, input, color);
-//        }
-//
-//        // The angle OpenCV gives us can be ambiguous, so look at the shape of
-//        // the rectangle to fix that.
-//        double rotRectAngle = rotatedRectFitToContour.angle;
-//        if (rotatedRectFitToContour.size.width < rotatedRectFitToContour.size.height) {
-//            rotRectAngle += 90;
-//        }
-//
-//        // Compute the angle and store it
-//        double angle = -(rotRectAngle - 180);
-//        drawTagText(rotatedRectFitToContour, Integer.toString((int) Math.round(angle)) + " deg", input, color);
-//
-//        // Define the 3D coordinates of the object corners in the object coordinate space
-//        MatOfPoint3f objectPoints = new MatOfPoint3f(
-//                new Point3(-objectWidth / 2, -objectHeight / 2, 0),
-//                new Point3(objectWidth / 2, -objectHeight / 2, 0),
-//                new Point3(objectWidth / 2, objectHeight / 2, 0),
-//                new Point3(-objectWidth / 2, objectHeight / 2, 0)
-//        );
-//
-//        // Get the 2D image points from the detected rectangle corners
-//        Point[] rectPoints = new Point[4];
-//        rotatedRectFitToContour.points(rectPoints);
-//
-//        // Order the image points in the same order as object points
-//        Point[] orderedRectPoints = orderPoints(rectPoints);
-//
-//        MatOfPoint2f imagePoints = new MatOfPoint2f(orderedRectPoints);
-//
-//        // Solve PnP
-//        Mat rvec = new Mat();
-//        Mat tvec = new Mat();
-//
-//        boolean success = Calib3d.solvePnP(
-//                objectPoints, // Object points in 3D
-//                imagePoints,  // Corresponding image points
-//                cameraMatrix,
-//                distCoeffs,
-//                rvec,
-//                tvec
-//        );
-//
-//        if (success) {
-//            drawAxis(input, rvec, tvec, cameraMatrix, distCoeffs);
-//
-//            // Store the pose information
-//            AnalyzedStone analyzedStone = new AnalyzedStone();
-//            analyzedStone.angle = rotRectAngle;
-//            analyzedStone.color = color;
-//            analyzedStone.rvec = rvec;
-//            analyzedStone.tvec = tvec;
-//            analyzedStone.dist = findDistance(analyzedStone);
-//            internalStoneList.add(analyzedStone);
-//
-//            if (analyzedStone.dist < closestDistance){
-//                closestDistance = analyzedStone.dist;
-//                closestStone = analyzedStone;
-//            }
-//        }
-//    }
-//
-//    void drawAxis(Mat img, Mat rvec, Mat tvec, Mat cameraMatrix, MatOfDouble distCoeffs)
-//    {
-//        // Length of the axis lines
-//        double axisLength = 5.0;
-//
-//        // Define the points in 3D space for the axes
-//        MatOfPoint3f axisPoints = new MatOfPoint3f(
-//                new Point3(0, 0, 0),
-//                new Point3(axisLength, 0, 0),
-//                new Point3(0, axisLength, 0),
-//                new Point3(0, 0, -axisLength) // Z axis pointing away from the camera
-//        );
-//
-//        // Project the 3D points to 2D image points
-//        MatOfPoint2f imagePoints = new MatOfPoint2f();
-//        Calib3d.projectPoints(axisPoints, rvec, tvec, cameraMatrix, distCoeffs, imagePoints);
-//
-//        Point[] imgPts = imagePoints.toArray();
-//
-//        // Draw the axis lines
-//        Imgproc.line(img, imgPts[0], imgPts[1], new Scalar(0, 0, 255), 2); // X axis in red
-//        Imgproc.line(img, imgPts[0], imgPts[2], new Scalar(0, 255, 0), 2); // Y axis in green
-//        Imgproc.line(img, imgPts[0], imgPts[3], new Scalar(255, 0, 0), 2); // Z axis in blue
-//    }
-//
-//    static Point[] orderPoints(Point[] pts)
-//    {
-//        // Orders the array of 4 points in the order: top-left, top-right, bottom-right, bottom-left
-//        Point[] orderedPts = new Point[4];
-//
-//        // Sum and difference of x and y coordinates
-//        double[] sum = new double[4];
-//        double[] diff = new double[4];
-//
-//        for (int i = 0; i < 4; i++)
-//        {
-//            sum[i] = pts[i].x + pts[i].y;
-//            diff[i] = pts[i].y - pts[i].x;
-//        }
-//
-//        // Top-left point has the smallest sum
-//        int tlIndex = indexOfMin(sum);
-//        orderedPts[0] = pts[tlIndex];
-//
-//        // Bottom-right point has the largest sum
-//        int brIndex = indexOfMax(sum);
-//        orderedPts[2] = pts[brIndex];
-//
-//        // Top-right point has the smallest difference
-//        int trIndex = indexOfMin(diff);
-//        orderedPts[1] = pts[trIndex];
-//
-//        // Bottom-left point has the largest difference
-//        int blIndex = indexOfMax(diff);
-//        orderedPts[3] = pts[blIndex];
-//
-//        return orderedPts;
-//    }
-//
-//    static int indexOfMin(double[] array)
-//    {
-//        int index = 0;
-//        double min = array[0];
-//
-//        for (int i = 1; i < array.length; i++)
-//        {
-//            if (array[i] < min)
-//            {
-//                min = array[i];
-//                index = i;
-//            }
-//        }
-//        return index;
-//    }
-//
-//    static int indexOfMax(double[] array)
-//    {
-//        int index = 0;
-//        double max = array[0];
-//
-//        for (int i = 1; i < array.length; i++)
-//        {
-//            if (array[i] > max)
-//            {
-//                max = array[i];
-//                index = i;
-//            }
-//        }
-//        return index;
-//    }
-//
-//    static void drawTagText(RotatedRect rect, String text, Mat mat, String color)
-//    {
-//        Scalar colorScalar = getColorScalar(color);
-//
-//        Imgproc.putText(
-//                mat, // The buffer we're drawing on
-//                text, // The text we're drawing
-//                new Point( // The anchor point for the text
-//                        rect.center.x - 50,  // x anchor point
-//                        rect.center.y + 25), // y anchor point
-//                Imgproc.FONT_HERSHEY_PLAIN, // Font
-//                1, // Font size
-//                colorScalar, // Font color
-//                1); // Font thickness
-//    }
-//
-//    static void drawRotatedRect(RotatedRect rect, Mat drawOn, String color)
-//    {
-//        /*
-//         * Draws a rotated rect by drawing each of the 4 lines individually
-//         */
-//
-//        Point[] points = new Point[4];
-//        rect.points(points);
-//
-//        Scalar colorScalar = getColorScalar(color);
-//
-//        for (int i = 0; i < 4; ++i)
-//        {
-//            Imgproc.line(drawOn, points[i], points[(i + 1) % 4], colorScalar, 2);
-//        }
-//    }
-//
-//    static Scalar getColorScalar(String color)
-//    {
-//        switch (color)
-//        {
-//            case "Blue":
-//                return BLUE;
-//            case "Yellow":
-//                return YELLOW;
-//            default:
-//                return RED;
-//        }
-//    }
-//
-//    double findAspectRatio(Size sample) {
-//        double height = sample.height;
-//        double width = sample.width;
-//
-//        if(sample.height > sample.width) {
-//            height = sample.width;
-//            width = sample.height;
-//        }
-//
-//        return (height / width);
-//    }
-//
-//    double findDistance(AnalyzedStone stone) {
-//        double distance = Math.sqrt(
-//                Math.pow(stone.tvec.get(0, 0)[0], 2) +  // tvec_x
-//                        Math.pow(stone.tvec.get(1, 0)[0], 2) +  // tvec_y
-//                        Math.pow(stone.tvec.get(2, 0)[0], 2)    // tvec_z (depth)
-//        );
-//
-//        return distance;
-//    }
-//
-//    public AnalyzedStone getClosestStone() {
-//        return closestStone;
-//    }
-//}
-//
-//public double getOutput() {
-//    return output;
-//}
+package org.firstinspires.ftc.teamcode.common.vision;
+
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+
+
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.vision.VisionProcessor;
+import org.opencv.calib3d.Calib3d;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfDouble;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.MatOfPoint3f;
+import org.opencv.core.Point3;
+import org.opencv.core.Point;
+import org.opencv.core.RotatedRect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
+import java.util.ArrayList;
+
+
+public class SampleDetectionProcessor implements VisionProcessor {
+    private final Mat ycrcbMat = new Mat();
+    private final Mat crMat = new Mat();
+    private final Mat cbMat = new Mat();
+
+    private final Mat blueThresholdMat = new Mat();
+    private final Mat redThresholdMat = new Mat();
+    private final Mat yellowThresholdMat = new Mat();
+
+    private final Mat morphedBlueThreshold = new Mat();
+    private final Mat morphedRedThreshold = new Mat();
+    private final Mat morphedYellowThreshold = new Mat();
+
+    private final Mat contoursOnPlainImageMat = new Mat();
+
+    private final Telemetry telemetry;
+    private double output = 0.0;
+
+    public double minArea = 40;
+    public double aspectRatioThresh = 0.5;
+    public double objectWidth = 3.5;  // cm
+    public double objectHeight = 1.5;  // cm
+
+    public static int YELLOW_MASK_THRESHOLD = 57;
+    private static final int BLUE_MASK_THRESHOLD = 150;
+    private static final int RED_MASK_THRESHOLD = 198;
+
+    private final Mat erodeElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3.5, 3.5));
+    private final Mat dilateElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3.5, 3.5));
+
+    private static final Scalar RED = new Scalar(255, 0, 0);
+    private static final Scalar BLUE = new Scalar(0, 0, 255);
+    private static final Scalar YELLOW = new Scalar(255, 255, 0);
+    private static final Scalar HIGHLIGHT_COLOR = new Scalar(0, 255, 0);
+
+    private static final int CONTOUR_LINE_THICKNESS = 2;
+    private static final int HIGHLIGHT_THICKNESS = 3;
+
+    private AnalyzedStone closestStone = null;
+    private double closestDistance = Double.MAX_VALUE;
+
+    private final ArrayList<AnalyzedStone> internalStoneList = new ArrayList<>();
+    private volatile ArrayList<AnalyzedStone> clientStoneList = new ArrayList<>();
+
+    private final Mat cameraMatrix = new Mat(3, 3, CvType.CV_64FC1);
+    private MatOfDouble distCoeffs = new MatOfDouble();
+
+    private static class AnalyzedStone {
+        double angle;
+        String color;
+        Mat rvec;
+        Mat tvec;
+        double dist;
+    }
+
+    public SampleDetectionProcessor(Telemetry telemetry) {
+        this.telemetry = telemetry;
+    }
+
+    @Override
+    public void init(int width, int height, CameraCalibration calibration) {
+        if (!cameraMatrix.empty()) {
+            cameraMatrix.release();
+        }
+
+        double fx = 800;
+        double fy = 800;
+        double cx = width/2.0;
+        double cy = height/2.0;
+
+        cameraMatrix.put(0, 0,
+                fx, 0, cx,
+                0, fy, cy,
+                0, 0, 1);
+
+        distCoeffs = new MatOfDouble(0, 0, 0, 0, 0);
+    }
+
+    @Override
+    public Object processFrame(Mat input, long captureTimeNanos) {
+        if (input == null || input.empty()) {
+            return null;
+        }
+
+        internalStoneList.clear();
+        findContours(input);
+
+        if (closestStone != null) {
+            telemetry.addLine("Closest Dist: " + closestStone.dist);
+            drawAxis(input, closestStone.rvec, closestStone.tvec, cameraMatrix, distCoeffs);
+            closestDistance = Double.MAX_VALUE;
+        }
+
+        clientStoneList = new ArrayList<>(internalStoneList);
+        telemetry.update();
+
+        return input;
+    }
+
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight,
+                            float scaleBmpPxToCanvasPx, float scaleCanvasDensity,
+                            Object userContext) {
+        Paint rectPaint = new Paint();
+        Paint textPaint = new Paint();
+        Paint highlightPaint = new Paint();
+
+        rectPaint.setStyle(Paint.Style.STROKE);
+        rectPaint.setStrokeWidth(scaleCanvasDensity * 2);
+
+        textPaint.setTextSize(scaleCanvasDensity * 20);
+        textPaint.setColor(Color.WHITE);
+
+        highlightPaint.setStyle(Paint.Style.STROKE);
+        highlightPaint.setStrokeWidth(scaleCanvasDensity * 3);
+        highlightPaint.setColor(Color.GREEN);
+
+        for(AnalyzedStone stone : clientStoneList) {
+            Point[] corners = new Point[4];
+            getStoneCorners(stone, corners);
+
+            switch(stone.color) {
+                case "Blue":
+                    rectPaint.setColor(Color.BLUE);
+                    break;
+                case "Yellow":
+                    rectPaint.setColor(Color.YELLOW);
+                    break;
+                default:
+                    rectPaint.setColor(Color.RED);
+                    break;
+            }
+
+            for(int i = 0; i < 4; i++) {
+                float startX = (float)corners[i].x * scaleBmpPxToCanvasPx;
+                float startY = (float)corners[i].y * scaleBmpPxToCanvasPx;
+                float endX = (float)corners[(i+1)%4].x * scaleBmpPxToCanvasPx;
+                float endY = (float)corners[(i+1)%4].y * scaleBmpPxToCanvasPx;
+
+                Paint paint = (stone == closestStone) ? highlightPaint : rectPaint;
+                canvas.drawLine(startX, startY, endX, endY, paint);
+            }
+
+            String info = String.format("%.1f°, %.1fcm", stone.angle, stone.dist);
+            canvas.drawText(info,
+                    (float)corners[0].x * scaleBmpPxToCanvasPx,
+                    (float)corners[0].y * scaleBmpPxToCanvasPx - 10,
+                    textPaint);
+        }
+
+        if(closestStone != null) {
+            drawAxis(canvas, closestStone.rvec, closestStone.tvec,
+                    scaleBmpPxToCanvasPx, scaleCanvasDensity);
+        }
+    }
+
+    private void findContours(Mat input) {
+        Imgproc.cvtColor(input, ycrcbMat, Imgproc.COLOR_RGB2YCrCb);
+        Core.extractChannel(ycrcbMat, cbMat, 2);
+        Core.extractChannel(ycrcbMat, crMat, 1);
+
+        Imgproc.threshold(cbMat, blueThresholdMat, BLUE_MASK_THRESHOLD, 255, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(crMat, redThresholdMat, RED_MASK_THRESHOLD, 255, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(cbMat, yellowThresholdMat, YELLOW_MASK_THRESHOLD, 255, Imgproc.THRESH_BINARY_INV);
+
+        morphMask(blueThresholdMat, morphedBlueThreshold);
+        morphMask(redThresholdMat, morphedRedThreshold);
+        morphMask(yellowThresholdMat, morphedYellowThreshold);
+
+        ArrayList<MatOfPoint> blueContours = new ArrayList<>();
+        ArrayList<MatOfPoint> redContours = new ArrayList<>();
+        ArrayList<MatOfPoint> yellowContours = new ArrayList<>();
+
+        Imgproc.findContours(morphedBlueThreshold, blueContours, new Mat(),
+                Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
+        Imgproc.findContours(morphedRedThreshold, redContours, new Mat(),
+                Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
+        Imgproc.findContours(morphedYellowThreshold, yellowContours, new Mat(),
+                Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
+
+        for(MatOfPoint contour : blueContours) {
+            analyzeContour(contour, input, "Blue");
+            contour.release();
+        }
+        for(MatOfPoint contour : redContours) {
+            analyzeContour(contour, input, "Red");
+            contour.release();
+        }
+        for(MatOfPoint contour : yellowContours) {
+            analyzeContour(contour, input, "Yellow");
+            contour.release();
+        }
+    }
+
+    private void morphMask(Mat input, Mat output) {
+        Imgproc.erode(input, output, erodeElement);
+        Imgproc.erode(output, output, erodeElement);
+        Imgproc.dilate(output, output, dilateElement);
+        Imgproc.dilate(output, output, dilateElement);
+    }
+
+    private void analyzeContour(MatOfPoint contour, Mat input, String color) {
+        Point[] points = contour.toArray();
+        MatOfPoint2f contour2f = new MatOfPoint2f(points);
+
+        RotatedRect rotatedRect = Imgproc.minAreaRect(contour2f);
+        if((rotatedRect.size.width * rotatedRect.size.height) > minArea &&
+                Math.abs(findAspectRatio(rotatedRect.size) - (8.9/3.8)) > aspectRatioThresh) {
+            drawRotatedRect(rotatedRect, input, color);
+        }
+
+        double rotRectAngle = rotatedRect.angle;
+        if (rotatedRect.size.width < rotatedRect.size.height) {
+            rotRectAngle += 90;
+        }
+
+        double angle = -(rotRectAngle - 180);
+        drawTagText(rotatedRect, String.format("%.0f°", angle), input, color);
+
+        MatOfPoint3f objectPoints = new MatOfPoint3f(
+                new Point3(-objectWidth / 2, -objectHeight / 2, 0),
+                new Point3(objectWidth / 2, -objectHeight / 2, 0),
+                new Point3(objectWidth / 2, objectHeight / 2, 0),
+                new Point3(-objectWidth / 2, objectHeight / 2, 0)
+        );
+
+        Point[] rectPoints = new Point[4];
+        rotatedRect.points(rectPoints);
+        Point[] orderedPoints = orderPoints(rectPoints);
+        MatOfPoint2f imagePoints = new MatOfPoint2f(orderedPoints);
+
+        Mat rvec = new Mat();
+        Mat tvec = new Mat();
+
+        if (Calib3d.solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec)) {
+            drawAxis(input, rvec, tvec, cameraMatrix, distCoeffs);
+
+            AnalyzedStone stone = new AnalyzedStone();
+            stone.angle = rotRectAngle;
+            stone.color = color;
+            stone.rvec = rvec;
+            stone.tvec = tvec;
+            stone.dist = findDistance(stone);
+            internalStoneList.add(stone);
+
+            if (stone.dist < closestDistance) {
+                closestDistance = stone.dist;
+                closestStone = stone;
+            }
+        }
+
+        contour2f.release();
+        objectPoints.release();
+        imagePoints.release();
+    }
+
+    private void getStoneCorners(AnalyzedStone stone, Point[] corners) {
+        MatOfPoint3f objectPoints = new MatOfPoint3f(
+                new Point3(-objectWidth / 2, -objectHeight / 2, 0),
+                new Point3(objectWidth / 2, -objectHeight / 2, 0),
+                new Point3(objectWidth / 2, objectHeight / 2, 0),
+                new Point3(-objectWidth / 2, objectHeight / 2, 0)
+        );
+
+        MatOfPoint2f imagePoints = new MatOfPoint2f();
+        Calib3d.projectPoints(objectPoints, stone.rvec, stone.tvec, cameraMatrix, distCoeffs, imagePoints);
+        Point[] points = imagePoints.toArray();
+        System.arraycopy(points, 0, corners, 0, 4);
+
+        objectPoints.release();
+        imagePoints.release();
+    }
+
+    private void drawAxis(Canvas canvas, Mat rvec, Mat tvec,
+                          float scaleBmpPxToCanvasPx, float scaleCanvasDensity) {
+        double axisLength = 5.0;
+
+        MatOfPoint3f axisPoints = new MatOfPoint3f(
+                new Point3(0, 0, 0),
+                new Point3(axisLength, 0, 0),
+                new Point3(0, axisLength, 0),
+                new Point3(0, 0, -axisLength)
+        );
+
+        MatOfPoint2f imagePoints = new MatOfPoint2f();
+        Calib3d.projectPoints(axisPoints, rvec, tvec, cameraMatrix, distCoeffs, imagePoints);
+        Point[] imgPts = imagePoints.toArray();
+
+        Paint axisPaint = new Paint();
+        axisPaint.setStrokeWidth(scaleCanvasDensity * 2);
+
+        // X axis (red)
+        axisPaint.setColor(Color.RED);
+        canvas.drawLine(
+                (float)imgPts[0].x * scaleBmpPxToCanvasPx,
+                (float)imgPts[0].y * scaleBmpPxToCanvasPx,
+                (float)imgPts[1].x * scaleBmpPxToCanvasPx,
+                (float)imgPts[1].y * scaleBmpPxToCanvasPx,
+                axisPaint
+        );
+
+        // Y axis (green)
+        axisPaint.setColor(Color.GREEN);
+        canvas.drawLine(
+                (float)imgPts[0].x * scaleBmpPxToCanvasPx,
+                (float)imgPts[0].y * scaleBmpPxToCanvasPx,
+                (float)imgPts[2].x * scaleBmpPxToCanvasPx,
+                (float)imgPts[0].x * scaleBmpPxToCanvasPx,
+                axisPaint
+        );
+
+        // Z axis (blue)
+        axisPaint.setColor(Color.BLUE);
+        canvas.drawLine(
+                (float)imgPts[0].x * scaleBmpPxToCanvasPx,
+                (float)imgPts[0].y * scaleBmpPxToCanvasPx,
+                (float)imgPts[3].x * scaleBmpPxToCanvasPx,
+                (float)imgPts[3].y * scaleBmpPxToCanvasPx,
+                axisPaint
+        );
+
+        axisPoints.release();
+        imagePoints.release();
+    }
+
+    private void drawAxis(Mat img, Mat rvec, Mat tvec, Mat cameraMatrix, MatOfDouble distCoeffs) {
+        double axisLength = 5.0;
+
+        MatOfPoint3f axisPoints = new MatOfPoint3f(
+                new Point3(0, 0, 0),
+                new Point3(axisLength, 0, 0),
+                new Point3(0, axisLength, 0),
+                new Point3(0, 0, -axisLength)
+        );
+
+        MatOfPoint2f imagePoints = new MatOfPoint2f();
+        Calib3d.projectPoints(axisPoints, rvec, tvec, cameraMatrix, distCoeffs, imagePoints);
+        Point[] imgPts = imagePoints.toArray();
+
+        Imgproc.line(img, imgPts[0], imgPts[1], new Scalar(0, 0, 255), 2);
+        Imgproc.line(img, imgPts[0], imgPts[2], new Scalar(0, 255, 0), 2);
+        Imgproc.line(img, imgPts[0], imgPts[3], new Scalar(255, 0, 0), 2);
+
+        axisPoints.release();
+        imagePoints.release();
+    }
+
+    private static Point[] orderPoints(Point[] pts) {
+        if (pts == null || pts.length != 4) {
+            return new Point[4];
+        }
+
+        Point[] orderedPts = new Point[4];
+        double[] sum = new double[4];
+        double[] diff = new double[4];
+
+        for (int i = 0; i < 4; i++) {
+            sum[i] = pts[i].x + pts[i].y;
+            diff[i] = pts[i].y - pts[i].x;
+        }
+
+        orderedPts[0] = pts[indexOfMin(sum)];    // Top-left
+        orderedPts[2] = pts[indexOfMax(sum)];    // Bottom-right
+        orderedPts[1] = pts[indexOfMin(diff)];   // Top-right
+        orderedPts[3] = pts[indexOfMax(diff)];   // Bottom-left
+
+        return orderedPts;
+    }
+
+    private static int indexOfMin(double[] array) {
+        int index = 0;
+        double min = array[0];
+
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] < min) {
+                min = array[i];
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    private static int indexOfMax(double[] array) {
+        int index = 0;
+        double max = array[0];
+
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > max) {
+                max = array[i];
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    private static void drawTagText(RotatedRect rect, String text, Mat mat, String color) {
+        Scalar colorScalar = getColorScalar(color);
+
+        Imgproc.putText(
+                mat,
+                text,
+                new Point(rect.center.x - 50, rect.center.y + 25),
+                Imgproc.FONT_HERSHEY_PLAIN,
+                1,
+                colorScalar,
+                1
+        );
+    }
+
+    private static void drawRotatedRect(RotatedRect rect, Mat drawOn, String color) {
+        Point[] points = new Point[4];
+        rect.points(points);
+        Scalar colorScalar = getColorScalar(color);
+
+        for (int i = 0; i < 4; i++) {
+            Imgproc.line(drawOn, points[i], points[(i + 1) % 4], colorScalar, 2);
+        }
+    }
+
+    private static Scalar getColorScalar(String color) {
+        switch (color) {
+            case "Blue":
+                return BLUE;
+            case "Yellow":
+                return YELLOW;
+            default:
+                return RED;
+        }
+    }
+
+    private double findAspectRatio(Size sample) {
+        double height = sample.height;
+        double width = sample.width;
+
+        if (height > width) {
+            height = width;
+            width = sample.height;
+        }
+
+        return height / width;
+    }
+
+    private double findDistance(AnalyzedStone stone) {
+        return Math.sqrt(
+                Math.pow(stone.tvec.get(0, 0)[0], 2) +
+                        Math.pow(stone.tvec.get(1, 0)[0], 2) +
+                        Math.pow(stone.tvec.get(2, 0)[0], 2)
+        );
+    }
+
+    public AnalyzedStone getClosestStone() {
+        return closestStone;
+    }
+
+    public ArrayList<AnalyzedStone> getDetectedStones() {
+        return clientStoneList;
+    }
+
+    public double getOutput() {
+        return output;
+    }
+}

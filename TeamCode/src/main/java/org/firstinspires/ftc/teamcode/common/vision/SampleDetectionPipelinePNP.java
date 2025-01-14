@@ -70,8 +70,8 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
      * Threshold values
      */
     public int YELLOW_MASK_THRESHOLD = 57;
-    static final int BLUE_MASK_THRESHOLD = 150;
-    static final int RED_MASK_THRESHOLD = 198;
+    public int BLUE_MASK_THRESHOLD = 150;
+    public int RED_MASK_THRESHOLD = 198;
 
     /*
      * The elements we use for noise reduction

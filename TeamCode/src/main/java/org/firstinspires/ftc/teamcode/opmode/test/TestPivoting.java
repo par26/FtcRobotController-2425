@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode.test;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
@@ -11,7 +12,7 @@ import org.firstinspires.ftc.teamcode.opmode.Teleop;
 
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
-public class TestPivoting extends Teleop {
+public class TestPivoting extends OpMode {
 
     public static double leftServoAngle;
     public static double rightServoAngle;

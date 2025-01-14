@@ -2,7 +2,13 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 
 
+import static org.firstinspires.ftc.teamcode.common.utils.RobotConstants.intakeSpinInPwr;
+import static org.firstinspires.ftc.teamcode.common.utils.RobotConstants.intakeSpinOutPwr;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.util.Constants;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -18,10 +24,13 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.common.action.Actions;
 
+import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.LConstants;
 import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
 import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
+import org.firstinspires.ftc.teamcode.common.utils.RobotConstants;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +46,9 @@ public class Teleop extends OpMode  {
     private DcMotorEx rightFront;
     private DcMotorEx rightRear;
 
+
+
+    private Follower follower;
 
     private int transferState;
 
@@ -65,7 +77,7 @@ public class Teleop extends OpMode  {
 
 
     Lift lift;
-    //Extend extend;
+    Extend extend;
     Outake outake;
     Intake intake;
 
@@ -113,6 +125,7 @@ public class Teleop extends OpMode  {
     DcMotorEx leftSlide;
     DcMotorEx rightSlide;
 
+    private final Pose startPose = new Pose(0,0,0);
 
     Gamepad currentGamepad1 = new Gamepad();
     Gamepad currentGamepad2 = new Gamepad();
@@ -137,64 +150,41 @@ public class Teleop extends OpMode  {
         //follower.initialize();
 
 
+        Constants.setConstants(FConstants.class, LConstants.class);
+        follower = new Follower(hardwareMap);
+        follower.setStartingPose(startPose);
 
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        motors = Arrays.asList(leftFront, leftRear, rightFront, rightRear);
-
-        for (DcMotorEx motor : motors) {
-            MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
-            motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
-            motor.setMotorType(motorConfigurationType);
-        }
-
-        for (DcMotorEx motor : motors) {
-            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        }
 
         teleopState = Intake.State.STOP;
 
         lift = new Lift(hardwareMap);
-        //extend = new Extend(hardwareMap);
+        extend = new Extend(hardwareMap);
         outake = new Outake(hardwareMap);
         intake = new Intake(hardwareMap);
 
 
-        //leftRear.setDirection(DcMotorEx.Direction.REVERSE);
+    }
 
-
-        //rightElbowServo = hardwareMap.get(ServoImplEx.class, "rightElbowServo");
-        //leftElbowServo = hardwareMap.get(ServoImplEx.class, "leftElbowServo");
-
-        //rightElbowServo.scaleRange(0, MAX_RETRACT_ANGLE);
-        //leftElbowServo.scaleRange(0, MAX_RETRACT_ANGLE);
-
-
-
-
-        transferState = 1;
-
+    @Override
+    public void start() {
+        follower.startTeleopDrive();
         initSubsystems();
         startSubsystems();
-
-
         intake.zeroArm();
-
     }
 
 
     private void initSubsystems() {
         lift.init();
-        //extend.init();
+        extend.init();
         outake.init();
         intake.init();
     }
 
     private void startSubsystems() {
         lift.start();
-        //extend.start();
+        extend.start();
         outake.start();
         intake.start();
     }
@@ -209,73 +199,60 @@ public class Teleop extends OpMode  {
         currentGamepad1.copy(gamepad1);
         currentGamepad2.copy(gamepad2);
 
-        double y = -gamepad2.left_stick_y; // Remember, this is reversed!
-        double x = gamepad2.left_stick_x; // this is strafing
-        double rx = gamepad2.right_stick_x;
 
         // Denominator is the largest motor power (absolute value) or 1
         // This ensures all the powers maintain the same ratio, but only when
         // at least one is out of the range [-1, 1]
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 0.85);
-        double leftFrontPower = (y + x + rx) / denominator;
-        double leftRearPower = (y - x + rx) / denominator;
-        double rightFrontPower = (y - x - rx) / denominator;
-        double rightRearPower = (y + x - rx) / denominator;
 
 
-
-        if(currentGamepad1.dpad_up && !previousGamepad1.dpad_up)  {
-            intake.setPower(1);
+        if (gamepad1.b) {
+            intake.setPower(intakeSpinInPwr);
             intake.setSpin(Intake.State.FORWARD, true);
-        }
-
-        if(currentGamepad1.dpad_down && !previousGamepad1.dpad_down)  {
-            intake.setPower(-1);
+        } else if (gamepad1.dpad_down) {
+            intake.setPower(intakeSpinOutPwr);
             intake.setSpin(Intake.State.REVERSE, true);
-        }
-
-        if(currentGamepad1.dpad_left && !previousGamepad1.dpad_left) {
+        } else {
             intake.setPower(0);
-            intake.setSpin(Intake.State.FORWARD, true);
-        }
-
-
-
-
-        switch(transferState) {
-            case 0:
-
-                intake.lowerArm();
-                outake.toTransfer();
-                transferState = 1;
-                break;
-            case 1:
-                intake.retractArm();
-                transferState = 2;
-                break;
-            case 2:
-                if(currentGamepad1.x && !previousGamepad1.x) {
-                    outake.closeClaw();
-                }
-                transferState = 3;
-                break;
-            case 3:
-                outake.toBucket();
-                break;
-            default:
-                transferState = 0;
+            intake.setSpin(Intake.State.STOP, true);
 
         }
 
 
-        if(currentGamepad1.y && !previousGamepad1.y) {
-            transferState = 0;
-        }
-
-
-
-
-
+//
+//        switch(transferState) {
+//            case 0:
+//
+//                intake.lowerArm();
+//                //outake.toTransfer();
+//                transferState = 1;
+//                break;
+//            case 1:
+//                intake.retractArm();
+//                transferState = 2;
+//                break;
+//            case 2:
+//                if(currentGamepad1.x && !previousGamepad1.x) {
+//                    //outake.closeClaw();
+//                }
+//                transferState = 3;
+//                break;
+//            case 3:
+//                //outake.toBucket();
+//                break;
+//            default:
+//                transferState = 0;
+//
+//        }
+//
+//
+//        if(currentGamepad1.y && !previousGamepad1.y) {
+//            transferState = 0;
+//        }
+//
+//
+//
+//
+//
         if(currentGamepad1.x && previousGamepad1.x) {
             outake.toTransfer();
         }
@@ -284,9 +261,9 @@ public class Teleop extends OpMode  {
         if(currentGamepad1.y && previousGamepad1.y) {
             outake.toBucket();
         }
-
-
-
+//
+//
+//
         if (currentGamepad2.a && !previousGamepad1.a) {
            outake.switchClawState();
         }
@@ -324,12 +301,10 @@ public class Teleop extends OpMode  {
         }
 
 
+        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
+        follower.update();
 
-        //powerSlides(slidePower);
-        leftFront.setPower(leftFrontPower);
-        leftRear.setPower(leftRearPower);
-        rightFront.setPower(rightFrontPower);
-        rightRear.setPower(rightRearPower);
+
 
         // telemetry.addData("Claw close value", clawClosed);
         telemetry.update();
@@ -339,8 +314,7 @@ public class Teleop extends OpMode  {
 
     @Override
     public void stop() {
-        
-
+        intake.lowerArm();
     }
 
 

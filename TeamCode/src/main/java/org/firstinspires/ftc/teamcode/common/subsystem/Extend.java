@@ -50,15 +50,15 @@ public class Extend {
 
     public Extend(HardwareMap hardwareMap) {
 
-        rightMotor = hardwareMap.get(DcMotorEx.class, "rightMotor");
+        rightMotor = hardwareMap.get(DcMotorEx.class, "rightExtend");
         rightMotor.setDirection(DcMotorEx.Direction.REVERSE);
         rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
-        leftMotor = hardwareMap.get(DcMotorEx.class, "leftMotor");
+        leftMotor = hardwareMap.get(DcMotorEx.class, "leftExtend");
         leftMotor.setDirection(DcMotorEx.Direction.REVERSE);
         leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         ExtendPID = new PIDController(p, i, d);
 
@@ -132,13 +132,13 @@ public class Extend {
 
         power = Range.clip(power, -1, 1);
 
-        if(Math.abs(lastPower- power) > 0.01) {
+        if(power > 1) {
             leftMotor.setPower(power);
+            rightMotor.setPower(-.1);
+        } else {
             rightMotor.setPower(power);
+            leftMotor.setPower(0);
         }
-
-
-        lastPower = power;
 
     }
 

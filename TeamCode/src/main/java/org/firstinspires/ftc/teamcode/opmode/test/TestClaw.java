@@ -57,7 +57,7 @@ public class TestClaw extends OpMode {
     public static int rigthReverse = 0;
     @Override
     public void init() {
-        leftClaw = hardwareMap.get(Servo.class, "servo");
+        leftClaw = hardwareMap.get(Servo.class, "oClaw");
 
         //rightClaw = hardwareMap.get(Servo.class, "rightServo");
 
