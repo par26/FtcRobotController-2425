@@ -140,9 +140,9 @@ public class Outake {
         setClawState(clawState.CLOSED);
     }
 
-//    //public void twistOWrist() {
-//        outakeWrist.setPosition(WRIST_POS);
-//    }
+    public void twistOWrist() {
+        wrist.setPosition(WRIST_POS);
+    }
 
     public void toTransfer () {
         lOutake.setPosition(ARM_RETRACT);
@@ -170,6 +170,7 @@ public class Outake {
 
     public void start() {
         Actions.runBlocking(closeClaw);
+        Actions.runBlocking(toTransfer);
     }
 
 }

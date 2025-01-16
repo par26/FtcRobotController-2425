@@ -132,12 +132,12 @@ public class Extend {
 
         power = Range.clip(power, -1, 1);
 
-        if(power > 1) {
-            leftMotor.setPower(power);
-            rightMotor.setPower(-.1);
-        } else {
+        if(power > 0) {
             rightMotor.setPower(power);
-            leftMotor.setPower(0);
+            leftMotor.setPower(-.1);
+        } else {
+            leftMotor.setPower(power);
+            rightMotor.setPower(0);
         }
 
     }

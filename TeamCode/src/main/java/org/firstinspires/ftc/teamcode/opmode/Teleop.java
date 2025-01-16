@@ -24,6 +24,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.common.action.Actions;
 
+import org.firstinspires.ftc.teamcode.common.action.ParallelAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.LConstants;
 import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
@@ -171,7 +172,6 @@ public class Teleop extends OpMode  {
         follower.startTeleopDrive();
         initSubsystems();
         startSubsystems();
-        intake.zeroArm();
     }
 
 
@@ -187,6 +187,8 @@ public class Teleop extends OpMode  {
         extend.start();
         outake.start();
         intake.start();
+
+        outake.toTransfer();
     }
 
     @Override
@@ -198,6 +200,7 @@ public class Teleop extends OpMode  {
 
         currentGamepad1.copy(gamepad1);
         currentGamepad2.copy(gamepad2);
+
 
 
         // Denominator is the largest motor power (absolute value) or 1
@@ -259,12 +262,13 @@ public class Teleop extends OpMode  {
 
 
         if(currentGamepad1.y && previousGamepad1.y) {
-            outake.toBucket();
+            Actions.runBlocking(new ParallelAction(outake.toBucket, intake.lowerArm));
         }
 //
 //
 //
-        if (currentGamepad2.a && !previousGamepad1.a) {
+        if (currentGamepad1.a && !previousGamepad1.a) {
+            telemetry.addLine("Claw button pressed");
            outake.switchClawState();
         }
 
@@ -273,6 +277,9 @@ public class Teleop extends OpMode  {
 //        if (currentGamepad1.x && !previousGamepad1.x) {
 //            outake.switchWristState();
 //        }
+
+
+
 
 
 
@@ -294,11 +301,11 @@ public class Teleop extends OpMode  {
 
         double slidePower = gamepad1.right_trigger - gamepad1.left_trigger;
 
-        if(Math.abs(slidePower) > arm_deadband) {
-            lift.setPower(slidePower);
-        } else {
-            lift.setPower(.1);
-        }
+
+
+
+        extend.setPower(slidePower);
+
 
 
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
