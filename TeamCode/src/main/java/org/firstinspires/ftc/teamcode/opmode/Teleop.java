@@ -210,10 +210,10 @@ public class Teleop extends OpMode  {
 
         if (gamepad1.b) {
             intake.setPower(intakeSpinInPwr);
-            intake.setSpin(Intake.State.FORWARD, true);
+            intake.setSpin(Intake.State.REVERSE, true);
         } else if (gamepad1.dpad_down) {
             intake.setPower(intakeSpinOutPwr);
-            intake.setSpin(Intake.State.REVERSE, true);
+            intake.setSpin(Intake.State.FORWARD, true);
         } else {
             intake.setPower(0);
             intake.setSpin(Intake.State.STOP, true);
@@ -303,8 +303,11 @@ public class Teleop extends OpMode  {
 
 
 
-
-        extend.setPower(slidePower);
+        if(slidePower > 0) {
+            lift.setPower(slidePower);
+        } else {
+            lift.setPower(.1);
+        }
 
 
 
