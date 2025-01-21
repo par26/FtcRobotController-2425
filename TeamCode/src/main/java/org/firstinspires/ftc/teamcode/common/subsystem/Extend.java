@@ -69,8 +69,7 @@ public class Extend {
 
             ExtendPID.setPIDF(p, i, d, f);
 
-            rightMotor
-.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
