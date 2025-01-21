@@ -12,9 +12,10 @@ import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
+//import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.teamcode.common.action.Action;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
+import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.FollowPathAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.LConstants;
@@ -61,10 +62,10 @@ public class Auton {
         this.startLocation = startLocation;
         this.follower = follower;
         this.startLocation = startLocation;
-//        this.extend = new Extend(BlocksOpModeCompanion.hardwareMap);
-//        this.intake = new Intake(BlocksOpModeCompanion.hardwareMap);
-//        this.lift = new Lift(BlocksOpModeCompanion.hardwareMap);
-//        this.outake = new Outake(BlocksOpModeCompanion.hardwareMap);
+        this.extend = new Extend(hardwareMap);
+        this.intake = new Intake(hardwareMap);
+        this.lift = new Lift(hardwareMap);
+        this.outake = new Outake(hardwareMap);
 
         createPoses();
 
@@ -86,6 +87,7 @@ public class Auton {
                 sample1Pose = blueBucketSampleTopPose;
                 sample2Pose = blueBucketSampleMiddlePose;
                 sample3Pose = blueBucketSampleBottomPose;
+//                sample1Control;
                 scorePose = blueBucketScorePose;
                 parkPose = blueBucketParkPose;
 
@@ -151,7 +153,7 @@ public class Auton {
             depositPreload = new Path(new BezierLine(new Point(spawnPose), new Point(preloadPose)));
             depositPreload.setLinearHeadingInterpolation(spawnPose.getHeading(), preloadPose.getHeading());
 
-            sample1 = new Path(new BezierCurve(new Point(preloadPose), new Point(sample1Control), new Point(sample1Pose)));
+            sample1 = new Path(new BezierCurve(new Point(preloadPose),  new Point(sample1Pose)));
             sample1.setLinearHeadingInterpolation(preloadPose.getHeading(), sample1Pose.getHeading());
 
             score1 = new Path(new BezierLine(new Point(sample1Pose), new Point(scorePose)));
@@ -244,12 +246,21 @@ public class Auton {
         return new SequentialAction(
                 //TODO: Add subsystem actions
                 new FollowPathAction(follower, sample1),
+                pickUpSample(),
                 new FollowPathAction(follower, score1),
+                depositSample(),
+                resetBot(),
                 new FollowPathAction(follower, sample2),
+                pickUpSample(),
                 new FollowPathAction(follower, score2),
+                //pickUpSample(),
+                depositSample(),
+                resetBot(),
                 new FollowPathAction(follower, sample3),
-                new FollowPathAction(follower, score3)
-
+                pickUpSample(),
+                new FollowPathAction(follower, score3),
+                depositSample(),
+                resetBot()
         );
     }
 
@@ -259,6 +270,36 @@ public class Auton {
 
         );
     }
+
+
+    public Action pickUpSample() {
+        return new SequentialAction(
+                intake.lowerArm,
+                intake.reverseIntake,
+                new SleepAction(1500),
+                intake.retractArm,
+                outake.openClaw
+
+        );
+    }
+
+    public Action depositSample() {
+        return new SequentialAction(
+                outake.openClaw,
+                outake.toBucket,
+                outake.openClaw
+        );
+    }
+
+    public Action resetBot() {
+        return new SequentialAction(
+                outake.toTransfer,
+                intake.lowerArm,
+                outake.closeClaw
+        );
+    }
+
+    //public Action
 
     public Action park() {
         return new SequentialAction(

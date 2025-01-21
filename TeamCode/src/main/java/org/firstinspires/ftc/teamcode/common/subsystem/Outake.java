@@ -30,7 +30,7 @@ public class Outake {
     private ServoImplEx oClaw;
     private ServoImplEx lOutake;
     private ServoImplEx rOutake;
-    //private ServoImplEx outakeWrist;
+    private ServoImplEx outakeWrist;
 
 
     private wristState wrist;
@@ -61,7 +61,7 @@ public class Outake {
         this.claw = clawState.CLOSED;
         lOutake = hardwareMap.get(ServoImplEx.class, "leftOutake");
         rOutake = hardwareMap.get(ServoImplEx.class, "rightOutake");
-        //outakeWrist = hardwareMap.get(ServoImplEx.class, "outakeWrist");
+        outakeWrist = hardwareMap.get(ServoImplEx.class, "wrist");
 
 
         this.wrist = wristState.STRAIGHT;
@@ -168,6 +168,7 @@ public class Outake {
     public void start() {
         Actions.runBlocking(closeClaw);
         Actions.runBlocking(toTransfer);
+        //outakeWrist.setPosition(RobotConstants.WRIST_TWIST_POSITION);
     }
 
 }

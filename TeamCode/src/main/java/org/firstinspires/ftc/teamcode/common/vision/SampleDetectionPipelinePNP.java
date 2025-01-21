@@ -63,7 +63,7 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
 
     Telemetry telemetry;
 
-    public double minArea = 40;
+    public double minArea = 200;
 
     public double aspectRatioThresh = 0.5;
     /*
@@ -312,12 +312,29 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
         Point[] points = contour.toArray();
         MatOfPoint2f contour2f = new MatOfPoint2f(points);
 
+        double area = Imgproc.contourArea(contour);
+        if (area < minArea) {
+            return;
+        }
+
         // Do a rect fit to the contour, and draw it on the screen
         RotatedRect rotatedRectFitToContour = Imgproc.minAreaRect(contour2f);
-        if((rotatedRectFitToContour.size.width *  rotatedRectFitToContour.size.height) > minArea &&
-                Math.abs(findAspectRatio(rotatedRectFitToContour.size) - (8.9/3.8)) > aspectRatioThresh) {
-            drawRotatedRect(rotatedRectFitToContour, input, color);
+
+
+        // More stringent aspect ratio check
+        if (!isValidAspectRatio(rotatedRectFitToContour.size)) {
+            return;
         }
+
+        // Additional check for rectangular shape
+        double rectangularity = area / (rotatedRectFitToContour.size.width * rotatedRectFitToContour.size.height);
+        if (rectangularity < 0.8) { // Adjust this threshold as needed
+            return;
+        }
+
+
+
+        drawRotatedRect(rotatedRectFitToContour, input, color);
 
         // The angle OpenCV gives us can be ambiguous, so look at the shape of
         // the rectangle to fix that.
@@ -517,16 +534,23 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
         }
     }
 
-    double findAspectRatio(Size sample) {
-        double height = sample.height;
-        double width = sample.width;
 
-        if(sample.height > sample.width) {
-            height = sample.width;
-            width = sample.height;
+    // Add this helper method for aspect ratio validation
+    private boolean isValidAspectRatio(Size size) {
+        double height = size.height;
+        double width = size.width;
+
+        // Ensure width is always the longer dimension
+        if(height > width) {
+            double temp = width;
+            width = height;
+            height = temp;
         }
 
-        return (height / width);
+        double ratio = width / height;
+        double difference = Math.abs(ratio - (8.9/3.8));
+
+        return difference <= aspectRatioThresh;
     }
 
     double findDistance(AnalyzedStone stone) {

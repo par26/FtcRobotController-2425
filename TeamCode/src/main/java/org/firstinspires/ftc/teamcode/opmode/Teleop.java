@@ -188,7 +188,7 @@ public class Teleop extends OpMode  {
         outake.start();
         intake.start();
 
-        outake.toTransfer();
+       outake.toTransfer();
     }
 
     @Override
@@ -209,14 +209,14 @@ public class Teleop extends OpMode  {
 
 
         if (gamepad1.b) {
-            intake.setPower(intakeSpinInPwr);
-            intake.setSpin(Intake.State.REVERSE, true);
+            intake.setPower(0);
+            intake.setSpin(Intake.State.STOP, true);
         } else if (gamepad1.dpad_down) {
             intake.setPower(intakeSpinOutPwr);
             intake.setSpin(Intake.State.FORWARD, true);
         } else {
-            intake.setPower(0);
-            intake.setSpin(Intake.State.STOP, true);
+            intake.setPower(intakeSpinInPwr);
+            intake.setSpin(Intake.State.REVERSE, true);
 
         }
 
@@ -256,18 +256,18 @@ public class Teleop extends OpMode  {
 //
 //
 //
-        if(currentGamepad1.x && previousGamepad1.x) {
+        if(currentGamepad2.x && previousGamepad2.x) {
             outake.toTransfer();
         }
 
 
-        if(currentGamepad1.y && previousGamepad1.y) {
+        if(currentGamepad2.y && previousGamepad2.y) {
             Actions.runBlocking(new ParallelAction(outake.toBucket, intake.lowerArm));
         }
 //
 //
 //
-        if (currentGamepad1.a && !previousGamepad1.a) {
+        if (currentGamepad2.a && !previousGamepad2.a) {
             telemetry.addLine("Claw button pressed");
            outake.switchClawState();
         }
@@ -299,16 +299,11 @@ public class Teleop extends OpMode  {
 
 
 
-        double slidePower = gamepad1.right_trigger - gamepad1.left_trigger;
 
 
+        double liftPower = gamepad2.right_trigger - gamepad2.left_trigger;
 
-        if(slidePower > 0) {
-            lift.setPower(slidePower);
-        } else {
-            lift.setPower(.1);
-        }
-
+        lift.setPower(-liftPower);
 
 
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);

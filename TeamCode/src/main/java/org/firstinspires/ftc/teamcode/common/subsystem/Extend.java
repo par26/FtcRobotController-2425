@@ -56,7 +56,7 @@ public class Extend {
         rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         leftMotor = hardwareMap.get(DcMotorEx.class, "leftExtend");
-        leftMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        //leftMotor.setDirection(DcMotorEx.Direction.REVERSE);
         leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
@@ -133,11 +133,13 @@ public class Extend {
         power = Range.clip(power, -1, 1);
 
         if(power > 0) {
-            rightMotor.setPower(power);
-            leftMotor.setPower(-.1);
-        } else {
             leftMotor.setPower(power);
             rightMotor.setPower(0);
+        } else if (power < -0.03) {
+            rightMotor.setPower(power);
+            leftMotor.setPower(0);
+        } else {
+            rightMotor.setPower(-.01);
         }
 
     }
