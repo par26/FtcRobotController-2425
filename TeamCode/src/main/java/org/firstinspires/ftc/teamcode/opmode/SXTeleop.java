@@ -2,18 +2,12 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 
 
-import static org.firstinspires.ftc.teamcode.common.utils.RobotConstants.intakeSpinInPwr;
-import static org.firstinspires.ftc.teamcode.common.utils.RobotConstants.intakeSpinOutPwr;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.common.action.Actions;
 
@@ -25,97 +19,24 @@ import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
 import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
 
-import java.util.List;
-
 
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
-public class Teleop extends OpMode  {
-
-
-    private DcMotorEx leftFront;
-    private DcMotorEx leftRear;
-    private DcMotorEx rightFront;
-    private DcMotorEx rightRear;
-
-
+public class SXTeleop extends OpMode  {
 
     private Follower follower;
 
-    private int transferState;
-
-
-
     private final double MAX_RETRACT_ANGLE = 200.0/360.0;
-
-    boolean clawClosed;
-    boolean elbowExtended;
-
-    boolean wristTwisted;
 
     public static double idle_power = 0.0;
 
-    ServoImplEx leftServo;
-    ServoImplEx rightServo;
-    DcMotorEx leftSlideMotor;
-
     double clawOpen = 0;
     double clawClose = 0.4;
-
-    Servo wrist;
-
-    DcMotorEx rightSlideMotor;
-
-
 
     Lift lift;
     Extend extend;
     Outake outake;
     Intake intake;
-
-    //ServoImplEx leftElbowServo;
-    //ServoImplEx rightElbowServo;
-
-    //DcMotorEx leftSlide;
-    final double arm_deadband = 0.05;
-
-    boolean pb, cb = false;
-
-    //rising edge for the a button
-    boolean pa, ca = false;
-
-    //rising edge for the x button
-    boolean px, cx = false;
-
-    //rising edge for the y button
-    boolean py, cy = false;
-
-
-    //rising edge for left trigger
-    boolean plt, clt = false;
-
-    //rising edge for right trigger
-    boolean prt, crt = false;
-
-    //rising edge for the left bumper
-    boolean plb, clb = false;
-
-    //rising edge for right bumper
-    boolean prb, crb = false;
-
-    //rising edge for back button
-    boolean pbb, cbb = false;
-
-    //rising edge for start button
-    boolean psb, csb = false;
-
-    private List<DcMotorEx> motors;
-
-    Servo claw;
-    Servo rightClaw;
-
-    DcMotorEx leftSlide;
-    DcMotorEx rightSlide;
 
     private final Pose startPose = new Pose(0,0,0);
 
@@ -130,23 +51,15 @@ public class Teleop extends OpMode  {
     double intakePower = 0;
 
     public static double rightOpen = 0.5;
-
     public static double leftClose = .2;
-
     public static double rightClose = .2;
 
     @Override
     public void init() {
 
-
-        //follower.initialize();
-
-
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
-
-
 
         teleopState = Intake.IntakeState.STOP;
 
@@ -179,74 +92,60 @@ public class Teleop extends OpMode  {
         outake.start();
         intake.start();
 
-       outake.toTransfer();
+        outake.toTransfer();
     }
 
     @Override
     public void loop() {
 
-
+        //Rising edge wannabe
         previousGamepad1.copy(currentGamepad1);
         previousGamepad2.copy(currentGamepad2);
 
         currentGamepad1.copy(gamepad1);
         currentGamepad2.copy(gamepad2);
 
-
-
         // Denominator is the largest motor power (absolute value) or 1
         // This ensures all the powers maintain the same ratio, but only when
         // at least one is out of the range [-1, 1]
 
+        //Intake Controls
+        if (Intake.pivotState == Intake.PivotState.LOWER) {
+            if (gamepad1.dpad_left || Intake.pivotState == Intake.PivotState.RETRACT) {
+                intake.setSpin(Intake.IntakeState.STOP, false);
+            } else if (gamepad1.dpad_up) {
+                intake.setSpin(Intake.IntakeState.FORWARD, false);
+            } else {
+                intake.setSpin(Intake.IntakeState.REVERSE, false);
+            }
+        }
 
-        if (gamepad1.b) {
-            intake.setPower(0);
-            intake.setSpin(Intake.IntakeState.STOP, true);
-        } else if (gamepad1.dpad_down) {
-            intake.setPower(intakeSpinOutPwr);
-            intake.setSpin(Intake.IntakeState.FORWARD, true);
-        } else {
-            intake.setPower(intakeSpinInPwr);
-            intake.setSpin(Intake.IntakeState.REVERSE, true);
+        //Transfer to Bucket
+        if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
+            if (Intake.pivotState == Intake.PivotState.LOWER) {
+                intake.retractArm();
+                outake.toTransfer();
+                outake.closeClaw();
+            } else {
+                intake.lowerArm();
+                outake.toBucket();
+                outake.openClaw();
+            }
+        }
 
+        if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+            if (Intake.pivotState == Intake.PivotState.LOWER) {
+                intake.retractArm();
+                outake.toTransfer();
+                outake.closeClaw();
+            } else {
+                intake.lowerArm();
+                outake.toSpeicmen();
+                outake.openClaw();
+            }
         }
 
 
-//
-//        switch(transferState) {
-//            case 0:
-//
-//                intake.lowerArm();
-//                //outake.toTransfer();
-//                transferState = 1;
-//                break;
-//            case 1:
-//                intake.retractArm();
-//                transferState = 2;
-//                break;
-//            case 2:
-//                if(currentGamepad1.x && !previousGamepad1.x) {
-//                    //outake.closeClaw();
-//                }
-//                transferState = 3;
-//                break;
-//            case 3:
-//                //outake.toBucket();
-//                break;
-//            default:
-//                transferState = 0;
-//
-//        }
-//
-//
-//        if(currentGamepad1.y && !previousGamepad1.y) {
-//            transferState = 0;
-//        }
-//
-//
-//
-//
-//
         if(currentGamepad2.x && previousGamepad2.x) {
             outake.toTransfer();
         }
@@ -255,22 +154,11 @@ public class Teleop extends OpMode  {
         if(currentGamepad2.y && previousGamepad2.y) {
             Actions.runBlocking(new ParallelAction(outake.toBucket, intake.lowerArm));
         }
-//
-//
-//
+
         if (currentGamepad2.a && !previousGamepad2.a) {
             telemetry.addLine("Claw button pressed");
-           outake.switchClawState();
+            outake.switchClawState();
         }
-
-
-//        //Open left
-//        if (currentGamepad1.x && !previousGamepad1.x) {
-//            outake.switchWristState();
-//        }
-
-
-
 
 
 
@@ -283,12 +171,6 @@ public class Teleop extends OpMode  {
             //extend.setManualPower(-0.7);
             intake.lowerArm();
         }
-
-
-
-
-
-
 
 
 
@@ -311,16 +193,6 @@ public class Teleop extends OpMode  {
     @Override
     public void stop() {
         intake.lowerArm();
-    }
-
-
-
-
-
-    public void moveSlidesToPostion(int targetPosition) {
-        while(leftSlide.getCurrentPosition() != targetPosition) {
-            leftSlide.setTargetPosition(targetPosition);
-        }
     }
 
 }

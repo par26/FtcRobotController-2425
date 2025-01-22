@@ -271,7 +271,7 @@ public class Auton {
         );
     }
 
-
+    //Bucket Specific
     public Action pickUpSample() {
         return new SequentialAction(
                 intake.lowerArm,
@@ -283,6 +283,7 @@ public class Auton {
         );
     }
 
+    //Bucket Specific
     public Action depositSample() {
         return new SequentialAction(
                 outake.openClaw,
@@ -291,6 +292,7 @@ public class Auton {
         );
     }
 
+    //
     public Action resetBot() {
         return new SequentialAction(
                 outake.toTransfer,
@@ -299,8 +301,7 @@ public class Auton {
         );
     }
 
-    //public Action
-
+    //Dual Action
     public Action park() {
         return new SequentialAction(
             new FollowPathAction(follower, park)
