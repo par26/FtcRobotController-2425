@@ -39,7 +39,7 @@ public class Outake {
 
     double wristPos, clawPos;
 
-    public RunAction openClaw, closeClaw, twistOWrist, toTransfer, toBucket, toSpecimen, liftOArm;
+    public RunAction openClaw, closeClaw, wristStraight, wristFlip, toTransfer, toBucket, toSpecimen, liftOArm;
     private double ARM_RETRACT = 0.5;
     private double ARM_SPECIMEN;
     private double WRIST_POS;
@@ -58,33 +58,47 @@ public class Outake {
 
 
         oClaw = hardwareMap.get(ServoImplEx.class, "oClaw");
-        this.claw = clawState.CLOSED;
         lOutake = hardwareMap.get(ServoImplEx.class, "leftOutake");
         rOutake = hardwareMap.get(ServoImplEx.class, "rightOutake");
         outakeWrist = hardwareMap.get(ServoImplEx.class, "wrist");
 
 
         this.wrist = wristState.STRAIGHT;
-
-
-
+        this.claw = clawState.CLOSED;
         lOutake.setDirection(Servo.Direction.REVERSE);
 
 
         openClaw = new RunAction(this::openClaw);
         closeClaw = new RunAction(this::closeClaw);
-        //twistOWrist = new RunAction(this::twistOWrist);
+
+        wristFlip = new RunAction(this::wristFlip);
+        wristStraight = new RunAction(this::wristStraight);
+
         toTransfer = new RunAction(this::toTransfer);
         toBucket = new RunAction(this::toBucket);
         toSpecimen = new RunAction(this::toSpeicmen);
         liftOArm = new RunAction(this::toBucket);
-
-
     }
 
-    public void setClawPos(double clawPos) {
-        oClaw.setPosition(clawPos);
+    public void setWristState(wristState state) {
+        if(state == wristState.STRAIGHT) {
+            outakeWrist.setPosition(WRIST_POS);
+            this.wrist = wristState.FLIP;
+        } else if(state == wristState.FLIP) {
+            outakeWrist.setPosition(0);
+            this.wrist = wristState.STRAIGHT;
+        }
     }
+
+
+    public void switchWristState() {
+        if(wrist == wristState.STRAIGHT) {
+            setWristState(wristState.FLIP);
+        } else if(wrist == wristState.FLIP) {
+            setWristState(wristState.STRAIGHT);
+        }
+    }
+
 
     public void setClawState(clawState state) {
         if (state == clawState.CLOSED) {
@@ -96,28 +110,7 @@ public class Outake {
         }
     }
 
-
-
-//
-//    public void setWristState(wristState state) {
-//        if(state == wristState.STRAIGHT) {
-//            outakeWrist.setPosition(WRIST_POS);
-//            this.wrist = wristState.FLIP;
-//        } else if(state == wristState.FLIP) {
-//            outakeWrist.setPosition(0);
-//            this.wrist = wristState.STRAIGHT;
-//        }
-//    }
-
-
-//    public void switchWristState() {
-//        if(wrist == wristState.STRAIGHT) {
-//            setWristState(wristState.FLIP);
-//        } else if(wrist == wristState.FLIP) {
-//            setWristState(wristState.STRAIGHT);
-//        }
-//    }
-//
+    public wristState getWristState() {return wrist;}
 
     public clawState getClawState() {
         return claw;
@@ -140,6 +133,13 @@ public class Outake {
         setClawState(clawState.CLOSED);
     }
 
+    public void wristStraight() {
+        setWristState(wristState.STRAIGHT);
+    }
+
+    public void wristFlip() {
+        setWristState(wristState.FLIP);
+    }
 
     public void toTransfer () {
         lOutake.setPosition(ARM_RETRACT);
@@ -168,7 +168,9 @@ public class Outake {
     public void start() {
         Actions.runBlocking(closeClaw);
         Actions.runBlocking(toTransfer);
-        //outakeWrist.setPosition(RobotConstants.WRIST_TWIST_POSITION);
+        //TODO: gon need to recheck this one gangy!!!
+        Actions.runBlocking(wristStraight);
+
     }
 
 }
