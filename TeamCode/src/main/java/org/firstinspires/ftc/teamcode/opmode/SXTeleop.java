@@ -112,80 +112,63 @@ public class SXTeleop extends OpMode  {
 
         //Intake Controls
         if (Intake.pivotState == Intake.PivotState.LOWER) {
-            if (gamepad1.dpad_left || Intake.pivotState == Intake.PivotState.RETRACT) {
+            if (gamepad2.dpad_left) {
                 intake.setSpin(Intake.IntakeState.STOP, false);
-            } else if (gamepad1.dpad_up) {
-                intake.setSpin(Intake.IntakeState.FORWARD, false);
-            } else {
+            } else if (gamepad2.dpad_up) {
                 intake.setSpin(Intake.IntakeState.REVERSE, false);
-            }
-        }
-
-        //Transfer to Bucket
-        if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
-            if (Intake.pivotState == Intake.PivotState.LOWER) {
-                Actions.runBlocking(new SequentialAction( new ParallelAction(intake.retractArm,
-                outake.toTransfer, outake.closeClaw)));
             } else {
-                Actions.runBlocking(new SequentialAction( new ParallelAction(intake.lowerArm,
-                        outake.toBucket, outake.openClaw)));
+                intake.setSpin(Intake.IntakeState.FORWARD, false);
             }
+        } else {
+            intake.setSpin(Intake.IntakeState.STOP, false);
         }
 
-        if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+        //Alternate intake & bucket
+        if ((currentGamepad1.left_bumper && !previousGamepad1.left_bumper) ||
+                (currentGamepad1.right_bumper && !previousGamepad1.right_bumper)) {
             if (Intake.pivotState == Intake.PivotState.LOWER) {
-                intake.retractArm();
-                outake.toTransfer();
-                outake.closeClaw();
+                Actions.runBlocking(new SequentialAction(outake.toTransfer, intake.retractArm));
+                telemetry.addLine("Transfer State");
             } else {
-                intake.lowerArm();
-                outake.toSpeicmen();
-                outake.openClaw();
+                if (currentGamepad1.left_bumper) {
+                    Actions.runBlocking(new SequentialAction(intake.lowerArm, outake.toBucket));
+                    telemetry.addLine("Intake/Outake: Bucket");
+                } else {
+                    Actions.runBlocking(new SequentialAction(intake.lowerArm, outake.toSpecimen));
+                    telemetry.addLine("Intake/Outake: Specimen");
+                }
             }
         }
 
-
-        if(currentGamepad2.x && previousGamepad2.x) {
-            outake.toTransfer();
-        }
-
-
-        if(currentGamepad2.y && previousGamepad2.y) {
-            Actions.runBlocking(new ParallelAction(outake.toBucket, intake.lowerArm));
-        }
-
-        if (currentGamepad2.a && !previousGamepad2.a) {
-            telemetry.addLine("Claw button pressed");
+        if (currentGamepad1.a && !previousGamepad1.a) {
             outake.switchClawState();
+            telemetry.addLine("Claw State: " + outake.getClawState());
         }
 
+        //TODO: implement wrist (in case of specimen hang)
 
-
-        if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
-            //extend.setManualPower(0.7);
-            intake.retractArm();
+        if (currentGamepad1.b && !previousGamepad1.b) {
+            outake.switchWristState();
+            telemetry.addLine("Wrist State: " + outake.getWristState());
         }
-
-        if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
-            //extend.setManualPower(-0.7);
-            intake.lowerArm();
-        }
-
-
-
-        double liftPower = gamepad2.right_trigger - gamepad2.left_trigger;
-
+        //Thought process to reversing controls:
+        //Gamepad 1 will be doing near nothing when the depositing at bucket right, so
+        // they can control how far it extends upwards.
+        //While trying to get sample from sub, gamepad 2 can control that (will take synchronization but less hassle
+        // for both parties overall)
+        double liftPower = gamepad1.right_trigger - gamepad1.left_trigger;
         lift.setPower(-liftPower);
 
+        double extendPower = gamepad2.right_trigger - gamepad2.left_trigger;
+        extend.setPower(-extendPower);
 
+        //driveing nyoooommmm
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         follower.update();
 
 
 
-        // telemetry.addData("Claw close value", clawClosed);
         telemetry.update();
-
     }
 
 

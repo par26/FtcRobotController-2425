@@ -15,7 +15,7 @@ public class RobotConstants {
 
 
 
-    public static double intakeSpinInPwr = 1;
+    public static double intakeSpinInPwr = 0.75;
     public static double intakeSpinOutPwr = -1;
     public static double intakeSpinStopPwr = 0;
 
