@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.common.action.Actions;
 
 import org.firstinspires.ftc.teamcode.common.action.ParallelAction;
+import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.LConstants;
 import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
@@ -123,13 +124,11 @@ public class SXTeleop extends OpMode  {
         //Transfer to Bucket
         if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
             if (Intake.pivotState == Intake.PivotState.LOWER) {
-                intake.retractArm();
-                outake.toTransfer();
-                outake.closeClaw();
+                Actions.runBlocking(new SequentialAction( new ParallelAction(intake.retractArm,
+                outake.toTransfer, outake.closeClaw)));
             } else {
-                intake.lowerArm();
-                outake.toBucket();
-                outake.openClaw();
+                Actions.runBlocking(new SequentialAction( new ParallelAction(intake.lowerArm,
+                        outake.toBucket, outake.openClaw)));
             }
         }
 
