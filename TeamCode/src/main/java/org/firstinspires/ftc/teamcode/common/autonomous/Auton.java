@@ -67,14 +67,31 @@ public class Auton {
         this.lift = new Lift(hardwareMap);
         this.outake = new Outake(hardwareMap);
 
+        initSubsystems();
+        startSubsystems();
+
+
         createPoses();
 
         follower.setMaxPower(.85);
 
-
         buildPaths();
+    }
 
+    private void initSubsystems() {
+        lift.init();
+        extend.init();
+        outake.init();
+        intake.init();
+    }
 
+    private void startSubsystems() {
+        lift.start();
+        extend.start();
+        outake.start();
+        intake.start();
+
+        outake.toTransfer();
     }
 
     public void createPoses() {
@@ -276,7 +293,6 @@ public class Auton {
         return new SequentialAction(
                 intake.lowerArm,
                 intake.reverseIntake,
-                new SleepAction(1500),
                 intake.retractArm,
                 outake.openClaw
 
@@ -288,7 +304,7 @@ public class Auton {
         return new SequentialAction(
                 outake.openClaw,
                 outake.toBucket,
-                outake.openClaw
+                outake.closeClaw
         );
     }
 
