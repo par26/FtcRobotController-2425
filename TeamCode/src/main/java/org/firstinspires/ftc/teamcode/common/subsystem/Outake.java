@@ -65,6 +65,7 @@ public class Outake {
 
         this.wrist = wristState.STRAIGHT;
         this.claw = clawState.CLOSED;
+        outakeWrist.setDirection(Servo.Direction.REVERSE);
         lOutake.setDirection(Servo.Direction.REVERSE);
 
 
@@ -92,9 +93,9 @@ public class Outake {
 
 
     public void switchWristState() {
-        if(wrist == wristState.STRAIGHT) {
+        if(this.wrist == wristState.STRAIGHT) {
             setWristState(wristState.FLIP);
-        } else if(wrist == wristState.FLIP) {
+        } else if(this.wrist == wristState.FLIP) {
             setWristState(wristState.STRAIGHT);
         }
     }

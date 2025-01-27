@@ -140,6 +140,7 @@ public class SXTeleop extends OpMode  {
                 }
             }
         }
+        
 
         if (currentGamepad1.a && !previousGamepad1.a) {
             outake.switchClawState();
