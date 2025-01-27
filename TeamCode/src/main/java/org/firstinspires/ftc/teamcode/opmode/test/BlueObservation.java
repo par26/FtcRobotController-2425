@@ -21,7 +21,7 @@ public class BlueObservation extends LinearOpMode {
     public void runOpMode() {
         Constants.setConstants(FConstants.class, LConstants.class);
 
-        auton = new Auton(hardwareMap, FieldConstants.RobotStart.BLUE_OBSERVATION, new Follower(hardwareMap));
+        auton = new Auton(hardwareMap, FieldConstants.RobotStart.OBSERVATION, new Follower(hardwareMap));
 
         waitForStart();
 

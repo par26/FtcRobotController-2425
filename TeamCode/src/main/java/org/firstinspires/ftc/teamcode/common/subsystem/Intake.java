@@ -31,7 +31,7 @@ public class Intake {
     //adjust as needed, for the wheel
 
     private final double ARM_LOWER, ARM_RETRACT;
-  //palceholder arm and wrist values
+    //palceholder arm and wrist values
     public Intake(HardwareMap hardwareMap) {
         Lspin = hardwareMap.get(CRServo.class, "leftSpin");
         Rspin = hardwareMap.get(CRServo.class, "rightSpin");

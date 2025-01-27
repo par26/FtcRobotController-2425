@@ -9,16 +9,12 @@ import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.follower.*;
 import com.pedropathing.pathgen.Point;
-import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 //import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.teamcode.common.action.Action;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
-import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.FollowPathAction;
-import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.FConstants;
-import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.LConstants;
 import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
@@ -47,19 +43,17 @@ public class Auton {
     public PathChain pushSamples;
     //Poses
     //Both
-    public Pose spawnPose, preloadPose, parkPose;
+    public Pose spawnPose, preloadPose, parkPose, parkControlPose, preloadControlPose;
     //Bucket
     //TODO: we gon need vision for bucket
-    public Pose sample1Control, sample1Pose, sample2Pose, sample3Pose, scorePose;
+    public Pose sample1Pose, sample2Pose, sample3Pose, scorePose;
     //Observation
     public Pose grabPose, specimen1Pose, specimen2Pose, specimen3Pose, specimen4Pose, specimen5Pose;
     //Push
     public Pose pushSeg1Pose, pushSeg1Control, pushSeg2Pose, pushSeg2Control, pushSeg3Pose, pushSeg3Control, pushSeg4Pose, pushSeg4Control;
 
     public Auton(HardwareMap hardwareMap, RobotStart startLocation, Follower follower) {
-        //TODO: add subsystems when they're done
 
-        this.startLocation = startLocation;
         this.follower = follower;
         this.startLocation = startLocation;
         this.extend = new Extend(hardwareMap);
@@ -95,70 +89,40 @@ public class Auton {
     }
 
     public void createPoses() {
-        //TODO: Need to finish the actual poses,
-        // bucket assigning should be done by now 11/22/24
         switch(startLocation) {
-            case BLUE_BUCKET:
-                spawnPose = blueBucketStartPose;
-                preloadPose = blueBucketPreloadPose;
-                sample1Pose = blueBucketSampleTopPose;
-                sample2Pose = blueBucketSampleMiddlePose;
-                sample3Pose = blueBucketSampleBottomPose;
-//                sample1Control;
-                scorePose = blueBucketScorePose;
-                parkPose = blueBucketParkPose;
+            case BUCKET:
+                spawnPose = bucketStartPose;
+                preloadPose = bucketPreloadPose;
+                preloadControlPose = BucketPreloadControl;
+
+                sample1Pose = BucketSampleTopPose;
+                sample2Pose = BucketSampleMiddlePose;
+                sample3Pose = BucketSampleBottomPose;
+
+                scorePose = BucketScorePose;
+                parkPose = bucketParkPose;
+                parkControlPose = bucketParkControl;
 
                 break;
-            case BLUE_OBSERVATION:
-                spawnPose = blueObservationStartPose;
-                preloadPose = blueObservationPreloadPose;
-                grabPose = blueObservationGrabPose;
-                parkPose = blueObservationParkPose;
-                specimen1Pose = blueSpecimen1Pose;
-                specimen2Pose = blueSpecimen2Pose;
-                specimen3Pose = blueSpecimen3Pose;
-                specimen4Pose = blueSpecimen4Pose;
-                specimen5Pose = blueSpecimen5Pose;
+            case OBSERVATION:
+                spawnPose = observationStartPose;
+                preloadPose = observationPreloadPose;
+                grabPose = observationGrabPose;
+                parkPose = observationParkPose;
+                specimen1Pose = specimen1FCPose;
+                specimen2Pose = specimen2FCPose;
+                specimen3Pose = specimen3FCPose;
+                specimen4Pose = specimen4FCPose;
+                specimen5Pose = specimen5FCPose;
 
-                pushSeg1Pose = bluePushSeg1Pose;
-                pushSeg1Control = bluePushSeg1Control;
-                pushSeg2Pose = bluePushSeg2Pose;
-                pushSeg2Control = bluePushSeg2Control;
-                pushSeg3Pose = bluePushSeg3Pose;
-                pushSeg3Control = bluePushSeg3Control;
-                pushSeg4Pose = bluePushSeg4Pose;
-                pushSeg4Control = bluePushSeg4Control;
-
-                break;
-            case RED_BUCKET:
-                spawnPose = redBucketStartPose;
-                preloadPose = redBucketPreloadPose;
-                sample1Pose = redBucketSampleTopPose;
-                sample2Pose = redBucketSampleMiddlePose;
-                sample3Pose = redBucketSampleBottomPose;
-                scorePose = redBucketScorePose;
-                parkPose = redBucketParkPose;
-
-                break;
-            case RED_OBSERVATION:
-                spawnPose = redObservationStartPose;
-                preloadPose = redObservationPreloadPose;
-                grabPose = redObservationGrabPose;
-                parkPose = redObservationParkPose;
-                specimen1Pose = redSpecimen1Pose;
-                specimen2Pose = redSpecimen2Pose;
-                specimen3Pose = redSpecimen3Pose;
-                specimen4Pose = redSpecimen4Pose;
-                specimen5Pose = redSpecimen5Pose;
-
-                pushSeg1Pose = redPushSeg1Pose;
-                pushSeg1Control = redPushSeg1Control;
-                pushSeg2Pose = redPushSeg2Pose;
-                pushSeg2Control = redPushSeg2Control;
-                pushSeg3Pose = redPushSeg3Pose;
-                pushSeg3Control = redPushSeg3Control;
-                pushSeg4Pose = redPushSeg4Pose;
-                pushSeg4Control = redPushSeg4Control;
+                pushSeg1Pose = pushSeg1FCPose;
+                pushSeg1Control = pushSeg1FCControl;
+                pushSeg2Pose = pushSeg2FCPose;
+                pushSeg2Control = pushSeg2FCControl;
+                pushSeg3Pose = pushSeg3FCPose;
+                pushSeg3Control = pushSeg3FCControl;
+                pushSeg4Pose = pushSeg4FCPose;
+                pushSeg4Control = pushSeg4FCControl;
                 break;
         }
 
@@ -166,8 +130,8 @@ public class Auton {
     }
 
     public void buildPaths() {
-        if (startLocation == RobotStart.RED_BUCKET || startLocation == RobotStart.BLUE_BUCKET) {
-            depositPreload = new Path(new BezierLine(new Point(spawnPose), new Point(preloadPose)));
+        if (startLocation == RobotStart.BUCKET) {
+            depositPreload = new Path(new BezierCurve(new Point(spawnPose), new Point(preloadControlPose), new Point(preloadPose)));
             depositPreload.setLinearHeadingInterpolation(spawnPose.getHeading(), preloadPose.getHeading());
 
             sample1 = new Path(new BezierCurve(new Point(preloadPose),  new Point(sample1Pose)));
@@ -188,12 +152,12 @@ public class Auton {
             score3 = new Path(new BezierLine(new Point(sample3Pose), new Point(scorePose)));
             score3.setLinearHeadingInterpolation(sample3Pose.getHeading(), scorePose.getHeading());
 
-            park = new Path(new BezierLine(new Point(scorePose), new Point(parkPose)));
+            park = new Path(new BezierCurve(new Point(scorePose), new Point(parkControlPose), new Point(parkPose)));
             park.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading());
 
         }
 
-        if (startLocation == RobotStart.RED_OBSERVATION || startLocation == RobotStart.BLUE_OBSERVATION) {
+        if (startLocation == RobotStart.OBSERVATION) {
             depositPreload = new Path(new BezierLine(new Point(spawnPose), new Point(preloadPose)));
             depositPreload.setLinearHeadingInterpolation(spawnPose.getHeading(), preloadPose.getHeading());
 
