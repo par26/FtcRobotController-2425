@@ -61,7 +61,7 @@ public class FieldConstants {
 
     public static final Pose bucketSampleTopPose = new Pose(35.4, 132.7, 0);
     public static final Pose bucketSampleMiddlePose = new Pose(35.4, 132, 0);
-    public static final Pose bucketSampleBottomPose = new Pose(45.5, 132,  0);
+    public static final Pose bucketSampleBottomPose = new Pose(39.3, 132.48,  Math.toRadians(60));
 
     /* To Replace w/ Extend
     public static final Pose bucketSampleTopPose = new Pose(25, 125, Math.toRadians(345));
