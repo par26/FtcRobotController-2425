@@ -127,17 +127,20 @@ public class SXTeleop extends OpMode  {
         //Alternate intake & bucket
         if ((currentGamepad1.left_bumper && !previousGamepad1.left_bumper) ||
                 (currentGamepad1.right_bumper && !previousGamepad1.right_bumper)) {
-            if (Intake.pivotState == Intake.PivotState.LOWER) {
-                Actions.runBlocking(new SequentialAction(outake.toTransfer, intake.retractArm));
-                telemetry.addLine("Transfer State");
-            } else {
-                if (currentGamepad1.left_bumper) {
-                    Actions.runBlocking(new SequentialAction(intake.lowerArm, outake.toBucket));
-                    telemetry.addLine("Intake/Outake: Bucket");
-                } else {
-                    Actions.runBlocking(new SequentialAction(intake.lowerArm, outake.toSpecimen));
-                    telemetry.addLine("Intake/Outake: Specimen");
-                }
+            switch (Intake.pivotState) {
+                case LOWER:
+                    Actions.runBlocking(new SequentialAction(outake.toTransfer, intake.retractArm));
+                    telemetry.addLine("Transfer State");
+                case RETRACT:
+                    if (currentGamepad1.left_bumper) {
+                        Actions.runBlocking(new SequentialAction(intake.lowerArm, outake.toBucket));
+                        telemetry.addLine("Intake/Outake: Bucket");
+                    }
+
+                    if (currentGamepad1.right_bumper) {
+                        Actions.runBlocking(new SequentialAction(intake.lowerArm, outake.toSpecimen));
+                        telemetry.addLine("Intake/Outake: Specimen");
+                    }
             }
         }
         
