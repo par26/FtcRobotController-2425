@@ -38,13 +38,13 @@ public class FieldConstants {
 
     // Preload Poses
     // TODO: Adjust accordingly how far robot can reach
-    public static final Pose bucketPreloadPose = new Pose(16.3, 127.31, Math.toRadians(315));
+    public static final Pose bucketPreloadPose = new Pose(14.5, 129, Math.toRadians(315));
     public static final Pose observationPreloadPose = new Pose(38.25, 60.625, Math.toRadians(180));
 
-    public static final Pose BucketPreloadControl = new Pose(15.66, 93.02);
+    public static final Pose bucketPreloadControl = new Pose(15.66, 93.02);
 
     //Bucket Score Poses TODO: adjust accordingly
-    public static final Pose BucketScorePose = new Pose(16.3, 127.31, Math.toRadians(315));
+    public static final Pose bucketScorePose = new Pose(14.5, 129, Math.toRadians(315));
 
     //Observation Grab Poses
     public static final Pose observationGrabPose = new Pose(12.3, 33, Math.toRadians(270));
@@ -59,9 +59,15 @@ public class FieldConstants {
 
     //Bucket Sample Action Poses
 
-    public static final Pose BucketSampleTopPose = new Pose(35, 121.5, 0);
-    public static final Pose BucketSampleMiddlePose = new Pose(35, 132, 0);
-    public static final Pose BucketSampleBottomPose = new Pose(40, 132.7,  Math.toRadians(60));
+    public static final Pose bucketSampleTopPose = new Pose(35.4, 132.7, 0);
+    public static final Pose bucketSampleMiddlePose = new Pose(35.4, 132, 0);
+    public static final Pose bucketSampleBottomPose = new Pose(45.5, 132,  0);
+
+    /* To Replace w/ Extend
+    public static final Pose bucketSampleTopPose = new Pose(25, 125, Math.toRadians(345));
+    public static final Pose bucketSampleMiddlePose = new Pose(25, 129, Math.toRadians(8));
+    public static final Pose bucketSampleBottomPose = new Pose(25, 134,  Math.toRadians(20));
+     */
 
     //Push Points (im gonna cray cray)
     public static final Pose pushSeg1FCPose = new Pose(59.64,31.44, Math.toRadians(190));

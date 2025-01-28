@@ -93,13 +93,13 @@ public class Auton {
             case BUCKET:
                 spawnPose = bucketStartPose;
                 preloadPose = bucketPreloadPose;
-                preloadControlPose = BucketPreloadControl;
+                preloadControlPose = bucketPreloadControl;
 
-                sample1Pose = BucketSampleTopPose;
-                sample2Pose = BucketSampleMiddlePose;
-                sample3Pose = BucketSampleBottomPose;
+                sample1Pose = bucketSampleTopPose;
+                sample2Pose = bucketSampleMiddlePose;
+                sample3Pose = bucketSampleBottomPose;
 
-                scorePose = BucketScorePose;
+                scorePose = bucketScorePose;
                 parkPose = bucketParkPose;
                 parkControlPose = bucketParkControl;
 
@@ -224,8 +224,8 @@ public class Auton {
     }
 
     public Action depositBucket() {
+        //TODO: use parallel action when auton is substituted with extend working and follow path and extend at the same time
         return new SequentialAction(
-                //TODO: Add subsystem actions
                 new FollowPathAction(follower, sample1),
                 pickUpSample(),
                 new FollowPathAction(follower, score1),
