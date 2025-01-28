@@ -33,7 +33,7 @@ public class FieldConstants {
         OBSERVATION,
     }
 
-    public static final Pose bucketStartPose = new Pose(7.893, 86.685, Math.toRadians(270));
+    public static final Pose bucketStartPose = new Pose(7.116, 87.59, Math.toRadians(270));
     public static final Pose observationStartPose = new Pose(9.5, 65.25, Math.toRadians(180));
 
     // Preload Poses
@@ -78,7 +78,7 @@ public class FieldConstants {
     public static final Pose observationParkPose = new Pose(60, 47, 0);
 
     public static final Pose bucketParkPose = new Pose(59, 96, Math.toRadians(90));
-    public static final Pose bucketParkControl = new Pose(60, 126);
+    public static final Pose bucketParkControl = new Pose(70.38, 106.87);
 
 
 }
