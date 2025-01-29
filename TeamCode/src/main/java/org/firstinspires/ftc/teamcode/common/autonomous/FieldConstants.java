@@ -57,7 +57,7 @@ public class FieldConstants {
     public static final Pose specimen4FCPose = new Pose(specimen1FCPose.getX(), specimen3FCPose.getY()+3.5, Math.toRadians(180));
     public static final Pose specimen5FCPose = new Pose(specimen1FCPose.getX(), specimen4FCPose.getY()+3.5, Math.toRadians(180));
 
-    //Bucket Sample Action Poses
+    //Bucket Sample Action Poses because it's important
 
     public static final Pose bucketSampleTopPose = new Pose(35.4, 132.7, 0);
     public static final Pose bucketSampleMiddlePose = new Pose(35.4, 132, 0);
