@@ -1,221 +1,93 @@
 package org.firstinspires.ftc.teamcode.common.subsystem;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.arcrobotics.ftclib.controller.PIDController;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.common.action.Action;
+import org.firstinspires.ftc.teamcode.common.action.Actions;
 import org.firstinspires.ftc.teamcode.common.action.RunAction;
+import org.firstinspires.ftc.teamcode.common.utils.RobotConstants;
 
 public class Extend {
 
     private Telemetry telemetry;
 
-    public DcMotorEx rightMotor;
-    public DcMotorEx leftMotor;
+    private ServoImplEx lExtend;
+    private ServoImplEx rExtend;
 
-    private int pos, initalPos;
-    public RunAction setPosition; //note that you can make more runactions, very easy
-    public PIDController ExtendPID;
-    public static int target;
+    private double extended;
+    private double retracted;
 
-    private boolean slidesReached;
+    public RunAction extendEx, retractEx;
 
-    private boolean slidesRetracted;
-
-    private double power;
-    private double lastPower;
-    private int targetPos;
-    private int currentPos;
-
-    private final double MAX_DOWN_POWER = 1, MAX_UP_POWER = 0, MIN_POS = 0 , MAX_POS = 1; //hello import these into robot constants pls :)
-
-    public enum State{
-        PID, MANUAL
+    public enum extendState {
+        EXTENDED, RETRACTED
     }
 
-
-    State state;
-
-    public static double p = 0.04, i = 0, d = 0.000001, f = 0.01;
-    private final double TICKS_PER_REV = 384.5; //ticks
-
-    private final double PULLEY_CIRCUMFERENCE = 4.40945; //inches
+    private extendState state;
 
     public Extend(HardwareMap hardwareMap) {
+        lExtend = hardwareMap.get(ServoImplEx.class, "leftExtend");
+        rExtend = hardwareMap.get(ServoImplEx.class, "rightExtend");
 
-        rightMotor = hardwareMap.get(DcMotorEx.class, "rightExtend");
-        rightMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        lExtend.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        rExtend.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
-        leftMotor = hardwareMap.get(DcMotorEx.class, "leftExtend");
-        //leftMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
-        ExtendPID = new PIDController(p, i, d);
 
-        setPosition = new RunAction(this::setPosition);
+        extended = RobotConstants.EX_EXTEND;
+        retracted = RobotConstants.EX_RETRACT;
+
+        state = extendState.RETRACTED;
+
+        lExtend.setDirection(Servo.Direction.REVERSE);
+
+        extendEx = new RunAction(this::extendExtend);
+        retractEx = new RunAction(this::retractExtend);
+
     }
-    public void update() {
-        if (state == Extend.State.PID) {
 
-            ExtendPID.setPIDF(p, i, d, f);
-
-            rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-
-            slidesReached = ExtendPID.atSetPoint();
-            slidesRetracted = (target <= 0) && slidesReached;
-
-
-            double pid = ExtendPID.calculate(rightMotor.getCurrentPosition(), target);
-
-            // Just make sure it gets to fully retracted if target is 0
-            if (target == 0 && !slidesReached) {
-                power -= 0.1;
-            } /*else if (target >= MAX_SLIDES_EXTENSION && !slidesReached) {
-                power += 0.1;
-            } */
-
-            if (slidesRetracted) {
-                resetEncoder();
-                setPower(0);
-            } else {
-                setPower(pid);
-            }
-
-
-            telemetry.addData("Extend pos", rightMotor.getCurrentPosition());
-            telemetry.addData("Extend target", target);
-        } else {
-            setPower(this.power);
+    public void setExtendState(Extend.extendState state) {
+        if(state == extendState.EXTENDED) {
+            lExtend.setPosition(extended);
+            rExtend.setPosition(extended);
+            this.state = extendState.EXTENDED;
+        } else if(state == extendState.RETRACTED) {
+            lExtend.setPosition(retracted);
+            rExtend.setPosition(retracted);
+            this.state = extendState.RETRACTED;
         }
     }
 
-    public double getExtendPID(double currentPos, double targetPos) {
-        return Range.clip(ExtendPID.calculate(currentPos, targetPos), MAX_DOWN_POWER, MAX_UP_POWER);
-    }
 
-
-
-    public void setManualPower(double power) {
-        state = Extend.State.MANUAL;
-        this.power = power;
-    }
-
-    public void stopManual() {
-        state = Extend.State.PID;
-        this.power = 0;
-    }
-
-    public void setTarget(int b) {
-        state = Extend.State.PID;
-        target = b;
-    }
-
-    public void setPosition() {
-        setTarget(0); //this will be used as template to move Lif tto where we want the Extend to move
-    }
-
-
-    public void setPower(double power) {
-
-        power = Range.clip(power, -1, 1);
-
-        if(power > 0) {
-            leftMotor.setPower(power);
-            rightMotor.setPower(0);
-        } else if (power < -0.03) {
-            rightMotor.setPower(power);
-            leftMotor.setPower(0);
+    public void switchExtendState() {
+        if(this.state == extendState.RETRACTED) {
+            setExtendState(extendState.EXTENDED);
         } else {
-            rightMotor.setPower(-.01);
+            setExtendState(extendState.RETRACTED);
         }
-
     }
 
 
-    public void setTargetHeight(double inches) {
-        setTarget(toTicks(inches));
+    public void retractExtend() {
+        setExtendState(extendState.RETRACTED);
     }
 
-    //util kinda
-    public void updatePIDConstants(double p, double d, double i, double f) {
-        ExtendPID.setPIDF(p, i, d, f);
+    public void extendExtend() {
+        setExtendState(extendState.EXTENDED);
     }
 
-
-
-    public int getTargetPos() {
-        return targetPos;
+    public String getState() {
+        return this.state == extendState.EXTENDED ? "Extended" : "Retracted";
     }
-
-    public int getCurrentPos() {
-        return currentPos;
-    }
-
-    public int getAbsPosError() {
-        return Math.abs(targetPos - currentPos);
-    }
-
-    public int toTicks(double inches) { // convert inches to motor ticks
-        return (int) (inches / PULLEY_CIRCUMFERENCE * TICKS_PER_REV);
-    }
-
-    public double toInches(double ticks) { // convert motor ticks to inches
-        return ticks * PULLEY_CIRCUMFERENCE / TICKS_PER_REV;
-    }
-
-    public void resetEncoder() {
-        rightMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        leftMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-
-        rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
-    public boolean atTarget() {
-        return Math.abs(target - leftMotor.getCurrentPosition()) < 10;
-    }
-
 
     public void init() {
-        resetEncoder();
-        initalPos = currentPos;
-        rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-
-        leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-
-        resetEncoder();
-
+        Actions.runBlocking(retractEx);
     }
 
     public void start() {
-        initalPos = currentPos;
-        setTarget(0);
+        Actions.runBlocking(retractEx);
     }
-
-
-    public Action waitSlide() {
-        return new Action() {
-            private boolean set = false;
-            @Override
-            public boolean run(TelemetryPacket telemetryPacket) {
-                return atTarget();
-            }
-        };
-    }
-
-
 }

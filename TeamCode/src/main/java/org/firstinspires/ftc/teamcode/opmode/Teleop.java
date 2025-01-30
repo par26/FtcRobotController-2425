@@ -264,11 +264,6 @@ public class Teleop extends OpMode  {
         }
 
 
-        //Open left
-        if (currentGamepad2.b && !previousGamepad2.b) {
-            outake.switchWristState();
-        }
-
 
 
 

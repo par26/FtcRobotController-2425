@@ -28,13 +28,6 @@ public class SXTeleop extends OpMode  {
 
     private Follower follower;
 
-    private final double MAX_RETRACT_ANGLE = 200.0/360.0;
-
-    public static double idle_power = 0.0;
-
-    double clawOpen = 0;
-    double clawClose = 0.4;
-
     Lift lift;
     Extend extend;
     Outake outake;
@@ -49,12 +42,6 @@ public class SXTeleop extends OpMode  {
     Gamepad previousGamepad2 = new Gamepad();
 
     Intake.IntakeState teleopState;
-
-    double intakePower = 0;
-
-    public static double rightOpen = 0.5;
-    public static double leftClose = .2;
-    public static double rightClose = .2;
 
     @Override
     public void init() {
@@ -152,11 +139,6 @@ public class SXTeleop extends OpMode  {
 
         //TODO: implement wrist (in case of specimen hang)
 
-        if (currentGamepad1.b && !previousGamepad1.b) {
-            outake.switchWristState();
-            telemetry.addLine("Wrist State: " + outake.getWristState());
-        }
-
         //Thought process to reversing controls:
         //Gamepad 1 will be doing near nothing when the depositing at bucket right, so
         // they can control how far it extends upwards.
@@ -164,9 +146,6 @@ public class SXTeleop extends OpMode  {
         // for both parties overall)
         double liftPower = gamepad1.right_trigger - gamepad1.left_trigger;
         lift.setPower(-liftPower);
-
-        double extendPower = gamepad2.right_trigger - gamepad2.left_trigger;
-        extend.setPower(-extendPower);
 
         //driveing nyoooommmm
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);

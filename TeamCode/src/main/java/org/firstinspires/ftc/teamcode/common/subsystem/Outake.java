@@ -1,10 +1,6 @@
 package org.firstinspires.ftc.teamcode.common.subsystem;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
@@ -18,10 +14,6 @@ public class Outake {
         CLOSED, OPEN
     }
 
-    public enum wristState {
-        STRAIGHT, FLIP
-    }
-
     public enum armState {
         TRANSFER, BUCKET, SPECIMEN
     }
@@ -30,19 +22,15 @@ public class Outake {
     private ServoImplEx oClaw;
     private ServoImplEx lOutake;
     private ServoImplEx rOutake;
-    private ServoImplEx outakeWrist;
 
-
-    private wristState wrist;
 
     private double clawOpen, clawClose;
 
-    double wristPos, clawPos;
+    double clawPos;
 
-    public RunAction openClaw, closeClaw, wristStraight, wristFlip, toTransfer, toBucket, toSpecimen, liftOArm;
+    public RunAction openClaw, closeClaw, toTransfer, toBucket, toSpecimen, liftOArm;
     private double ARM_RETRACT = 0.5;
     private double ARM_SPECIMEN;
-    private double WRIST_POS;
     private double ARM_BUCKET;
 
     public Outake(HardwareMap hardwareMap) {
@@ -51,7 +39,6 @@ public class Outake {
         ARM_RETRACT = RobotConstants.OUTAKE_ARM_LOWER;
         ARM_BUCKET= RobotConstants.OUTAKE_ARM_BUCKET;
         ARM_SPECIMEN = RobotConstants.OUTAKE_ARM_SPECIMEN;
-        WRIST_POS = RobotConstants.WRIST_TWIST_POSITION;
 
         clawOpen = RobotConstants.CLAW_OPEN;
         clawClose = RobotConstants.CLAW_CLOSE;
@@ -60,46 +47,20 @@ public class Outake {
         oClaw = hardwareMap.get(ServoImplEx.class, "oClaw");
         lOutake = hardwareMap.get(ServoImplEx.class, "leftOutake");
         rOutake = hardwareMap.get(ServoImplEx.class, "rightOutake");
-        outakeWrist = hardwareMap.get(ServoImplEx.class, "wrist");
 
 
-        this.wrist = wristState.STRAIGHT;
         this.claw = clawState.CLOSED;
-        outakeWrist.setDirection(Servo.Direction.REVERSE);
         lOutake.setDirection(Servo.Direction.REVERSE);
 
 
         openClaw = new RunAction(this::openClaw);
         closeClaw = new RunAction(this::closeClaw);
 
-        wristFlip = new RunAction(this::wristFlip);
-        wristStraight = new RunAction(this::wristStraight);
-
         toTransfer = new RunAction(this::toTransfer);
         toBucket = new RunAction(this::toBucket);
         toSpecimen = new RunAction(this::toSpeicmen);
         liftOArm = new RunAction(this::toBucket);
     }
-
-    public void setWristState(wristState state) {
-        if(state == wristState.STRAIGHT) {
-            outakeWrist.setPosition(WRIST_POS);
-            this.wrist = wristState.FLIP;
-        } else if(state == wristState.FLIP) {
-            outakeWrist.setPosition(0);
-            this.wrist = wristState.STRAIGHT;
-        }
-    }
-
-
-    public void switchWristState() {
-        if(this.wrist == wristState.STRAIGHT) {
-            setWristState(wristState.FLIP);
-        } else if(this.wrist == wristState.FLIP) {
-            setWristState(wristState.STRAIGHT);
-        }
-    }
-
 
     public void setClawState(clawState state) {
         if (state == clawState.CLOSED) {
@@ -110,8 +71,6 @@ public class Outake {
             this.claw = clawState.OPEN;
         }
     }
-
-    public wristState getWristState() {return wrist;}
 
     public clawState getClawState() {
         return claw;
@@ -134,14 +93,6 @@ public class Outake {
         setClawState(clawState.CLOSED);
     }
 
-    public void wristStraight() {
-        setWristState(wristState.STRAIGHT);
-    }
-
-    public void wristFlip() {
-        setWristState(wristState.FLIP);
-    }
-
     public void toTransfer () {
         lOutake.setPosition(ARM_RETRACT);
         rOutake.setPosition(ARM_RETRACT);
@@ -158,7 +109,6 @@ public class Outake {
     }
 
     public void checkPos() {
-        //wristPos = outakeWrist.getPosition();
         clawPos = oClaw.getPosition();
     }
 
@@ -169,8 +119,7 @@ public class Outake {
     public void start() {
         Actions.runBlocking(closeClaw);
         Actions.runBlocking(toTransfer);
-        //TODO: gon need to recheck this one gangy!!!
-        Actions.runBlocking(wristStraight);
+
 
     }
 
