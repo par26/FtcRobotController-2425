@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.common.action.Actions;
 
 import org.firstinspires.ftc.teamcode.common.action.ParallelAction;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
-import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.LConstants;
 import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
@@ -24,7 +23,7 @@ import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
 
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
-public class SXTeleop extends OpMode  {
+public class SXTeleOp extends OpMode  {
 
     private Follower follower;
 
@@ -41,7 +40,11 @@ public class SXTeleop extends OpMode  {
     Gamepad previousGamepad1 = new Gamepad();
     Gamepad previousGamepad2 = new Gamepad();
 
-    Intake.IntakeState teleopState;
+    private enum TeleOpState{
+        TRANSFER, INOUT
+    }
+
+    private TeleOpState currTeleState;
 
     @Override
     public void init() {
@@ -50,12 +53,13 @@ public class SXTeleop extends OpMode  {
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
 
-        teleopState = Intake.IntakeState.STOP;
+        currTeleState = TeleOpState.TRANSFER;
 
         lift = new Lift(hardwareMap);
         extend = new Extend(hardwareMap);
         outake = new Outake(hardwareMap);
         intake = new Intake(hardwareMap);
+
 
 
     }
@@ -112,39 +116,68 @@ public class SXTeleop extends OpMode  {
         }
 
         //Alternate intake & bucket
-        if ((currentGamepad1.left_bumper && !previousGamepad1.left_bumper) ||
-                (currentGamepad1.right_bumper && !previousGamepad1.right_bumper)) {
+        if ((currentGamepad2.left_bumper && !previousGamepad2.left_bumper) ||
+                (currentGamepad2.right_bumper && previousGamepad2.right_bumper)) {
             switch (Intake.pivotState) {
                 case LOWER:
                     Actions.runBlocking(new SequentialAction(outake.toTransfer, intake.retractArm));
                     telemetry.addLine("Transfer State");
                 case RETRACT:
-                    if (currentGamepad1.left_bumper) {
+                    if (currentGamepad2.left_bumper) {
                         Actions.runBlocking(new SequentialAction(intake.lowerArm, outake.toBucket));
                         telemetry.addLine("Intake/Outake: Bucket");
                     }
 
-                    if (currentGamepad1.right_bumper) {
+                    if (currentGamepad2.right_bumper) {
                         Actions.runBlocking(new SequentialAction(intake.lowerArm, outake.toSpecimen));
                         telemetry.addLine("Intake/Outake: Specimen");
                     }
             }
         }
-        
 
-        if (currentGamepad1.a && !previousGamepad1.a) {
+        //Alternating Tele State
+        // transformers urr er uh ah eh eh
+        //TODO: impl sleepaction when necesary
+        if (currentGamepad2.b && !previousGamepad2.b) {
+            switch (currTeleState) {
+                case TRANSFER:
+                    Actions.runBlocking(new SequentialAction(
+                            outake.closeClaw,
+                            new ParallelAction(
+                                    outake.toBucket,
+                                    intake.lowerArm
+                            ),
+                            extend.extendEx,
+                            intake.lowerArm
+                    ));
+
+                    currTeleState = TeleOpState.INOUT;
+                case INOUT:
+                    Actions.runBlocking(new SequentialAction(
+                            outake.openClaw,
+                            new ParallelAction(
+                                    outake.toTransfer,
+                                    intake.retractArm
+                            ),
+                            extend.retractEx,
+                            intake.reverseIntake
+                    ));
+
+                    currTeleState = TeleOpState.TRANSFER;
+            }
+        }
+
+        if (currentGamepad2.x && !previousGamepad2.x) {
+            extend.switchExtendState();
+            telemetry.addLine("Extend State: " + extend.getState());
+        }
+
+        if (currentGamepad2.a && !previousGamepad2.a) {
             outake.switchClawState();
             telemetry.addLine("Claw State: " + outake.getClawState());
         }
 
-        //TODO: implement wrist (in case of specimen hang)
-
-        //Thought process to reversing controls:
-        //Gamepad 1 will be doing near nothing when the depositing at bucket right, so
-        // they can control how far it extends upwards.
-        //While trying to get sample from sub, gamepad 2 can control that (will take synchronization but less hassle
-        // for both parties overall)
-        double liftPower = gamepad1.right_trigger - gamepad1.left_trigger;
+        double liftPower = gamepad2.right_trigger - gamepad2.left_trigger;
         lift.setPower(-liftPower);
 
         //driveing nyoooommmm

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.common.action.Actions;
 import org.firstinspires.ftc.teamcode.common.action.RunAction;
+import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
 import org.firstinspires.ftc.teamcode.common.utils.RobotConstants;
 
 public class Outake {
@@ -96,14 +97,17 @@ public class Outake {
     public void toTransfer () {
         lOutake.setPosition(ARM_RETRACT);
         rOutake.setPosition(ARM_RETRACT);
+        Actions.runBlocking(new SequentialAction(openClaw));
     }
 
     public void toBucket() {
+        Actions.runBlocking(new SequentialAction(closeClaw));
         lOutake.setPosition(ARM_BUCKET);
         rOutake.setPosition(ARM_BUCKET);
     }
 
     public void toSpeicmen() {
+        Actions.runBlocking(new SequentialAction(closeClaw));
         lOutake.setPosition(ARM_SPECIMEN);
         rOutake.setPosition(ARM_SPECIMEN);
     }
