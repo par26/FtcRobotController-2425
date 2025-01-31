@@ -4,8 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
-
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.vision.VisionProcessor;
@@ -91,13 +89,10 @@ public class SampleDetectionProcessor implements VisionProcessor {
 
     public SampleDetectionProcessor(Telemetry telemetry) {
         this.telemetry = telemetry;
-
-
     }
 
     @Override
     public void init(int width, int height, CameraCalibration calibration) {
-
         // Initialize camera parameters
         double fx = 800;
         double fy = 800;
@@ -128,7 +123,9 @@ public class SampleDetectionProcessor implements VisionProcessor {
             drawAxis(input, closestStone.rvec, closestStone.tvec, cameraMatrix, distCoeffs);
         }
 
-        clientStoneList = new ArrayList<>(internalStoneList);
+        // Reuse the existing list instead of creating a new one
+        clientStoneList.clear();
+        clientStoneList.addAll(internalStoneList);
         telemetry.update();
 
         return input;
@@ -156,7 +153,6 @@ public class SampleDetectionProcessor implements VisionProcessor {
         }
     }
 
-    // [Include all other helper methods from the original class...]
     void findContours(Mat input) {
         // Convert the input image to YCrCb color space
         Imgproc.cvtColor(input, ycrcbMat, Imgproc.COLOR_RGB2YCrCb);
@@ -188,14 +184,25 @@ public class SampleDetectionProcessor implements VisionProcessor {
                 Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
 
         // Analyze contours
-        for(MatOfPoint contour : blueContoursList) {
+        for (MatOfPoint contour : blueContoursList) {
             analyzeContour(contour, input, "Blue");
         }
-        for(MatOfPoint contour : redContoursList) {
+        for (MatOfPoint contour : redContoursList) {
             analyzeContour(contour, input, "Red");
         }
-        for(MatOfPoint contour : yellowContoursList) {
+        for (MatOfPoint contour : yellowContoursList) {
             analyzeContour(contour, input, "Yellow");
+        }
+
+        // Release contours
+        for (MatOfPoint contour : blueContoursList) {
+            contour.release();
+        }
+        for (MatOfPoint contour : redContoursList) {
+            contour.release();
+        }
+        for (MatOfPoint contour : yellowContoursList) {
+            contour.release();
         }
     }
 
@@ -225,83 +232,101 @@ public class SampleDetectionProcessor implements VisionProcessor {
         }
     }
 
-
     void analyzeContour(MatOfPoint contour, Mat input, String color) {
-        Point[] points = contour.toArray();
-        MatOfPoint2f contour2f = new MatOfPoint2f(points);
-
-        RotatedRect rotatedRectFitToContour = Imgproc.minAreaRect(contour2f);
-        if((rotatedRectFitToContour.size.width * rotatedRectFitToContour.size.height) > minArea &&
-                Math.abs(findAspectRatio(rotatedRectFitToContour.size) - (8.9/3.8)) > aspectRatioThresh) {
-            drawRotatedRect(rotatedRectFitToContour, input, color);
-        }
-
-        double rotRectAngle = rotatedRectFitToContour.angle;
-        if (rotatedRectFitToContour.size.width < rotatedRectFitToContour.size.height) {
-            rotRectAngle += 90;
-        }
-
-        double angle = -(rotRectAngle - 180);
-        drawTagText(rotatedRectFitToContour, Integer.toString((int) Math.round(angle)) + " deg", input, color);
-
-        MatOfPoint3f objectPoints = new MatOfPoint3f(
-                new Point3(-objectWidth / 2, -objectHeight / 2, 0),
-                new Point3(objectWidth / 2, -objectHeight / 2, 0),
-                new Point3(objectWidth / 2, objectHeight / 2, 0),
-                new Point3(-objectWidth / 2, objectHeight / 2, 0)
-        );
-
-        Point[] rectPoints = new Point[4];
-        rotatedRectFitToContour.points(rectPoints);
-        Point[] orderedRectPoints = orderPoints(rectPoints);
-        MatOfPoint2f imagePoints = new MatOfPoint2f(orderedRectPoints);
-
+        MatOfPoint2f contour2f = new MatOfPoint2f();
+        MatOfPoint3f objectPoints = new MatOfPoint3f();
+        MatOfPoint2f imagePoints = new MatOfPoint2f();
         Mat rvec = new Mat();
         Mat tvec = new Mat();
 
-        boolean success = Calib3d.solvePnP(
-                objectPoints,
-                imagePoints,
-                cameraMatrix,
-                distCoeffs,
-                rvec,
-                tvec
-        );
+        try {
+            Point[] points = contour.toArray();
+            contour2f.fromArray(points);
 
-        if (success) {
-            drawAxis(input, rvec, tvec, cameraMatrix, distCoeffs);
-
-            AnalyzedStone analyzedStone = new AnalyzedStone();
-            analyzedStone.angle = rotRectAngle;
-            analyzedStone.color = color;
-            analyzedStone.rvec = rvec;
-            analyzedStone.tvec = tvec;
-            analyzedStone.dist = findDistance(analyzedStone);
-            internalStoneList.add(analyzedStone);
-
-            if (analyzedStone.dist < closestDistance) {
-                closestDistance = analyzedStone.dist;
-                closestStone = analyzedStone;
+            RotatedRect rotatedRectFitToContour = Imgproc.minAreaRect(contour2f);
+            if ((rotatedRectFitToContour.size.width * rotatedRectFitToContour.size.height) > minArea &&
+                    Math.abs(findAspectRatio(rotatedRectFitToContour.size) - (8.9 / 3.8)) > aspectRatioThresh) {
+                drawRotatedRect(rotatedRectFitToContour, input, color);
             }
+
+            double rotRectAngle = rotatedRectFitToContour.angle;
+            if (rotatedRectFitToContour.size.width < rotatedRectFitToContour.size.height) {
+                rotRectAngle += 90;
+            }
+
+            double angle = -(rotRectAngle - 180);
+            drawTagText(rotatedRectFitToContour, Integer.toString((int) Math.round(angle)) + " deg", input, color);
+
+            objectPoints.fromArray(
+                    new Point3(-objectWidth / 2, -objectHeight / 2, 0),
+                    new Point3(objectWidth / 2, -objectHeight / 2, 0),
+                    new Point3(objectWidth / 2, objectHeight / 2, 0),
+                    new Point3(-objectWidth / 2, objectHeight / 2, 0)
+            );
+
+            Point[] rectPoints = new Point[4];
+            rotatedRectFitToContour.points(rectPoints);
+            Point[] orderedRectPoints = orderPoints(rectPoints);
+            imagePoints.fromArray(orderedRectPoints);
+
+            boolean success = Calib3d.solvePnP(
+                    objectPoints,
+                    imagePoints,
+                    cameraMatrix,
+                    distCoeffs,
+                    rvec,
+                    tvec
+            );
+
+            if (success) {
+                drawAxis(input, rvec, tvec, cameraMatrix, distCoeffs);
+
+                AnalyzedStone analyzedStone = new AnalyzedStone();
+                analyzedStone.angle = rotRectAngle;
+                analyzedStone.color = color;
+                analyzedStone.rvec = rvec.clone(); // Clone to avoid releasing the original
+                analyzedStone.tvec = tvec.clone(); // Clone to avoid releasing the original
+                analyzedStone.dist = findDistance(analyzedStone);
+                internalStoneList.add(analyzedStone);
+
+                if (analyzedStone.dist < closestDistance) {
+                    closestDistance = analyzedStone.dist;
+                    closestStone = analyzedStone;
+                }
+            }
+        } finally {
+            // Release temporary Mats
+            contour2f.release();
+            objectPoints.release();
+            imagePoints.release();
+            rvec.release();
+            tvec.release();
         }
     }
 
     void drawAxis(Mat img, Mat rvec, Mat tvec, Mat cameraMatrix, MatOfDouble distCoeffs) {
-        double axisLength = 5.0;
-        MatOfPoint3f axisPoints = new MatOfPoint3f(
-                new Point3(0, 0, 0),
-                new Point3(axisLength, 0, 0),
-                new Point3(0, axisLength, 0),
-                new Point3(0, 0, -axisLength)
-        );
-
+        MatOfPoint3f axisPoints = new MatOfPoint3f();
         MatOfPoint2f imagePoints = new MatOfPoint2f();
-        Calib3d.projectPoints(axisPoints, rvec, tvec, cameraMatrix, distCoeffs, imagePoints);
 
-        Point[] imgPts = imagePoints.toArray();
-        Imgproc.line(img, imgPts[0], imgPts[1], new Scalar(0, 0, 255), 2);
-        Imgproc.line(img, imgPts[0], imgPts[2], new Scalar(0, 255, 0), 2);
-        Imgproc.line(img, imgPts[0], imgPts[3], new Scalar(255, 0, 0), 2);
+        try {
+            axisPoints.fromArray(
+                    new Point3(0, 0, 0),
+                    new Point3(5.0, 0, 0),
+                    new Point3(0, 5.0, 0),
+                    new Point3(0, 0, -5.0)
+            );
+
+            Calib3d.projectPoints(axisPoints, rvec, tvec, cameraMatrix, distCoeffs, imagePoints);
+
+            Point[] imgPts = imagePoints.toArray();
+            Imgproc.line(img, imgPts[0], imgPts[1], new Scalar(0, 0, 255), 2);
+            Imgproc.line(img, imgPts[0], imgPts[2], new Scalar(0, 255, 0), 2);
+            Imgproc.line(img, imgPts[0], imgPts[3], new Scalar(255, 0, 0), 2);
+        } finally {
+            // Release temporary Mats
+            axisPoints.release();
+            imagePoints.release();
+        }
     }
 
     static Point[] orderPoints(Point[] pts) {
@@ -369,16 +394,19 @@ public class SampleDetectionProcessor implements VisionProcessor {
 
     static Scalar getColorScalar(String color) {
         switch (color) {
-            case "Blue": return BLUE;
-            case "Yellow": return YELLOW;
-            default: return RED;
+            case "Blue":
+                return BLUE;
+            case "Yellow":
+                return YELLOW;
+            default:
+                return RED;
         }
     }
 
     double findAspectRatio(Size sample) {
         double height = sample.height;
         double width = sample.width;
-        if(sample.height > sample.width) {
+        if (sample.height > sample.width) {
             height = sample.width;
             width = sample.height;
         }
@@ -394,18 +422,26 @@ public class SampleDetectionProcessor implements VisionProcessor {
     }
 
     void getStoneCorners(AnalyzedStone stone, Point[] corners) {
-        MatOfPoint3f objectPoints = new MatOfPoint3f(
-                new Point3(-objectWidth / 2, -objectHeight / 2, 0),
-                new Point3(objectWidth / 2, -objectHeight / 2, 0),
-                new Point3(objectWidth / 2, objectHeight / 2, 0),
-                new Point3(-objectWidth / 2, objectHeight / 2, 0)
-        );
-
+        MatOfPoint3f objectPoints = new MatOfPoint3f();
         MatOfPoint2f imagePoints = new MatOfPoint2f();
-        Calib3d.projectPoints(objectPoints, stone.rvec, stone.tvec, cameraMatrix, distCoeffs, imagePoints);
 
-        Point[] points = imagePoints.toArray();
-        System.arraycopy(points, 0, corners, 0, 4);
+        try {
+            objectPoints.fromArray(
+                    new Point3(-objectWidth / 2, -objectHeight / 2, 0),
+                    new Point3(objectWidth / 2, -objectHeight / 2, 0),
+                    new Point3(objectWidth / 2, objectHeight / 2, 0),
+                    new Point3(-objectWidth / 2, objectHeight / 2, 0)
+            );
+
+            Calib3d.projectPoints(objectPoints, stone.rvec, stone.tvec, cameraMatrix, distCoeffs, imagePoints);
+
+            Point[] points = imagePoints.toArray();
+            System.arraycopy(points, 0, corners, 0, 4);
+        } finally {
+            // Release temporary Mats
+            objectPoints.release();
+            imagePoints.release();
+        }
     }
 
     void highlightClosestObject(Mat input) {
@@ -440,8 +476,6 @@ public class SampleDetectionProcessor implements VisionProcessor {
                     2);
         }
     }
-
-
 
     public ArrayList<AnalyzedStone> getDetectedStones() {
         return clientStoneList;

@@ -56,17 +56,18 @@ public class Lift {
 
     public Lift (HardwareMap hardwareMap) {
         rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
-        rightLift.setDirection(DcMotorEx.Direction.REVERSE);
+        //rightLift.setDirection(DcMotorEx.Direction.REVERSE);
         rightLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         rightLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        rightLift.setDirection(DcMotorEx.Direction.REVERSE);
+
 
 
         leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
 
         leftLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        leftLift.setDirection(DcMotorEx.Direction.REVERSE);
+        //leftLift.setDirection(DcMotorEx.Direction.REVERSE);
 
         liftPID = new PIDFController(p, i, d, f);
 
@@ -87,11 +88,13 @@ public class Lift {
             slidesRetracted = (target <= 0) && slidesReached;
 
 
+            currentPos = rightLift.getCurrentPosition();
             double pid = liftPID.calculate(rightLift.getCurrentPosition(), target);
+
 
             // Just make sure it gets to fully retracted if target is 0
             if (target == 0 && !slidesReached) {
-                power -= 0.1;
+                power -= 0.03;
             } /*else if (target >= MAX_SLIDES_EXTENSION && !slidesReached) {
                 power += 0.1;
             } */
@@ -104,8 +107,8 @@ public class Lift {
             }
 
 
-            telemetry.addData("lift pos", rightLift.getCurrentPosition());
-            telemetry.addData("lift target", target);
+
+
         } else {
             setPower(this.power);
         }
@@ -220,7 +223,12 @@ public class Lift {
             private boolean set = false;
             @Override
             public boolean run(TelemetryPacket telemetryPacket) {
-                return atTarget();
+                if (atTarget())
+                {return true;}
+
+                update();
+
+                return false;
             }
         };
     }

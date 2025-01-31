@@ -247,7 +247,7 @@ public class Auton {
 
     public Action hangSpecimen() {
         return new SequentialAction(
-          //TODO: Implement outake actions
+                //TODO: Implement outake actions
 
         );
     }
@@ -284,7 +284,8 @@ public class Auton {
     //Dual Action
     public Action park() {
         return new SequentialAction(
-            new FollowPathAction(follower, park)
+                new FollowPathAction(follower, park)
         );
     }
 }
+

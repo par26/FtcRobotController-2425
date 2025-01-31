@@ -21,10 +21,9 @@ import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
 public class Slide_PID_Test extends OpMode {
 
 
-    DcMotorEx rightMotor, leftMotor;
 
-    public static double p = 0, i = 0, d = 0;
-    public static double f = 0;
+    Lift lift;
+    public static double p = 0.04, i = 0, d = 0.000001, f = 0.01;
     public static int target = 200;
 
 
@@ -38,30 +37,16 @@ public class Slide_PID_Test extends OpMode {
 
     @Override
     public void init() {
+        lift = new Lift(hardwareMap);
 
-        rightMotor = hardwareMap.get(DcMotorEx.class, "rightExtend");
-        //rightMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-
-        leftMotor = hardwareMap.get(DcMotorEx.class, "leftExtend");
-
-        leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        lift.init();
+        lift.start();
     }
 
     @Override
     public void loop() {
 
-        rightMotor = hardwareMap.get(DcMotorEx.class, "rightExtend");
-        //rightMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        rightMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-
-        leftMotor = hardwareMap.get(DcMotorEx.class, "leftExtend");
-
-        leftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        leftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        lift.updatePIDConstants(p, i, d, f);
 
 
         // This is a rising-edge detector that runs if and only if "a" was pressed this loop.
@@ -71,15 +56,22 @@ public class Slide_PID_Test extends OpMode {
 
 
         if (gamepad1.left_trigger > 0) {
-            rightMotor.setPower(-gamepad1.left_trigger);
-
-            // If we get any sort of manual input, turn PIDF off.
+            lift.setManualPower(-gamepad1.left_trigger);
             usePIDF = false;
         } else if (gamepad1.right_trigger > 0) {
-            leftMotor.setPower(gamepad1.right_trigger);
+            lift.setManualPower(gamepad1.right_trigger);
 
             // If we get any sort of manual input, turn PIDF off.
             usePIDF = false;
+        } else if (usePIDF) {
+            lift.setTarget(target);
+
         }
+
+
+        telemetry.addData("lift pos", lift.getCurrentPos());
+        telemetry.addData("lift target", target);
+        telemetry.update();
+        lift.update();
     }
 }

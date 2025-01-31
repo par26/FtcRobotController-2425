@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.common.action.Actions;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
+import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.autonomous.Auton;
 import org.firstinspires.ftc.teamcode.common.autonomous.FieldConstants;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.FConstants;
@@ -28,6 +29,7 @@ public class BlueBucket extends LinearOpMode {
         Actions.runBlocking(
                 new SequentialAction(
                         auton.depositPreload(),
+                        new SleepAction(1000),
                         auton.depositSample(),
                         auton.resetBot(),
                         auton.depositBucket(),
