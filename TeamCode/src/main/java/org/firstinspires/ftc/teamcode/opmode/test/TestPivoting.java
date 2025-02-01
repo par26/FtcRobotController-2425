@@ -1,73 +1,86 @@
 package org.firstinspires.ftc.teamcode.opmode.test;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.opmode.Teleop;
+import org.firstinspires.ftc.teamcode.common.action.Actions;
+import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
+import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
+import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
+import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
 
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TestPivoting extends OpMode {
 
-    public static double leftServoAngle;
-    public static double rightServoAngle;
+//    public static double leftServoAngle;
+//    public static double rightServoAngle;
+//
+//    public static int leftDirection = 0;
+//    public static int rightDirection = 0;
 
-    public static int leftDirection = 0;
-    public static int rightDirection = 0;
+    Intake intake;
+    Outake outake;
 
     ElapsedTime timer;
-    ServoImplEx leftServo;
-    ServoImplEx rightServo;
+    ServoImplEx leftOuttake;
+    ServoImplEx rightOuttake;
 
+    ServoImplEx leftIntake, rightIntake;
 
-    boolean cx, px, ca, pa = false;
+    Gamepad currentGamepad1 = new Gamepad();
+    Gamepad currentGamepad2 = new Gamepad();
+
+    Gamepad previousGamepad1 = new Gamepad();
+    Gamepad previousGamepad2 = new Gamepad();
 
     @Override
     public void init() {
-        leftServo = hardwareMap.get(ServoImplEx.class, "leftOutake");
-        rightServo = hardwareMap.get(ServoImplEx.class, "rightOutake");
 
-
-
-
-        if(rightDirection == 0) {
-            rightServo.setDirection(Servo.Direction.FORWARD);
-        } else if(rightDirection == 1) {
-            rightServo.setDirection(Servo.Direction.REVERSE);
-        }
-
-        if(leftDirection == 0) {
-            leftServo.setDirection(Servo.Direction.FORWARD);
-        } else if(leftDirection == 1) {
-            leftServo.setDirection(Servo.Direction.REVERSE);
-        }
-
-        leftServo.setPosition(0);
-        rightServo.setPosition(0);
+        intake.init();
+        intake.start();
+        outake.init();
+        outake.start();
     }
 
 
     @Override
     public void loop() {
         //Open left
-        px = cx;
-        cx = gamepad1.x;
-        if (cx && !px) {
-            leftServo.setPosition(0);
-            rightServo.setPosition(0);
+
+        previousGamepad1.copy(currentGamepad1);
+        previousGamepad2.copy(currentGamepad2);
+
+        currentGamepad1.copy(gamepad1);
+        currentGamepad2.copy(gamepad2);
+
+        if (currentGamepad1.a && !previousGamepad1.a) {
+            Actions.runBlocking(outake.toTransfer);
+            telemetry.addLine("Outake: Transfer");
+
         }
 
-        //Close left
-        pa = ca;
-        ca = gamepad1.a;
-        if (ca && !pa) {
-            leftServo.setPosition(leftServoAngle);
-            rightServo.setPosition(rightServoAngle);
+        if (currentGamepad1.b && !previousGamepad1.b) {
+            Actions.runBlocking(outake.toBucket);
+            telemetry.addLine("Outake: Bucket");
+
         }
+
+        if (currentGamepad1.x && !previousGamepad1.x) {
+            Actions.runBlocking(intake.lowerArm);
+            telemetry.addLine("Intake: Lower Arm");
+
+        }
+
+        if (currentGamepad1.y && !previousGamepad1.y) {
+            Actions.runBlocking(intake.retractArm);
+            telemetry.addLine("Intake: Retracted Arm");
+        }
+
+        telemetry.update();
     }
 }

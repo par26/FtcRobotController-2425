@@ -13,7 +13,7 @@ public class RobotConstants {
     public static double CLAW_CLOSE = 0.5;
     public static double CLAW_OPEN = 0;
 
-    public static double EX_EXTEND = 0.31;
+    public static double EX_EXTEND = 0.30;
     public static double EX_RETRACT = 0;
 
     public static double intakeSpinInPwr = 0.6;
