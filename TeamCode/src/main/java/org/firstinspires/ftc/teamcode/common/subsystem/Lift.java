@@ -28,7 +28,7 @@ public class Lift {
     public DcMotorEx leftLift;
 
     private int pos, initalPos;
-    public RunAction setPosition; //note that you can make more runactions, very easy
+    public RunAction topBucket, lowBucket, l2Touch, lowered; //note that you can make more runactions, very easy
     public PIDFController liftPID;
     public static int target;
 
@@ -41,6 +41,8 @@ public class Lift {
     private double lastPower;
     private int targetPos;
     private int currentPos;
+
+
 
     private final double MAX_DOWN_POWER = 1, MAX_UP_POWER = 0, MIN_POS = 0 , MAX_POS = 1; //hello import these into robot constants pls :)
 
@@ -110,15 +112,16 @@ public class Lift {
 
 
         } else {
-            setPower(this.power);
-        }
+            if(Math.abs(this.power) < 0.1) {
+                setPower(this.power);
+            } else {
+                setPower(this.power);
+            }        }
     }
 
     public double getLiftPID(double currentPos, double targetPos) {
         return Range.clip(liftPID.calculate(currentPos, targetPos), MAX_DOWN_POWER, MAX_UP_POWER);
     }
-
-
 
     public void setManualPower(double power) {
         state = State.MANUAL;
@@ -232,5 +235,8 @@ public class Lift {
             }
         };
     }
+
+    public void
+
 
 }
