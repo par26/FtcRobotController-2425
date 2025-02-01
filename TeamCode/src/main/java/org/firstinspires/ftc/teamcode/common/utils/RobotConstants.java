@@ -20,11 +20,10 @@ public class RobotConstants {
     public static double intakeSpinOutPwr = -1;
     public static double intakeSpinStopPwr = 0;
 
-    public static int liftToZero = 30;
-    public static int liftToHighChamber = 200;
+    public static int liftToMidChamber = 200;
     public static int liftToLowChamber = 200;
     public static int liftToLowBucket = 200;
-    public static int liftToHighBucket = 1750;
-    public static int liftToTransfer = 200;
+    public static int liftToHighBucket = 2000;
+    public static int liftToTransfer = 0;
 
 }

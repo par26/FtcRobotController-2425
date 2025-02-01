@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 //import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.teamcode.common.action.Action;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
+import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.FollowPathAction;
 import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
@@ -154,7 +155,7 @@ public class Auton {
 
             park = new Path(new BezierCurve(new Point(scorePose), new Point(parkControlPose), new Point(parkPose)));
             park.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading());
-
+            //max chen was here. Sam Xue also likes penis, slobbering all over it.
         }
 
         if (startLocation == RobotStart.OBSERVATION) {
@@ -255,9 +256,11 @@ public class Auton {
     //Bucket Specific
     public Action pickUpSample() {
         return new SequentialAction(
-                extend.extendEx,
                 intake.lowerArm,
                 intake.reverseIntake,
+                extend.extendEx,
+                new SleepAction(888),
+                extend.retractEx,
                 intake.retractArm,
                 outake.openClaw
 
@@ -267,26 +270,56 @@ public class Auton {
     //Bucket Specific
     public Action depositSample() {
         return new SequentialAction(
-                outake.openClaw,
+                outake.closeClaw,
+                lift.topBucket,
+                new SleepAction(2000),
                 outake.toBucket,
-                outake.closeClaw
+                outake.openClaw
         );
     }
 
     //
     public Action resetBot() {
         return new SequentialAction(
-                extend.retractEx,
                 outake.toTransfer,
-                intake.lowerArm,
-                outake.closeClaw
+                lift.lowered,
+                intake.lowerArm
         );
     }
 
     public Action liftHighBucket() {
         return new SequentialAction(
-                life.
-        )
+                lift.topBucket,
+                lift.waitSlide()
+        );
+    }
+
+    public Action liftLowBucket() {
+        return new SequentialAction(
+                lift.lowBucket,
+                lift.waitSlide()
+        );
+    }
+
+    public Action liftL2Chamber() {
+        return new SequentialAction(
+                lift.l2Touch,
+                lift.waitSlide()
+        );
+    }
+
+    public Action liftL1Chamber() {
+        return new SequentialAction(
+                lift.l1Touch,
+                lift.waitSlide()
+        );
+    }
+
+    public Action liftLowered() {
+        return new SequentialAction(
+                lift.topBucket,
+                lift.waitSlide()
+        );
     }
 
     //Dual Action
