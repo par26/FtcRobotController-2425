@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.common.action.Actions;
 
-import org.firstinspires.ftc.teamcode.common.action.ParallelAction;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
 import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.FConstants;
@@ -42,10 +41,10 @@ public class SXTeleOp extends OpMode  {
     Gamepad previousGamepad2 = new Gamepad();
 
     private enum TeleOpState{
-        TRANSFER, INOUT
+        TRANSFER_IN, TRANSFER_OUT, IN, OUT
     }
 
-    private TeleOpState currTeleState;
+    private TeleOpState TeleState;
 
     @Override
     public void init() {
@@ -54,7 +53,7 @@ public class SXTeleOp extends OpMode  {
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
 
-        currTeleState = TeleOpState.TRANSFER;
+        TeleState = TeleOpState.TRANSFER_IN;
 
         lift = new Lift(hardwareMap);
         extend = new Extend(hardwareMap);
@@ -89,6 +88,36 @@ public class SXTeleOp extends OpMode  {
         outake.toTransfer();
     }
 
+    private void switchToTransfer() {
+        Actions.runBlocking(new SequentialAction(
+                outake.openClaw,
+                outake.toTransfer,
+                intake.retractArm,
+                extend.retractEx
+        ));
+    }
+
+    private void switchToOuttake() {
+        Actions.runBlocking(new SequentialAction(
+                outake.closeClaw,
+                new SleepAction(500),
+                outake.toBucket,
+                intake.retractArm,
+                extend.retractEx
+        ));
+    }
+
+    private void switchToIntake() {
+        Actions.runBlocking(new SequentialAction(
+                outake.openClaw,
+                outake.toTransfer,
+                extend.extendEx,
+                new SleepAction(1250),
+                intake.lowerArm
+
+        ));
+    }
+
     @Override
     public void loop() {
 
@@ -116,73 +145,140 @@ public class SXTeleOp extends OpMode  {
             intake.setSpin(Intake.IntakeState.STOP, false);
         }
 
-        //Alternate intake & bucket
-        if ((currentGamepad2.left_bumper && !previousGamepad2.left_bumper) ||
-                (currentGamepad2.right_bumper && previousGamepad2.right_bumper)) {
-            switch (Intake.pivotState) {
-                case LOWER:
-                    Actions.runBlocking(new SequentialAction(outake.toTransfer, intake.retractArm));
-                    telemetry.addLine("Transfer State");
-                case RETRACT:
-                    if (currentGamepad2.left_bumper) {
-                        Actions.runBlocking(new SequentialAction(intake.lowerArm, outake.toBucket));
-                        telemetry.addLine("Intake/Outake: Bucket");
-                    }
+        //Tele State State Machine
+        // transformers urr er uh ah eh eh
+        if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
+            switch (TeleState) {
+                case TRANSFER_IN:
+                    switchToTransfer();
 
-                    if (currentGamepad2.right_bumper) {
-                        Actions.runBlocking(new SequentialAction(intake.lowerArm, outake.toSpecimen));
-                        telemetry.addLine("Intake/Outake: Specimen");
-                    }
+                    TeleState = TeleOpState.IN;
+                case IN:
+                    switchToIntake();
+
+                    TeleState = TeleOpState.TRANSFER_OUT;
+                case TRANSFER_OUT:
+                    switchToTransfer();
+
+                    TeleState = TeleOpState.OUT;
+                case OUT:
+                    switchToOuttake();
+
+                    TeleState = TeleOpState.TRANSFER_IN;
             }
         }
 
+        //Alternate intake & bucket
+//        if ((currentGamepad2.left_bumper && !previousGamepad2.left_bumper) ||
+//                (currentGamepad2.right_bumper && previousGamepad2.right_bumper)) {
+//            switch (Intake.pivotState) {
+//                case LOWER:
+//                    Actions.runBlocking(new SequentialAction(outake.toTransfer, intake.retractArm));
+//                    telemetry.addLine("Transfer State");
+//                case RETRACT:
+//                    if (currentGamepad2.left_bumper) {
+//                        Actions.runBlocking(new SequentialAction(intake.lowerArm, outake.toBucket));
+//                        telemetry.addLine("Intake/Outake: Bucket");
+//                    }
+//
+//                    if (currentGamepad2.right_bumper) {
+//                        Actions.runBlocking(new SequentialAction(intake.lowerArm, outake.toSpecimen));
+//                        telemetry.addLine("Intake/Outake: Specimen");
+//                    }
+//            }
+//        }
+
+
+
         //Alternating Tele State
-        // transformers urr er uh ah eh eh
-        //TODO: impl sleepaction when necesary
+//        //TODO: impl sleepaction when necesary
+//        if (currentGamepad2.b && !previousGamepad2.b) {
+//            switch (currTeleState) {
+//                case TRANSFER:
+//                    Actions.runBlocking(new SequentialAction(
+//                            outake.closeClaw,
+//                            new SleepAction(800),
+//                            new ParallelAction(
+//                                    outake.toBucket,
+//                                    intake.lowerArm
+//                            ),
+//                            extend.extendEx,
+//                            intake.spinIntake
+//                    ));
+//
+//                    currTeleState = TeleOpState.INOUT;
+//                case INOUT:
+//                    Actions.runBlocking(new SequentialAction(
+//                            outake.openClaw,
+//                            new SleepAction(800),
+//                            new ParallelAction(
+//                                    outake.toTransfer,
+//                                    intake.retractArm
+//                            ),
+//                            extend.retractEx,
+//                            intake.reverseIntake
+//                    ));
+//
+//                    currTeleState = TeleOpState.TRANSFER;
+//            }
+//        }
+
+//        if (currentGamepad2.x && !previousGamepad2.x) {
+//            extend.switchExtendState();
+//            telemetry.addLine("Extend State: " + extend.getState());
+//        }
+
+
+        //TELEOP STATE FAILSAFE (GP2)
+        if (currentGamepad2.y && !previousGamepad2.y) {
+            switchToOuttake();
+
+            TeleState = TeleOpState.TRANSFER_IN;
+        }
+
         if (currentGamepad2.b && !previousGamepad2.b) {
-            switch (currTeleState) {
-                case TRANSFER:
-                    Actions.runBlocking(new SequentialAction(
-                            outake.closeClaw,
-                            new SleepAction(800),
-                            new ParallelAction(
-                                    outake.toBucket,
-                                    intake.lowerArm
-                            ),
-                            extend.extendEx,
-                            intake.lowerArm
-                    ));
+            switchToTransfer();
 
-                    currTeleState = TeleOpState.INOUT;
-                case INOUT:
-                    Actions.runBlocking(new SequentialAction(
-                            outake.openClaw,
-                            new SleepAction(800),
-                            new ParallelAction(
-                                    outake.toTransfer,
-                                    intake.retractArm
-                            ),
-                            extend.retractEx,
-                            intake.reverseIntake
-                    ));
-
-                    currTeleState = TeleOpState.TRANSFER;
-            }
+            TeleState = TeleOpState.IN;
         }
 
         if (currentGamepad2.x && !previousGamepad2.x) {
-            extend.switchExtendState();
-            telemetry.addLine("Extend State: " + extend.getState());
+            switchToTransfer();
+
+            TeleState = TeleOpState.OUT;
         }
 
         if (currentGamepad2.a && !previousGamepad2.a) {
+            switchToIntake();
+
+            TeleState = TeleOpState.TRANSFER_OUT;
+        }
+
+        if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
             outake.switchClawState();
             telemetry.addLine("Claw State: " + outake.getClawState());
         }
 
-        double liftPower = gamepad2.right_trigger - gamepad2.left_trigger;
+        //Lift Controls (GP1)
+
+        //Manual Lift
+        double liftPower = gamepad1.right_trigger - gamepad1.left_trigger;
         if(Math.abs(liftPower) > 0.1) {
             lift.setManualPower(liftPower);
+        }
+
+        //Automatic Lift
+        if(currentGamepad1.dpad_up && previousGamepad1.dpad_up) {
+            Actions.runBlocking(lift.topBucket);
+        }
+        if(currentGamepad1.dpad_down && previousGamepad1.dpad_down) {
+            Actions.runBlocking(lift.lowered);
+        }
+        if(currentGamepad1.dpad_left && previousGamepad1.dpad_left) {
+            Actions.runBlocking(lift.l1Touch);
+        }
+        if(currentGamepad1.dpad_right && previousGamepad1.dpad_right) {
+            Actions.runBlocking(lift.l2Touch);
         }
 
 

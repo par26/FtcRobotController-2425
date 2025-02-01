@@ -30,8 +30,8 @@ public class TestExtend extends OpMode {
         pa = ca;
         ca = gamepad1.a;
         if (ca && !pa) {
-            extend.switchExtendState();
             telemetry.addLine("Extend Switched" + extend.getState());
+            extend.switchExtendState();
             count++;
             telemetry.update();
         }

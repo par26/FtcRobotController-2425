@@ -1,24 +1,17 @@
 package org.firstinspires.ftc.teamcode.common.subsystem;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.arcrobotics.ftclib.controller.PDController;
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.PIDFController;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.common.action.Action;
 import org.firstinspires.ftc.teamcode.common.action.RunAction;
 
-import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
+import org.firstinspires.ftc.teamcode.common.utils.RobotConstants;
 
 public class Lift {
 
@@ -28,7 +21,7 @@ public class Lift {
     public DcMotorEx leftLift;
 
     private int pos, initalPos;
-    public RunAction topBucket, lowBucket, l2Touch, lowered; //note that you can make more runactions, very easy
+    public RunAction topBucket, lowBucket, l2Touch, l1Touch, lowered; //note that you can make more runactions, very easy
     public PIDFController liftPID;
     public static int target;
 
@@ -73,7 +66,11 @@ public class Lift {
 
         liftPID = new PIDFController(p, i, d, f);
 
-        setPosition = new RunAction(this::setPosition);
+        topBucket = new RunAction(this::setTopBucket);
+        lowBucket = new RunAction(this::setLowBucket);
+        l2Touch = new RunAction(this::setL2Touch);
+        l1Touch = new RunAction(this::setL1Touch);
+        lowered = new RunAction(this::setLowered);
     }
 
 
@@ -236,7 +233,25 @@ public class Lift {
         };
     }
 
-    public void
+    public void setTopBucket() {
+        setTarget(RobotConstants.liftToHighBucket);
+    }
+
+    public void setLowBucket() {
+        setTarget(RobotConstants.liftToLowBucket);
+    }
+
+    public void setLowered() {
+        setTarget(RobotConstants.liftToTransfer);
+    }
+
+    public void setL1Touch() {
+        setTarget(RobotConstants.liftToLowChamber);
+    }
+
+    public void setL2Touch() {
+        setTarget(RobotConstants.liftToMidChamber);
+    }
 
 
 }
