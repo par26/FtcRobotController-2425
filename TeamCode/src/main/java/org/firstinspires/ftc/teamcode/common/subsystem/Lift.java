@@ -120,8 +120,6 @@ public class Lift {
         return Range.clip(liftPID.calculate(currentPos, targetPos), MAX_DOWN_POWER, MAX_UP_POWER);
     }
 
-
-
     public void setManualPower(double power) {
         state = State.MANUAL;
         this.power = power;
@@ -229,5 +227,8 @@ public class Lift {
             }
         };
     }
+
+    public void
+
 
 }
