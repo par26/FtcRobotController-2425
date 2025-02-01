@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.common.action.Actions;
 
 import org.firstinspires.ftc.teamcode.common.action.ParallelAction;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
+import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.LConstants;
 import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
@@ -143,6 +144,7 @@ public class SXTeleOp extends OpMode  {
                 case TRANSFER:
                     Actions.runBlocking(new SequentialAction(
                             outake.closeClaw,
+                            new SleepAction(800),
                             new ParallelAction(
                                     outake.toBucket,
                                     intake.lowerArm
@@ -155,6 +157,7 @@ public class SXTeleOp extends OpMode  {
                 case INOUT:
                     Actions.runBlocking(new SequentialAction(
                             outake.openClaw,
+                            new SleepAction(800),
                             new ParallelAction(
                                     outake.toTransfer,
                                     intake.retractArm
@@ -178,14 +181,17 @@ public class SXTeleOp extends OpMode  {
         }
 
         double liftPower = gamepad2.right_trigger - gamepad2.left_trigger;
-        lift.setPower(-liftPower);
+        if(Math.abs(liftPower) > 0.1) {
+            lift.setManualPower(liftPower);
+        }
+
 
         //driveing nyoooommmm
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
+
+
         follower.update();
-
-
-
+        lift.update();
         telemetry.update();
     }
 

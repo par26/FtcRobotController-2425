@@ -220,6 +220,7 @@ public class Auton {
         return new SequentialAction(
                 //TODO: Add subsystem actions
                 new FollowPathAction(follower, depositPreload)
+
         );
     }
 
@@ -234,7 +235,6 @@ public class Auton {
                 new FollowPathAction(follower, sample2),
                 pickUpSample(),
                 new FollowPathAction(follower, score2),
-                //pickUpSample(),
                 depositSample(),
                 resetBot(),
                 new FollowPathAction(follower, sample3),
@@ -255,6 +255,7 @@ public class Auton {
     //Bucket Specific
     public Action pickUpSample() {
         return new SequentialAction(
+                extend.extendEx,
                 intake.lowerArm,
                 intake.reverseIntake,
                 intake.retractArm,
@@ -275,10 +276,17 @@ public class Auton {
     //
     public Action resetBot() {
         return new SequentialAction(
+                extend.retractEx,
                 outake.toTransfer,
                 intake.lowerArm,
                 outake.closeClaw
         );
+    }
+
+    public Action liftHighBucket() {
+        return new SequentialAction(
+                life.
+        )
     }
 
     //Dual Action
