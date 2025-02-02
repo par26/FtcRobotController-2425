@@ -59,15 +59,14 @@ public class FieldConstants {
 
     //Bucket Sample Action Poses
 
-    public static final Pose bucketSampleTopPose = new Pose(35.4, 132.7, 0);
-    public static final Pose bucketSampleMiddlePose = new Pose(35.4, 132, 0);
-    public static final Pose bucketSampleBottomPose = new Pose(39.3, 132.48,  Math.toRadians(60));
+//    public static final Pose bucketSampleTopPose = new Pose(35.4, 132.7, 0);
+//    public static final Pose bucketSampleMiddlePose = new Pose(35.4, 132, 0);
+//    public static final Pose bucketSampleBottomPose = new Pose(39.3, 132.48,  Math.toRadians(60));
 
-    /* To Replace w/ Extend
+    // To Replace w/ Extend
     public static final Pose bucketSampleTopPose = new Pose(25, 125, Math.toRadians(345));
     public static final Pose bucketSampleMiddlePose = new Pose(25, 129, Math.toRadians(8));
     public static final Pose bucketSampleBottomPose = new Pose(25, 134,  Math.toRadians(20));
-     */
 
     //Push Points (im gonna cray cray)
     public static final Pose pushSeg1FCPose = new Pose(59.64,31.44, Math.toRadians(190));

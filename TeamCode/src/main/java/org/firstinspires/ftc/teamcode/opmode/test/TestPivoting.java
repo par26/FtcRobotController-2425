@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmode.test;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -41,10 +42,12 @@ public class TestPivoting extends OpMode {
     @Override
     public void init() {
 
+        intake = new Intake(hardwareMap);
+        outake = new Outake(hardwareMap);
+
         intake.init();
-        intake.start();
         outake.init();
-        outake.start();
+        new SequentialAction(intake.lowerArm, outake.toTransfer);
     }
 
 
