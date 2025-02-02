@@ -12,6 +12,8 @@ import android.util.Size;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.common.vision.SampleDetectionPipelinePNP;
 
+import java.util.ArrayList;
+
 public class Vision {
     private VisionPortal visionPortal;
     public SampleDetectionProcessor visionPipeline;
@@ -44,6 +46,10 @@ public class Vision {
 
     public void setProcessorEnabled(VisionProcessor processor, boolean enabled) {
         this.visionPortal.setProcessorEnabled(processor, enabled);
+    }
+
+    public ArrayList<SampleDetectionProcessor.AnalyzedStone> getAnalyzedStone() {
+        return visionPipeline.getDetectedStones();
     }
 
 

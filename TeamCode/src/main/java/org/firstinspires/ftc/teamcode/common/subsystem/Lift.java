@@ -60,7 +60,7 @@ public class Lift {
         leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
 
         leftLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         //leftLift.setDirection(DcMotorEx.Direction.REVERSE);
 

@@ -79,7 +79,7 @@ public class SampleDetectionProcessor implements VisionProcessor {
     private ArrayList<AnalyzedStone> internalStoneList = new ArrayList<>();
     private volatile ArrayList<AnalyzedStone> clientStoneList = new ArrayList<>();
 
-    static class AnalyzedStone {
+    static public class AnalyzedStone {
         double angle;
         String color;
         Mat rvec;

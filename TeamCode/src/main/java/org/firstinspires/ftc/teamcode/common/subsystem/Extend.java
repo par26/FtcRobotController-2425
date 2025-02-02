@@ -42,8 +42,8 @@ public class Extend {
 
         state = extendState.RETRACTED;
 
-        lExtend.setDirection(Servo.Direction.REVERSE);
-
+        //lExtend.setDirection(Servo.Direction.REVERSE);
+        rExtend.setDirection(Servo.Direction.REVERSE);
         extendEx = new RunAction(this::extendExtend);
         retractEx = new RunAction(this::retractExtend);
 

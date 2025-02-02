@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 //import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.teamcode.common.action.Action;
+import org.firstinspires.ftc.teamcode.common.action.Actions;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
 import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.FollowPathAction;
@@ -68,7 +69,7 @@ public class Auton {
 
         createPoses();
 
-        follower.setMaxPower(.85);
+        follower.setMaxPower(1);
 
         buildPaths();
     }
@@ -76,8 +77,9 @@ public class Auton {
     private void initSubsystems() {
         lift.init();
         extend.init();
-        outake.init();
         intake.init();
+        outake.init();
+
     }
 
     private void startSubsystems() {

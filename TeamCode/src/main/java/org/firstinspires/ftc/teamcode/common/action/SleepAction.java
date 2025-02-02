@@ -34,8 +34,7 @@ public class SleepAction implements Action {
         }
 
         if (!isFinished) {
-            p.put("Sleep Time Remaining", dt - timer.seconds());
-            if (timer.seconds() >= dt) {
+            if (timer.milliseconds() >= dt) {
                 isFinished = true;
                 return false; // Action is finished
             }
