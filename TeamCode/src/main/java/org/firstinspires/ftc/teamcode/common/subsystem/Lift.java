@@ -119,7 +119,7 @@ public class Lift {
 
         } else {
             if(Math.abs(this.power) < 0.1) {
-                setPower(this.power);
+                setPower(f);
             } else {
                 setPower(this.power);
             }

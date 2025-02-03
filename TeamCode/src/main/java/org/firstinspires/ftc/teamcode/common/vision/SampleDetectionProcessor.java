@@ -328,7 +328,6 @@ public class SampleDetectionProcessor implements VisionProcessor {
             imagePoints.release();
         }
     }
-
     static Point[] orderPoints(Point[] pts) {
         Point[] orderedPts = new Point[4];
         double[] sum = new double[4];
