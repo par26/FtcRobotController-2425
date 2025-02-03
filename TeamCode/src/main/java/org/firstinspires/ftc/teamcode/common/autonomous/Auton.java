@@ -13,7 +13,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 //import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.teamcode.common.action.Action;
-import org.firstinspires.ftc.teamcode.common.action.Actions;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
 import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.FollowPathAction;
@@ -63,7 +62,6 @@ public class Auton {
         this.lift = new Lift(hardwareMap);
         this.outake = new Outake(hardwareMap);
 
-        initSubsystems();
         startSubsystems();
 
 
@@ -72,14 +70,6 @@ public class Auton {
         follower.setMaxPower(1);
 
         buildPaths();
-    }
-
-    private void initSubsystems() {
-        lift.init();
-        extend.init();
-        intake.init();
-        outake.init();
-
     }
 
     private void startSubsystems() {
@@ -108,24 +98,24 @@ public class Auton {
 
                 break;
             case OBSERVATION:
-                spawnPose = observationStartPose;
-                preloadPose = observationPreloadPose;
-                grabPose = observationGrabPose;
-                parkPose = observationParkPose;
-                specimen1Pose = specimen1FCPose;
-                specimen2Pose = specimen2FCPose;
-                specimen3Pose = specimen3FCPose;
-                specimen4Pose = specimen4FCPose;
-                specimen5Pose = specimen5FCPose;
-
-                pushSeg1Pose = pushSeg1FCPose;
-                pushSeg1Control = pushSeg1FCControl;
-                pushSeg2Pose = pushSeg2FCPose;
-                pushSeg2Control = pushSeg2FCControl;
-                pushSeg3Pose = pushSeg3FCPose;
-                pushSeg3Control = pushSeg3FCControl;
-                pushSeg4Pose = pushSeg4FCPose;
-                pushSeg4Control = pushSeg4FCControl;
+//                spawnPose = observationStartPose;
+//                preloadPose = observationPreloadPose;
+//                grabPose = observationGrabPose;
+//                parkPose = observationParkPose;
+//                specimen1Pose = specimen1FCPose;
+//                specimen2Pose = specimen2FCPose;
+//                specimen3Pose = specimen3FCPose;
+//                specimen4Pose = specimen4FCPose;
+//                specimen5Pose = specimen5FCPose;
+//
+//                pushSeg1Pose = pushSeg1FCPose;
+//                pushSeg1Control = pushSeg1FCControl;
+//                pushSeg2Pose = pushSeg2FCPose;
+//                pushSeg2Control = pushSeg2FCControl;
+//                pushSeg3Pose = pushSeg3FCPose;
+//                pushSeg3Control = pushSeg3FCControl;
+//                pushSeg4Pose = pushSeg4FCPose;
+//                pushSeg4Control = pushSeg4FCControl;
                 break;
         }
 
@@ -157,65 +147,64 @@ public class Auton {
 
             park = new Path(new BezierCurve(new Point(scorePose), new Point(parkControlPose), new Point(parkPose)));
             park.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading());
-            //max chen was here. Sam Xue also likes penis, slobbering all over it.
         }
 
         if (startLocation == RobotStart.OBSERVATION) {
-            depositPreload = new Path(new BezierLine(new Point(spawnPose), new Point(preloadPose)));
-            depositPreload.setLinearHeadingInterpolation(spawnPose.getHeading(), preloadPose.getHeading());
-
-            pushSamples = follower.pathBuilder()
-                    .addPath(new BezierCurve(
-                            new Point(preloadPose),
-                            new Point(pushSeg1Control),
-                            new Point(pushSeg1Pose)
-                    )).setLinearHeadingInterpolation(preloadPose.getHeading(), pushSeg1Pose.getHeading())
-                    .addPath(new BezierCurve(
-                            new Point(pushSeg1Pose),
-                            new Point(pushSeg2Control),
-                            new Point(pushSeg2Pose)
-                    )).setLinearHeadingInterpolation(pushSeg1Pose.getHeading(), pushSeg2Pose.getHeading())
-                    .addPath(new BezierCurve(
-                            new Point(pushSeg2Pose),
-                            new Point(pushSeg3Control),
-                            new Point(pushSeg3Pose)
-                    )).setLinearHeadingInterpolation(pushSeg2Pose.getHeading(), pushSeg3Control.getHeading())
-                    .addPath(new BezierCurve(
-                            new Point(pushSeg3Pose),
-                            new Point(pushSeg4Control),
-                            new Point(pushSeg4Pose)
-                    )).setLinearHeadingInterpolation(pushSeg3Pose.getHeading(), pushSeg4Control.getHeading())
-                    .build();
-
-            hangSpecimen1 = new Path(new BezierLine(new Point(grabPose), new Point(specimen1Pose)));
-            hangSpecimen1.setLinearHeadingInterpolation(grabPose.getHeading(), specimen1Pose.getHeading());
-
-            grabSpecimen2 = new Path(new BezierLine(new Point(specimen1Pose), new Point(grabPose)));
-            grabSpecimen2.setLinearHeadingInterpolation(specimen1Pose.getHeading(), grabPose.getHeading());
-
-            hangSpecimen2 = new Path(new BezierLine(new Point(grabPose), new Point(specimen2Pose)));
-            hangSpecimen2.setLinearHeadingInterpolation(grabPose.getHeading(), specimen2Pose.getHeading());
-
-            grabSpecimen3 = new Path(new BezierLine(new Point(specimen2Pose), new Point(grabPose)));
-            grabSpecimen3.setLinearHeadingInterpolation(specimen2Pose.getHeading(), grabPose.getHeading());
-
-            hangSpecimen3 = new Path(new BezierLine(new Point(grabPose), new Point(specimen3Pose)));
-            hangSpecimen3.setLinearHeadingInterpolation(grabPose.getHeading(), specimen3Pose.getHeading());
-
-            grabSpecimen4 = new Path(new BezierLine(new Point(specimen3Pose), new Point(grabPose)));
-            grabSpecimen4.setLinearHeadingInterpolation(specimen3Pose.getHeading(), grabPose.getHeading());
-
-            hangSpecimen4 = new Path(new BezierLine(new Point(grabPose), new Point(specimen4Pose)));
-            hangSpecimen4.setLinearHeadingInterpolation(grabPose.getHeading(), specimen4Pose.getHeading());
-
-            grabSpecimen5 = new Path(new BezierLine(new Point(specimen4Pose), new Point(grabPose)));
-            grabSpecimen5.setLinearHeadingInterpolation(specimen4Pose.getHeading(), grabPose.getHeading());
-
-            hangSpecimen5 = new Path(new BezierLine(new Point(grabPose), new Point(specimen5Pose)));
-            hangSpecimen5.setLinearHeadingInterpolation(grabPose.getHeading(), specimen5Pose.getHeading());
-
-            park = new Path(new BezierLine(new Point(scorePose), new Point(parkPose)));
-            park.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading());
+//            depositPreload = new Path(new BezierLine(new Point(spawnPose), new Point(preloadPose)));
+//            depositPreload.setLinearHeadingInterpolation(spawnPose.getHeading(), preloadPose.getHeading());
+//
+//            pushSamples = follower.pathBuilder()
+//                    .addPath(new BezierCurve(
+//                            new Point(preloadPose),
+//                            new Point(pushSeg1Control),
+//                            new Point(pushSeg1Pose)
+//                    )).setLinearHeadingInterpolation(preloadPose.getHeading(), pushSeg1Pose.getHeading())
+//                    .addPath(new BezierCurve(
+//                            new Point(pushSeg1Pose),
+//                            new Point(pushSeg2Control),
+//                            new Point(pushSeg2Pose)
+//                    )).setLinearHeadingInterpolation(pushSeg1Pose.getHeading(), pushSeg2Pose.getHeading())
+//                    .addPath(new BezierCurve(
+//                            new Point(pushSeg2Pose),
+//                            new Point(pushSeg3Control),
+//                            new Point(pushSeg3Pose)
+//                    )).setLinearHeadingInterpolation(pushSeg2Pose.getHeading(), pushSeg3Pose.getHeading())
+//                    .addPath(new BezierCurve(
+//                            new Point(pushSeg3Pose),
+//                            new Point(pushSeg4Control),
+//                            new Point(pushSeg4Pose)
+//                    )).setLinearHeadingInterpolation(pushSeg3Pose.getHeading(), pushSeg4Pose.getHeading())
+//                    .build();
+//
+//            hangSpecimen1 = new Path(new BezierLine(new Point(grabPose), new Point(specimen1Pose)));
+//            hangSpecimen1.setLinearHeadingInterpolation(grabPose.getHeading(), specimen1Pose.getHeading());
+//
+//            grabSpecimen2 = new Path(new BezierLine(new Point(specimen1Pose), new Point(grabPose)));
+//            grabSpecimen2.setLinearHeadingInterpolation(specimen1Pose.getHeading(), grabPose.getHeading());
+//
+//            hangSpecimen2 = new Path(new BezierLine(new Point(grabPose), new Point(specimen2Pose)));
+//            hangSpecimen2.setLinearHeadingInterpolation(grabPose.getHeading(), specimen2Pose.getHeading());
+//
+//            grabSpecimen3 = new Path(new BezierLine(new Point(specimen2Pose), new Point(grabPose)));
+//            grabSpecimen3.setLinearHeadingInterpolation(specimen2Pose.getHeading(), grabPose.getHeading());
+//
+//            hangSpecimen3 = new Path(new BezierLine(new Point(grabPose), new Point(specimen3Pose)));
+//            hangSpecimen3.setLinearHeadingInterpolation(grabPose.getHeading(), specimen3Pose.getHeading());
+//
+//            grabSpecimen4 = new Path(new BezierLine(new Point(specimen3Pose), new Point(grabPose)));
+//            grabSpecimen4.setLinearHeadingInterpolation(specimen3Pose.getHeading(), grabPose.getHeading());
+//
+//            hangSpecimen4 = new Path(new BezierLine(new Point(grabPose), new Point(specimen4Pose)));
+//            hangSpecimen4.setLinearHeadingInterpolation(grabPose.getHeading(), specimen4Pose.getHeading());
+//
+//            grabSpecimen5 = new Path(new BezierLine(new Point(specimen4Pose), new Point(grabPose)));
+//            grabSpecimen5.setLinearHeadingInterpolation(specimen4Pose.getHeading(), grabPose.getHeading());
+//
+//            hangSpecimen5 = new Path(new BezierLine(new Point(grabPose), new Point(specimen5Pose)));
+//            hangSpecimen5.setLinearHeadingInterpolation(grabPose.getHeading(), specimen5Pose.getHeading());
+//
+//            park = new Path(new BezierLine(new Point(scorePose), new Point(parkPose)));
+//            park.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading());
         }
     }
 
@@ -223,7 +212,6 @@ public class Auton {
         return new SequentialAction(
                 //TODO: Add subsystem actions
                 new FollowPathAction(follower, depositPreload)
-
         );
     }
 
@@ -258,12 +246,13 @@ public class Auton {
     //Bucket Specific
     public Action pickUpSample() {
         return new SequentialAction(
-                intake.lowerArm,
-                intake.reverseIntake,
+                intake.armLower,
+                intake.intakeReverse,
                 extend.extendEx,
-                new SleepAction(888),
+                new SleepAction(1500),
                 extend.retractEx,
-                intake.retractArm,
+                intake.intakeStop,
+                intake.armToTransfer,
                 outake.openClaw
 
         );
@@ -273,8 +262,7 @@ public class Auton {
     public Action depositSample() {
         return new SequentialAction(
                 outake.closeClaw,
-                lift.topBucket,
-                new SleepAction(2000),
+                liftHighBucket(),
                 outake.toBucket,
                 outake.openClaw
         );
@@ -284,8 +272,8 @@ public class Auton {
     public Action resetBot() {
         return new SequentialAction(
                 outake.toTransfer,
-                lift.lowered,
-                intake.lowerArm
+                liftLowered(),
+                intake.armLower
         );
     }
 
@@ -319,7 +307,7 @@ public class Auton {
 
     public Action liftLowered() {
         return new SequentialAction(
-                lift.topBucket,
+                lift.lowered,
                 lift.waitSlide()
         );
     }
@@ -328,6 +316,7 @@ public class Auton {
     public Action park() {
         return new SequentialAction(
                 new FollowPathAction(follower, park)
+                //impl liftl1 chamber or l2 chamber
         );
     }
 }

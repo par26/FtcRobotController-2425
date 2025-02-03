@@ -161,16 +161,7 @@ public class Teleop extends OpMode  {
     @Override
     public void start() {
         follower.startTeleopDrive();
-        initSubsystems();
         startSubsystems();
-    }
-
-
-    private void initSubsystems() {
-        lift.init();
-        extend.init();
-        outake.init();
-        intake.init();
     }
 
     private void startSubsystems() {
@@ -253,7 +244,7 @@ public class Teleop extends OpMode  {
 
 
         if(currentGamepad2.y && previousGamepad2.y) {
-            Actions.runBlocking(new ParallelAction(outake.toBucket, intake.lowerArm));
+            Actions.runBlocking(new ParallelAction(outake.toBucket, intake.armLower));
         }
 //
 //

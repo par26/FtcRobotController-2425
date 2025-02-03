@@ -63,6 +63,11 @@ public class Outake {
         liftOArm = new RunAction(this::toBucket);
     }
 
+    public void start() {
+        Actions.runBlocking(closeClaw);
+        Actions.runBlocking(toTransfer);
+    }
+
     public void setClawState(clawState state) {
         if (state == clawState.CLOSED) {
             oClaw.setPosition(clawClose);
@@ -114,17 +119,6 @@ public class Outake {
 
     public void checkPos() {
         clawPos = oClaw.getPosition();
-    }
-
-    public void init() {
-        Actions.runBlocking(closeClaw);
-    }
-
-    public void start() {
-        Actions.runBlocking(closeClaw);
-        Actions.runBlocking(toTransfer);
-
-
     }
 
 }

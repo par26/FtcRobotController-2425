@@ -3,14 +3,11 @@ package org.firstinspires.ftc.teamcode.opmode.test;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.common.action.Actions;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
-import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
 
@@ -45,9 +42,9 @@ public class TestPivoting extends OpMode {
         intake = new Intake(hardwareMap);
         outake = new Outake(hardwareMap);
 
-        intake.init();
-        outake.init();
-        new SequentialAction(intake.lowerArm, outake.toTransfer);
+        intake.start();
+        outake.start();
+        new SequentialAction(intake.armLower, outake.toTransfer);
     }
 
 
@@ -74,13 +71,13 @@ public class TestPivoting extends OpMode {
         }
 
         if (currentGamepad1.x && !previousGamepad1.x) {
-            Actions.runBlocking(intake.lowerArm);
+            Actions.runBlocking(intake.armLower);
             telemetry.addLine("Intake: Lower Arm");
 
         }
 
         if (currentGamepad1.y && !previousGamepad1.y) {
-            Actions.runBlocking(intake.retractArm);
+            Actions.runBlocking(intake.armToTransfer);
             telemetry.addLine("Intake: Retracted Arm");
         }
 

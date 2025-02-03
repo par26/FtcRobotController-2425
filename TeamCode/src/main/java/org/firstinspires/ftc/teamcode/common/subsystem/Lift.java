@@ -73,6 +73,18 @@ public class Lift {
         lowered = new RunAction(this::setLowered);
     }
 
+    public void start() {
+        resetEncoder();
+        initalPos = currentPos;
+        rightLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        rightLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+
+        leftLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        leftLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        resetEncoder();
+
+        setTarget(0);
+    }
 
     public void update() {
         if (state == State.PID) {
@@ -105,15 +117,13 @@ public class Lift {
                 setPower(pid);
             }
 
-
-
-
         } else {
             if(Math.abs(this.power) < 0.1) {
                 setPower(this.power);
             } else {
                 setPower(this.power);
-            }        }
+            }
+        }
     }
 
     public double getLiftPID(double currentPos, double targetPos) {
@@ -196,25 +206,6 @@ public class Lift {
 
     public boolean atTarget() {
         return Math.abs(target - leftLift.getCurrentPosition()) < 10;
-    }
-
-
-    public void init() {
-        resetEncoder();
-        initalPos = currentPos;
-        rightLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        rightLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-
-        leftLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        leftLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-
-        resetEncoder();
-
-    }
-
-    public void start() {
-        initalPos = currentPos;
-        setTarget(0);
     }
 
 

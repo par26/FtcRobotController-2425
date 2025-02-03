@@ -49,6 +49,10 @@ public class Extend {
 
     }
 
+    public void start() {
+        Actions.runBlocking(retractEx);
+    }
+
     public void setExtendState(Extend.extendState state) {
         if(state == extendState.EXTENDED) {
             lExtend.setPosition(extended);
@@ -83,11 +87,4 @@ public class Extend {
         return this.state == extendState.EXTENDED ? "Extended" : "Retracted";
     }
 
-    public void init() {
-        Actions.runBlocking(retractEx);
-    }
-
-    public void start() {
-        Actions.runBlocking(retractEx);
-    }
 }

@@ -15,8 +15,8 @@ public class FieldConstants {
      *  ------
      *  Height
      *
-     * Length: 16.5
-     * Width: 14.5
+     * Height: 14.5
+     * Width: 16.5
      * Robot deposits sample in bucket from back
      * Robot intakes sample from front
      *

@@ -26,7 +26,7 @@ public class Intake {
     private ServoImplEx larmPivot;
     private ServoImplEx rarmPivot;
 
-    public RunAction spinIntake, stopIntake, reverseIntake, lowerArm, retractArm, twistArm;
+    public RunAction intakeSpin, intakeStop, intakeReverse, armLower, armToTransfer;
     private double spinPower, reversePower, stopPower;
     //adjust as needed, for the wheel
 
@@ -52,14 +52,20 @@ public class Intake {
 
         rarmPivot.setDirection(ServoImplEx.Direction.REVERSE);
 
-        spinIntake = new RunAction(this::spinIntake);
-        reverseIntake = new RunAction(this::reverseIntake);
-        stopIntake = new RunAction(this::stopIntake);
-        lowerArm = new RunAction(this::lowerArm);
-        retractArm = new RunAction(this::retractArm);
+        intakeSpin = new RunAction(this::spinIntake);
+        intakeReverse = new RunAction(this::reverseIntake);
+        intakeStop = new RunAction(this::stopIntake);
+        armLower = new RunAction(this::lowerArm);
+        armToTransfer = new RunAction(this::retractArm);
 
 
     }
+
+    public void start() {
+        Actions.runBlocking(new ParallelAction(armToTransfer, intakeStop));
+    }
+
+
     //okok
     //spin to win part
     public void setSpin(IntakeState state, boolean onlyChangeState) {
@@ -76,8 +82,6 @@ public class Intake {
             }
         }
     }
-
-
 
 
 
@@ -121,16 +125,6 @@ public class Intake {
         larmPivot.setPosition(0);
         rarmPivot.setPosition(0);
     }
-
-
-    public void init() {
-        Actions.runBlocking(new ParallelAction(retractArm, stopIntake));
-
-    }
-    public void start() {
-        Actions.runBlocking(new ParallelAction(retractArm, stopIntake));
-    }
-
 
 
 }
