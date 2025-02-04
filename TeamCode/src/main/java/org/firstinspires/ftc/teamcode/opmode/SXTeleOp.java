@@ -140,6 +140,7 @@ public class SXTeleOp extends OpMode  {
                 telemetry.addLine("Intake Spin: Spinning Out");
             }
         } else {
+            Actions.runBlocking(new SleepAction(800));
             intake.setSpin(Intake.IntakeState.STOP, false);
         }
 
