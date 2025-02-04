@@ -82,13 +82,16 @@ public class SXTeleOp extends OpMode  {
                 outake.openClaw,
                 outake.toTransfer,
                 intake.armToTransfer,
-                extend.retractEx
+                extend.retractEx,
+                new SleepAction(1000),
+                intake.intakeStop
         ));
     }
 
     private void switchToOuttake() {
         Actions.runBlocking(new SequentialAction(
                 outake.closeClaw,
+                intake.intakeStop,
                 new SleepAction(500),
                 outake.toBucket,
                 intake.armToTransfer,
@@ -102,7 +105,8 @@ public class SXTeleOp extends OpMode  {
                 outake.toTransfer,
                 extend.extendEx,
                 new SleepAction(500),
-                intake.armLower
+                intake.armLower,
+                intake.intakeSpin
 
         ));
     }
@@ -126,23 +130,6 @@ public class SXTeleOp extends OpMode  {
         currentGamepad1.copy(gamepad1);
         currentGamepad2.copy(gamepad2);
 
-
-        //Intake Controls
-        if (Intake.pivotState == Intake.PivotState.LOWER) {
-            if (gamepad2.dpad_left) {
-                intake.setSpin(Intake.IntakeState.STOP, false);
-                telemetry.addLine("Intake Spin: Stopped");
-            } else if (gamepad2.dpad_up) {
-                intake.setSpin(Intake.IntakeState.REVERSE, false);
-                telemetry.addLine("Intake Spin: Intaking");
-            } else {
-                intake.setSpin(Intake.IntakeState.FORWARD, false);
-                telemetry.addLine("Intake Spin: Spinning Out");
-            }
-        } else {
-            Actions.runBlocking(new SleepAction(800));
-            intake.setSpin(Intake.IntakeState.STOP, false);
-        }
 
         //Tele State State Machine
         // transformers urr er uh ah eh eh
