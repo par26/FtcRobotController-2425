@@ -223,18 +223,25 @@ public class Auton {
                 new FollowPathAction(follower, score1),
                 depositSample(),
                 resetBot(),
+                new SleepAction(1000),
                 new FollowPathAction(follower, sample2),
                 pickUpSample(),
                 new FollowPathAction(follower, score2),
                 depositSample(),
                 resetBot(),
+                new SleepAction(1000),
                 new FollowPathAction(follower, sample3),
                 pickUpSample(),
                 new FollowPathAction(follower, score3),
                 depositSample(),
-                resetBot()
+                resetBot(),
+                new SleepAction(1000)
         );
     }
+
+//    public Action visionSample() {
+//
+//    }
 
     public Action hangSpecimen() {
         return new SequentialAction(
@@ -251,8 +258,9 @@ public class Auton {
                 extend.extendEx,
                 new SleepAction(1500),
                 extend.retractEx,
-                intake.intakeStop,
                 intake.armToTransfer,
+                new SleepAction(800),
+                intake.intakeStop,
                 outake.openClaw
 
         );
@@ -268,7 +276,6 @@ public class Auton {
         );
     }
 
-    //
     public Action resetBot() {
         return new SequentialAction(
                 outake.toTransfer,

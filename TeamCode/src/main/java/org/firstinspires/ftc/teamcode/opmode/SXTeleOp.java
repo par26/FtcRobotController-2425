@@ -53,7 +53,7 @@ public class SXTeleOp extends OpMode  {
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
 
-        TeleState = TeleOpState.TRANSFER_IN;
+        TeleState = TeleOpState.IN;
 
         lift = new Lift(hardwareMap);
         extend = new Extend(hardwareMap);
@@ -107,10 +107,19 @@ public class SXTeleOp extends OpMode  {
         ));
     }
 
+    private double squareInput(double input) {
+        double result = input * input;
+
+        if(input < 0) {
+            result *= -1;
+        }
+
+        return result;
+    }
+
     @Override
     public void loop() {
 
-        //Rising edge wannabe
         previousGamepad1.copy(currentGamepad1);
         previousGamepad2.copy(currentGamepad2);
 
@@ -219,7 +228,7 @@ public class SXTeleOp extends OpMode  {
 
 
         //driveing nyoooommmm
-        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
+        follower.setTeleOpMovementVectors(squareInput(-gamepad1.left_stick_y), squareInput(-gamepad1.left_stick_x), squareInput(-gamepad1.right_stick_x), true);
 
 
         follower.update();
