@@ -104,8 +104,8 @@ public class Lift {
 
 
             // Just make sure it gets to fully retracted if target is 0
-            if (target == 0 && !slidesReached) {
-                power -= 0.03;
+            if (atTarget() && !slidesReached) {
+                power -= .1;
             } /*else if (target >= MAX_SLIDES_EXTENSION && !slidesReached) {
                 power += 0.1;
             } */
@@ -118,11 +118,7 @@ public class Lift {
             }
 
         } else {
-            if(Math.abs(this.power) < 0.1) {
-                setPower(f);
-            } else {
-                setPower(this.power);
-            }
+            setPower(this.power);
         }
     }
 
@@ -205,7 +201,7 @@ public class Lift {
     }
 
     public boolean atTarget() {
-        return Math.abs(target - leftLift.getCurrentPosition()) < 10;
+        return Math.abs(target - leftLift.getCurrentPosition()) < 5;
     }
 
 

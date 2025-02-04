@@ -5,12 +5,18 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 //vision!!!
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.common.action.Action;
+import org.firstinspires.ftc.teamcode.common.action.RunAction;
 import org.firstinspires.ftc.teamcode.common.vision.SampleDetectionProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import android.util.Size;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.common.vision.SampleDetectionPipelinePNP;
+import org.opencv.core.Mat;
 
 import java.util.ArrayList;
 
@@ -18,8 +24,10 @@ public class Vision {
     private VisionPortal visionPortal;
     public SampleDetectionProcessor visionPipeline;
 
-    public Vision(Telemetry telemetry){
-        this.visionPipeline = new SampleDetectionProcessor(telemetry);
+    RunAction getStone;
+
+    public Vision(){
+        this.visionPipeline = new SampleDetectionProcessor();
     }
 
     public void startCamera() {
@@ -33,6 +41,29 @@ public class Vision {
                 .build();
 
         visionPortal.setProcessorEnabled(visionPipeline, true);
+
+    }
+
+
+    public Action processSingleFrame() {
+        return new Action() {
+            @Override
+            public boolean run(TelemetryPacket telemetryPacket) {
+                if (visionPortal == null || visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+                    startCamera();
+                    return false;
+                }
+
+                // Wait for the processor to process one frame
+                if(visionPipeline.isFrameProcessed()) {
+                    visionPortal.stopStreaming();
+                    return true;
+                    // Wait until the frame is processed
+                }
+
+                return false;
+            }
+        };
     }
 
     public VisionPortal.CameraState getCameraState() {

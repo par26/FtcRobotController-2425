@@ -42,6 +42,9 @@ public class SampleDetectionProcessor implements VisionProcessor {
 
     private Telemetry telemetry;
 
+
+
+    private boolean frameProccessed = false;
     // Configuration parameters
     public double minArea = 40;
     public double aspectRatioThresh = 0.5;
@@ -80,15 +83,15 @@ public class SampleDetectionProcessor implements VisionProcessor {
     private volatile ArrayList<AnalyzedStone> clientStoneList = new ArrayList<>();
 
     static public class AnalyzedStone {
-        double angle;
-        String color;
-        Mat rvec;
-        Mat tvec;
-        double dist;
+        public double angle;
+        public String color;
+        public Mat rvec;
+        public Mat tvec;
+        public double dist;
     }
 
-    public SampleDetectionProcessor(Telemetry telemetry) {
-        this.telemetry = telemetry;
+    public SampleDetectionProcessor() {
+        //this.telemetry = telemetry;
     }
 
     @Override
@@ -128,29 +131,30 @@ public class SampleDetectionProcessor implements VisionProcessor {
         clientStoneList.addAll(internalStoneList);
         telemetry.update();
 
+        frameProccessed = true;
         return input;
     }
 
     @Override
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight,
                             float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
-        // Implement any additional canvas drawing if needed
-        if (closestStone != null) {
-            // Create paint object for drawing
-            Paint paint = new Paint();
-            paint.setColor(android.graphics.Color.GREEN);
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(4);
-
-            // Draw text with distance information
-            String distanceText = String.format("Distance: %.2f units", closestStone.dist);
-            paint.setTextSize(36);
-            canvas.drawText(distanceText, 50, 50, paint);
-
-            // Draw color information
-            String colorText = "Color: " + closestStone.color;
-            canvas.drawText(colorText, 50, 100, paint);
-        }
+//        // Implement any additional canvas drawing if needed
+//        if (closestStone != null) {
+//            // Create paint object for drawing
+//            Paint paint = new Paint();
+//            paint.setColor(android.graphics.Color.GREEN);
+//            paint.setStyle(Paint.Style.STROKE);
+//            paint.setStrokeWidth(4);
+//
+//            // Draw text with distance information
+//            String distanceText = String.format("Distance: %.2f units", closestStone.dist);
+//            paint.setTextSize(36);
+//            canvas.drawText(distanceText, 50, 50, paint);
+//
+//            // Draw color information
+//            String colorText = "Color: " + closestStone.color;
+//            canvas.drawText(colorText, 50, 100, paint);
+//        }
     }
 
     void findContours(Mat input) {
@@ -476,6 +480,9 @@ public class SampleDetectionProcessor implements VisionProcessor {
         }
     }
 
+    public boolean isFrameProcessed(){
+        return frameProccessed;
+    }
     public ArrayList<AnalyzedStone> getDetectedStones() {
         return clientStoneList;
     }

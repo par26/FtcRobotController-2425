@@ -200,9 +200,8 @@ public class SXTeleOp extends OpMode  {
 
         //Manual Lift
         double liftPower = gamepad1.right_trigger - gamepad1.left_trigger;
-        if(Math.abs(liftPower) > 0.1) {
-            lift.setManualPower(liftPower);
-        }
+        lift.setManualPower(liftPower);
+
 
         //Automatic Lift
         if(currentGamepad1.dpad_up && previousGamepad1.dpad_up) {
