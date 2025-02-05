@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.common.action.Actions;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
+import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
 
@@ -23,6 +24,7 @@ public class TestPivoting extends OpMode {
 
     Intake intake;
     Outake outake;
+    Extend extend;
 
     ElapsedTime timer;
     ServoImplEx leftOuttake;
@@ -41,9 +43,11 @@ public class TestPivoting extends OpMode {
 
         intake = new Intake(hardwareMap);
         outake = new Outake(hardwareMap);
+        extend = new Extend(hardwareMap);
 
         intake.start();
         outake.start();
+        extend.start();
         new SequentialAction(intake.armLower, outake.toTransfer);
     }
 
@@ -79,6 +83,10 @@ public class TestPivoting extends OpMode {
         if (currentGamepad1.y && !previousGamepad1.y) {
             Actions.runBlocking(intake.armToTransfer);
             telemetry.addLine("Intake: Retracted Arm");
+        }
+
+        if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down) {
+            outake.switchClawState();
         }
 
         telemetry.update();

@@ -106,7 +106,7 @@ public class SXTeleOp extends OpMode  {
                 extend.extendEx,
                 new SleepAction(500),
                 intake.armLower,
-                intake.intakeSpin
+                intake.intakeIn
 
         ));
     }

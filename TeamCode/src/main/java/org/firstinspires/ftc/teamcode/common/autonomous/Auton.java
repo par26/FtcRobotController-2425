@@ -254,7 +254,7 @@ public class Auton {
     public Action pickUpSample() {
         return new SequentialAction(
                 intake.armLower,
-                intake.intakeReverse,
+                intake.intakeIn,
                 extend.extendEx,
                 new SleepAction(1500),
                 extend.retractEx,

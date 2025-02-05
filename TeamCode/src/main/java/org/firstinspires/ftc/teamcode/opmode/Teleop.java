@@ -244,7 +244,7 @@ public class Teleop extends OpMode  {
 
 
         if(currentGamepad2.y && previousGamepad2.y) {
-            Actions.runBlocking(new ParallelAction(outake.toBucket, intake.armLower));
+            outake.toBucket();
         }
 //
 //

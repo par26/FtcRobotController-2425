@@ -20,7 +20,6 @@ public class TestExtend extends OpMode {
 
     @Override
     public void start() {
-        extend.init();
         extend.start();
     }
 
@@ -30,8 +29,8 @@ public class TestExtend extends OpMode {
         pa = ca;
         ca = gamepad1.a;
         if (ca && !pa) {
-            telemetry.addLine("Extend Switched" + extend.getState());
             extend.switchExtendState();
+            telemetry.addLine("Extend Switched" + extend.getState());
             count++;
             telemetry.update();
         }

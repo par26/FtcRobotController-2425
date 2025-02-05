@@ -39,7 +39,6 @@ public class Slide_PID_Test extends OpMode {
     public void init() {
         lift = new Lift(hardwareMap);
 
-        lift.init();
         lift.start();
     }
 

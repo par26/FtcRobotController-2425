@@ -30,7 +30,7 @@ public class Outake {
     double clawPos;
 
     public RunAction openClaw, closeClaw, toTransfer, toBucket, toSpecimen, liftOArm;
-    private double ARM_RETRACT = 0.5;
+    private double ARM_RETRACT;
     private double ARM_SPECIMEN;
     private double ARM_BUCKET;
 
@@ -91,28 +91,25 @@ public class Outake {
         }
     }
 
-    public void openClaw() {
+    public void closeClaw() {
         setClawState(clawState.OPEN);
     }
 
-    public void closeClaw() {
+    public void openClaw() {
         setClawState(clawState.CLOSED);
     }
 
     public void toTransfer () {
         lOutake.setPosition(ARM_RETRACT);
         rOutake.setPosition(ARM_RETRACT);
-        Actions.runBlocking(new SequentialAction(openClaw));
     }
 
     public void toBucket() {
-        Actions.runBlocking(new SequentialAction(closeClaw));
         lOutake.setPosition(ARM_BUCKET);
         rOutake.setPosition(ARM_BUCKET);
     }
 
     public void toSpeicmen() {
-        Actions.runBlocking(new SequentialAction(closeClaw));
         lOutake.setPosition(ARM_SPECIMEN);
         rOutake.setPosition(ARM_SPECIMEN);
     }

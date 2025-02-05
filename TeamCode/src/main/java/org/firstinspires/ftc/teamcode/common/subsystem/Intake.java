@@ -26,7 +26,7 @@ public class Intake {
     private ServoImplEx larmPivot;
     private ServoImplEx rarmPivot;
 
-    public RunAction intakeSpin, intakeStop, intakeReverse, armLower, armToTransfer;
+    public RunAction intakeIn, intakeStop, intakeOut, armLower, armToTransfer;
     private double spinPower, reversePower, stopPower;
     //adjust as needed, for the wheel
 
@@ -52,8 +52,8 @@ public class Intake {
 
         rarmPivot.setDirection(ServoImplEx.Direction.REVERSE);
 
-        intakeSpin = new RunAction(this::spinIntake);
-        intakeReverse = new RunAction(this::reverseIntake);
+        intakeIn = new RunAction(this::spinInIntake);
+        intakeOut = new RunAction(this::spinOutIntake);
         intakeStop = new RunAction(this::stopIntake);
         armLower = new RunAction(this::lowerArm);
         armToTransfer = new RunAction(this::retractArm);
@@ -74,9 +74,9 @@ public class Intake {
             //we are only changing the state, not actually changing the power
         } else {
             if (state == IntakeState.FORWARD) {
-                spinIntake();
+                spinInIntake();
             } else if (state == IntakeState.REVERSE) {
-                reverseIntake();
+                spinOutIntake();
             } else if (state == IntakeState.STOP) {
                 stopIntake();
             }
@@ -90,13 +90,13 @@ public class Intake {
         Rspin.setPower(power);
     }
 
-    public void spinIntake() {
+    public void spinInIntake() {
         Lspin.setPower(spinPower);
         Rspin.setPower(spinPower);
         this.intakeState = IntakeState.FORWARD;
     }
 
-    public void reverseIntake() {
+    public void spinOutIntake() {
         Lspin.setPower(reversePower);
         Rspin.setPower(reversePower);
         intakeState = IntakeState.REVERSE;
