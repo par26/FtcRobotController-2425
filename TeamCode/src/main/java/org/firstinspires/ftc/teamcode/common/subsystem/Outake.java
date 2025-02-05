@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.common.action.Actions;
 import org.firstinspires.ftc.teamcode.common.action.RunAction;
-import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
 import org.firstinspires.ftc.teamcode.common.utils.RobotConstants;
 
 public class Outake {
@@ -25,7 +24,7 @@ public class Outake {
     private ServoImplEx rOutake;
 
 
-    private double clawOpen, clawClose;
+    private double clawClose, clawOpen;
 
     double clawPos;
 
@@ -41,8 +40,8 @@ public class Outake {
         ARM_BUCKET= RobotConstants.OUTAKE_ARM_BUCKET;
         ARM_SPECIMEN = RobotConstants.OUTAKE_ARM_SPECIMEN;
 
-        clawOpen = RobotConstants.CLAW_OPEN;
         clawClose = RobotConstants.CLAW_CLOSE;
+        clawOpen = RobotConstants.CLAW_OPEN;
 
 
         oClaw = hardwareMap.get(ServoImplEx.class, "oClaw");
@@ -54,8 +53,8 @@ public class Outake {
         lOutake.setDirection(Servo.Direction.REVERSE);
 
 
-        openClaw = new RunAction(this::openClaw);
-        closeClaw = new RunAction(this::closeClaw);
+        openClaw = new RunAction(this::closeClaw);
+        closeClaw = new RunAction(this::openClaw);
 
         toTransfer = new RunAction(this::toTransfer);
         toBucket = new RunAction(this::toBucket);
@@ -91,11 +90,11 @@ public class Outake {
         }
     }
 
-    public void closeClaw() {
+    public void openClaw() {
         setClawState(clawState.OPEN);
     }
 
-    public void openClaw() {
+    public void closeClaw() {
         setClawState(clawState.CLOSED);
     }
 

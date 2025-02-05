@@ -10,8 +10,8 @@ public class RobotConstants {
     public static double OUTAKE_ARM_LOWER = 0.0;
     public static double OUTAKE_ARM_BUCKET = 0.8;
     public static double OUTAKE_ARM_SPECIMEN = 0.8;
-    public static double CLAW_CLOSE = 0.5;
-    public static double CLAW_OPEN = 0;
+    public static double CLAW_OPEN = 0.5;
+    public static double CLAW_CLOSE = 0;
 
     public static double EX_EXTEND = 0.265;
     public static double EX_RETRACT = 0;
