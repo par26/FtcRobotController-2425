@@ -83,7 +83,7 @@ public class SXTeleOp extends OpMode  {
                 outake.toTransfer,
                 intake.armToTransfer,
                 extend.retractEx,
-                new SleepAction(1000),
+                new SleepAction(800),
                 intake.intakeStop
         ));
     }
