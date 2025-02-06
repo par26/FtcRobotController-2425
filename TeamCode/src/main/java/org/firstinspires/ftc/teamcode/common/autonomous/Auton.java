@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 //import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.teamcode.common.action.Action;
+import org.firstinspires.ftc.teamcode.common.action.ParallelAction;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
 import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.FollowPathAction;
@@ -211,43 +212,46 @@ public class Auton {
     public Action depositPreload() {
         return new SequentialAction(
                 //TODO: Add subsystem actions
-                intake.armLower,
-                outake.toBucket,
-                intake.intakeIn,
-                new SleepAction(500),
-                intake.intakeOut,
-                intake.armToTransfer,
-                outake.toTransfer,
-                new SleepAction(850),
-                outake.closeClaw,
+                new ParallelAction(
+                        intake.armLower,
+                        outake.toBucket,
+                        intake.intakeIn
+                ),
+                new SleepAction(300),
+                new ParallelAction(
+                        intake.intakeOut,
+                        intake.armToTransfer,
+                        outake.toTransfer
+                ),
+                new SleepAction(300),
                 new FollowPathAction(follower, depositPreload),
-                lift.topBucket,
-                lift.waitSlide(),
-                outake.toBucket,
-                outake.openClaw,
-                new SleepAction(800)
+                depositSampleHigh(),
+
+
+                new SleepAction(300),
+                resetBot()
         );
     }
 
-    public Action depositBucket() {
+    public Action handleBucketChain() {
         //TODO: use parallel action when auton is substituted with extend working and follow path and extend at the same time
         return new SequentialAction(
                 new FollowPathAction(follower, sample1),
                 pickUpSample(),
                 new FollowPathAction(follower, score1),
-                depositSample(),
+                depositSampleHigh(),
                 resetBot(),
                 new SleepAction(1000),
                 new FollowPathAction(follower, sample2),
                 pickUpSample(),
                 new FollowPathAction(follower, score2),
-                depositSample(),
+                depositSampleHigh(),
                 resetBot(),
                 new SleepAction(1000),
                 new FollowPathAction(follower, sample3),
                 pickUpSample(),
                 new FollowPathAction(follower, score3),
-                depositSample(),
+                depositSampleHigh(),
                 resetBot(),
                 new SleepAction(1000)
         );
@@ -270,23 +274,28 @@ public class Auton {
                 intake.armLower,
                 intake.intakeIn,
                 extend.extendEx,
-                new SleepAction(3000),
+                new SleepAction(3500),
                 extend.retractEx,
                 intake.armToTransfer,
-                new SleepAction(800),
+                new SleepAction(700),
                 intake.intakeStop,
-                outake.closeClaw
 
+                new SleepAction(300)
         );
     }
 
     //Bucket Specific
-    public Action depositSample() {
+    public Action depositSampleHigh() {
         return new SequentialAction(
                 outake.closeClaw,
                 liftHighBucket(),
+                new SleepAction(150),
                 outake.toBucket,
-                outake.openClaw
+                new SleepAction(100),
+                outake.openClaw,
+
+
+                new SleepAction(300)
         );
     }
 
@@ -294,6 +303,7 @@ public class Auton {
         return new SequentialAction(
                 outake.toTransfer,
                 outake.openClaw,
+                new SleepAction(300),
                 lift.lowered,
                 lift.waitSlide(),
                 intake.armLower

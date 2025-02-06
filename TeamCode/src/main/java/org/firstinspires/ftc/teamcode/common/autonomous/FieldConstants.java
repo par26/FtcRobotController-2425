@@ -25,7 +25,6 @@ public class FieldConstants {
      */
 
     //TODO: Change bucket accordingly for meet
-        //for the record, only changed  bucket so far for upgraded but no extension bot
 
     public enum
     RobotStart {
@@ -38,13 +37,13 @@ public class FieldConstants {
 
     // Preload Poses
     // TODO: Adjust accordingly how far robot can reach
-    public static final Pose bucketPreloadPose = new Pose(14.5, 129, Math.toRadians(315));
+    public static final Pose bucketPreloadPose = new Pose(15.5, 127.5, Math.toRadians(315));
     public static final Pose observationPreloadPose = new Pose(38.25, 60.625, Math.toRadians(180));
 
     public static final Pose bucketPreloadControl = new Pose(15.66, 93.02);
 
     //Bucket Score Poses TODO: adjust accordingly
-    public static final Pose bucketScorePose = new Pose(16, 125, Math.toRadians(315));
+    public static final Pose bucketScorePose = new Pose(15.5, 127.5, Math.toRadians(315));
 
     //Observation Grab Poses
     public static final Pose observationGrabPose = new Pose(12.3, 33, Math.toRadians(270));
@@ -82,7 +81,7 @@ public class FieldConstants {
     //TODO: will need adjusting, not minmaxed
     public static final Pose observationParkPose = new Pose(60, 47, 0);
 
-    public static final Pose bucketParkPose = new Pose(59, 96, Math.toRadians(90));
+    public static final Pose bucketParkPose = new Pose(59, 97, Math.toRadians(90));
     public static final Pose bucketParkControl = new Pose(70.38, 106.87);
 
 

@@ -7,13 +7,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.common.action.Actions;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
+import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.autonomous.Auton;
 import org.firstinspires.ftc.teamcode.common.autonomous.FieldConstants;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.LConstants;
 
 @Autonomous
-public class BlueBucket extends LinearOpMode {
+public class AutonPathTest extends LinearOpMode {
 
     Auton auton;
 
@@ -28,8 +29,6 @@ public class BlueBucket extends LinearOpMode {
         Actions.runBlocking(
                 new SequentialAction(
                         auton.depositPreload(),
-                        auton.handleBucketChain(),
-                        auton.park(),
                         auton.resetBot()
                 )
         );
