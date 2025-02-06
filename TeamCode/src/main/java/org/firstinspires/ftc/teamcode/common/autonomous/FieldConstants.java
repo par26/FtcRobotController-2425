@@ -44,7 +44,7 @@ public class FieldConstants {
     public static final Pose bucketPreloadControl = new Pose(15.66, 93.02);
 
     //Bucket Score Poses TODO: adjust accordingly
-    public static final Pose bucketScorePose = new Pose(14.5, 129, Math.toRadians(315));
+    public static final Pose bucketScorePose = new Pose(16, 125, Math.toRadians(315));
 
     //Observation Grab Poses
     public static final Pose observationGrabPose = new Pose(12.3, 33, Math.toRadians(270));

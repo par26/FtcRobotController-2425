@@ -53,8 +53,8 @@ public class Outake {
         lOutake.setDirection(Servo.Direction.REVERSE);
 
 
-        openClaw = new RunAction(this::closeClaw);
-        closeClaw = new RunAction(this::openClaw);
+        openClaw = new RunAction(this::openClaw);
+        closeClaw = new RunAction(this::closeClaw);
 
         toTransfer = new RunAction(this::toTransfer);
         toBucket = new RunAction(this::toBucket);
@@ -63,8 +63,8 @@ public class Outake {
     }
 
     public void start() {
-        Actions.runBlocking(closeClaw);
         Actions.runBlocking(toTransfer);
+        Actions.runBlocking(openClaw);
     }
 
     public void setClawState(clawState state) {

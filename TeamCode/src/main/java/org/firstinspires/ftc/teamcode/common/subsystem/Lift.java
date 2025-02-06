@@ -21,7 +21,7 @@ public class Lift {
     public DcMotorEx leftLift;
 
     private int pos, initalPos;
-    public RunAction topBucket, lowBucket, l2Touch, l1Touch, lowered; //note that you can make more runactions, very easy
+    public RunAction update, topBucket, lowBucket, l2Touch, l1Touch, lowered; //note that you can make more runactions, very easy
     public PIDFController liftPID;
     public static int target;
 
@@ -71,6 +71,7 @@ public class Lift {
         l2Touch = new RunAction(this::setL2Touch);
         l1Touch = new RunAction(this::setL1Touch);
         lowered = new RunAction(this::setLowered);
+        update = new RunAction(this::update);
     }
 
     public void start() {
@@ -96,7 +97,7 @@ public class Lift {
 
 
             slidesReached = liftPID.atSetPoint();
-            slidesRetracted = (target <= 0) && slidesReached;
+            slidesRetracted = (target <= 5) && slidesReached;
 
 
             currentPos = rightLift.getCurrentPosition();
@@ -104,8 +105,8 @@ public class Lift {
 
 
             // Just make sure it gets to fully retracted if target is 0
-            if (atTarget() && !slidesReached) {
-                power -= .1;
+            if (slidesRetracted&& !slidesReached) {
+                power -= .05;
             } /*else if (target >= MAX_SLIDES_EXTENSION && !slidesReached) {
                 power += 0.1;
             } */
@@ -201,7 +202,7 @@ public class Lift {
     }
 
     public boolean atTarget() {
-        return Math.abs(target - leftLift.getCurrentPosition()) < 5;
+        return Math.abs(target - rightLift.getCurrentPosition()) < 10;
     }
 
 
@@ -210,12 +211,23 @@ public class Lift {
             private boolean set = false;
             @Override
             public boolean run(TelemetryPacket telemetryPacket) {
+
+                if(!set) {
+                    telemetryPacket.addLine("code staarted");
+                    setTarget(target);
+                    set = true;
+                }
+
+
                 if (atTarget())
-                {return true;}
+                {return false;}
 
                 update();
 
-                return false;
+                telemetryPacket.addLine("running wait action");
+                telemetryPacket.addTimestamp();
+
+                return true;
             }
         };
     }

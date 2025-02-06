@@ -28,9 +28,10 @@ public class BlueBucket extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        new SleepAction(1000),
                         auton.depositPreload(),
-                        new SleepAction(1000),
+                        new SleepAction(888),
+                        auton.resetBot(),
+                        new SleepAction(888),
                         auton.depositSample(),
                         auton.resetBot(),
                         auton.depositBucket(),

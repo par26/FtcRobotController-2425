@@ -211,7 +211,21 @@ public class Auton {
     public Action depositPreload() {
         return new SequentialAction(
                 //TODO: Add subsystem actions
-                new FollowPathAction(follower, depositPreload)
+                intake.armLower,
+                outake.toBucket,
+                intake.intakeIn,
+                new SleepAction(500),
+                intake.intakeOut,
+                intake.armToTransfer,
+                outake.toTransfer,
+                new SleepAction(850),
+                outake.closeClaw,
+                new FollowPathAction(follower, depositPreload),
+                lift.topBucket,
+                lift.waitSlide(),
+                outake.toBucket,
+                outake.openClaw,
+                new SleepAction(800)
         );
     }
 
@@ -256,12 +270,12 @@ public class Auton {
                 intake.armLower,
                 intake.intakeIn,
                 extend.extendEx,
-                new SleepAction(1500),
+                new SleepAction(3000),
                 extend.retractEx,
                 intake.armToTransfer,
                 new SleepAction(800),
                 intake.intakeStop,
-                outake.openClaw
+                outake.closeClaw
 
         );
     }
@@ -279,7 +293,9 @@ public class Auton {
     public Action resetBot() {
         return new SequentialAction(
                 outake.toTransfer,
-                liftLowered(),
+                outake.openClaw,
+                lift.lowered,
+                lift.waitSlide(),
                 intake.armLower
         );
     }
