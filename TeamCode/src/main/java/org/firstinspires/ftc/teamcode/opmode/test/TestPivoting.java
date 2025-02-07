@@ -47,7 +47,7 @@ public class TestPivoting extends OpMode {
 
         intake.start();
         outake.start();
-        extend.start();
+//        extend.start();
         new SequentialAction(intake.armLower, outake.toTransfer);
     }
 

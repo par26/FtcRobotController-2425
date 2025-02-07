@@ -47,8 +47,7 @@ public class Intake {
         reversePower = RobotConstants.intakeSpinOutPwr;
         stopPower = 0;
 
-        larmPivot.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        rarmPivot.setPwmRange(new PwmControl.PwmRange(500, 2500));
+
 
         rarmPivot.setDirection(ServoImplEx.Direction.REVERSE);
 
@@ -109,12 +108,12 @@ public class Intake {
     }
 
     // the arm itself
-    public void lowerArm() {
+    public void retractArm() {
         larmPivot.setPosition(ARM_LOWER);
        rarmPivot.setPosition(ARM_LOWER);
        pivotState = PivotState.LOWER;
     }
-    public void retractArm() {
+    public void lowerArm() {
         //bw
        larmPivot.setPosition(ARM_RETRACT);
        rarmPivot.setPosition(ARM_RETRACT);

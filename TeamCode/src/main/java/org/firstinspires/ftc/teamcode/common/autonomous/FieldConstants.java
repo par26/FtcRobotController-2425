@@ -37,13 +37,13 @@ public class FieldConstants {
 
     // Preload Poses
     // TODO: Adjust accordingly how far robot can reach
-    public static final Pose bucketPreloadPose = new Pose(15.5, 127.5, Math.toRadians(315));
+    public static final Pose bucketPreloadPose = new Pose(15.2, 127.8, Math.toRadians(315));
     public static final Pose observationPreloadPose = new Pose(38.25, 60.625, Math.toRadians(180));
 
     public static final Pose bucketPreloadControl = new Pose(15.66, 93.02);
 
     //Bucket Score Poses TODO: adjust accordingly
-    public static final Pose bucketScorePose = new Pose(15.5, 127.5, Math.toRadians(315));
+    public static final Pose bucketScorePose = new Pose(15.2, 127.8, Math.toRadians(315));
 
     //Observation Grab Poses
     public static final Pose observationGrabPose = new Pose(12.3, 33, Math.toRadians(270));

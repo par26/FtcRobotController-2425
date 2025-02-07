@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.common.subsystem;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
@@ -51,6 +52,9 @@ public class Outake {
 
         this.claw = clawState.CLOSED;
         lOutake.setDirection(Servo.Direction.REVERSE);
+
+        lOutake.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        rOutake.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
 
         openClaw = new RunAction(this::openClaw);
