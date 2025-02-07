@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.common.subsystem;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.common.action.Actions;
@@ -16,7 +15,7 @@ public class Intake {
         FORWARD, REVERSE, STOP
     }
     public enum PivotState {
-        LOWER, RETRACT
+        RETRACT, LOWER
     }
 
 
@@ -30,7 +29,7 @@ public class Intake {
     private double spinPower, reversePower, stopPower;
     //adjust as needed, for the wheel
 
-    private final double ARM_LOWER, ARM_RETRACT;
+    private final double ARM_RETRACT, ARM_LOWER;
     //palceholder arm and wrist values
     public Intake(HardwareMap hardwareMap) {
         Lspin = hardwareMap.get(CRServo.class, "leftSpin");
@@ -40,13 +39,12 @@ public class Intake {
         rarmPivot = hardwareMap.get(ServoImplEx.class, "rightArmPivot");
         this.intakeState = IntakeState.STOP;
         pivotState = PivotState.RETRACT;
-        ARM_LOWER = RobotConstants.INTAKE_ARM_LOWER;
         ARM_RETRACT = RobotConstants.INTAKE_ARM_RETRACT;
+        ARM_LOWER = RobotConstants.INTAKE_ARM_LOWER;
 
         spinPower = RobotConstants.intakeSpinInPwr;
         reversePower = RobotConstants.intakeSpinOutPwr;
         stopPower = 0;
-
 
 
         rarmPivot.setDirection(ServoImplEx.Direction.REVERSE);
@@ -109,15 +107,15 @@ public class Intake {
 
     // the arm itself
     public void retractArm() {
-        larmPivot.setPosition(ARM_LOWER);
-       rarmPivot.setPosition(ARM_LOWER);
-       pivotState = PivotState.LOWER;
+        larmPivot.setPosition(ARM_RETRACT);
+       rarmPivot.setPosition(ARM_RETRACT);
+       pivotState = PivotState.RETRACT;
     }
     public void lowerArm() {
         //bw
-       larmPivot.setPosition(ARM_RETRACT);
-       rarmPivot.setPosition(ARM_RETRACT);
-       pivotState = PivotState.RETRACT;
+       larmPivot.setPosition(ARM_LOWER);
+       rarmPivot.setPosition(ARM_LOWER);
+       pivotState = PivotState.LOWER;
     }
 
     public void zeroArm() {
