@@ -291,7 +291,7 @@ public class Auton {
                 liftHighBucket(),
                 new SleepAction(150),
                 outake.toBucket,
-                new SleepAction(100),
+                new SleepAction(1000),
                 outake.openClaw,
 
 
@@ -303,7 +303,7 @@ public class Auton {
         return new SequentialAction(
                 outake.toTransfer,
                 outake.openClaw,
-                new SleepAction(300),
+                new SleepAction(1000),
                 lift.lowered,
                 lift.waitSlide(),
                 intake.armLower
