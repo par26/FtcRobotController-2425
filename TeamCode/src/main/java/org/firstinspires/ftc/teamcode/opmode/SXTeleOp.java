@@ -222,7 +222,7 @@ public class SXTeleOp extends OpMode  {
         }
 
         //Intake Controls
-        if (gamepad2.dpad_up) {
+        if (currentGamepad2.dpad_up && previousGamepad2.dpad_up) {
             intake.setSpin(Intake.IntakeState.REVERSE, false);
         }
 
