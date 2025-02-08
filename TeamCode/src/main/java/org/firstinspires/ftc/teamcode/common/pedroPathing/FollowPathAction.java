@@ -21,7 +21,7 @@ public class FollowPathAction implements Action {
     private boolean holdEnd = false;
     private boolean started = false;
 
-    private double maxPower = 1.0; // Default max power
+    private double maxPower = .65; // Default max power
     private double completionThreshold = 0.99; // Default completion threshold
 
     public FollowPathAction(Follower follower, Path path, boolean holdEnd) {

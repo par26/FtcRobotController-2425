@@ -23,7 +23,7 @@ public class Slide_PID_Test extends OpMode {
 
 
     Lift lift;
-    public static double p = 0.04, i = 0, d = 0.000001, f = 0.01;
+    public static double p = 0.02, i = 0, d = 0.00005, f = 0.01;
     public static int target = 200;
 
 
@@ -68,8 +68,8 @@ public class Slide_PID_Test extends OpMode {
         }
 
 
-        telemetry.addData("lift pos", lift.getCurrentPos());
-        telemetry.addData("lift target", target);
+        telemetry.addData("pos", lift.getCurrentPos());
+        telemetry.addData("target", target);
         telemetry.update();
         lift.update();
     }

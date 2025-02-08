@@ -68,7 +68,8 @@ public class Auton {
 
         createPoses();
 
-        follower.setMaxPower(1);
+        follower.setMaxPower(0.65);
+
 
         buildPaths();
     }
@@ -209,6 +210,20 @@ public class Auton {
         }
     }
 
+    //depositPreload, sample1, score1, sample2, score2, sample3, score3;
+    public Action pathOnly() {
+        return new SequentialAction(
+                new FollowPathAction(follower, depositPreload),
+                new FollowPathAction(follower, sample1),
+                new FollowPathAction(follower, score1),
+                new FollowPathAction(follower, sample2),
+                new FollowPathAction(follower, score2),
+                new FollowPathAction(follower, sample3),
+                new FollowPathAction(follower, score3)
+        );
+    }
+
+
     public Action depositPreload() {
         return new SequentialAction(
                 //TODO: Add subsystem actions
@@ -237,6 +252,7 @@ public class Auton {
         //TODO: use parallel action when auton is substituted with extend working and follow path and extend at the same time
         return new SequentialAction(
                 new FollowPathAction(follower, sample1),
+                new SleepAction(1000),
                 pickUpSample(),
                 new FollowPathAction(follower, score1),
                 depositSampleHigh(),
@@ -271,12 +287,13 @@ public class Auton {
     //Bucket Specific
     public Action pickUpSample() {
         return new SequentialAction(
-                intake.armLower,
+               // extend.extendEx,
+                new SleepAction(1000),
                 intake.intakeIn,
-                extend.extendEx,
-                new SleepAction(3500),
-                extend.retractEx,
+                intake.armLower,
+                new SleepAction(3000),
                 intake.armToTransfer,
+                //extend.retractEx,
                 new SleepAction(700),
                 intake.intakeStop,
 
@@ -288,7 +305,7 @@ public class Auton {
     public Action depositSampleHigh() {
         return new SequentialAction(
                 outake.closeClaw,
-                liftHighBucket(),
+                //liftHighBucket(),
                 new SleepAction(150),
                 outake.toBucket,
                 new SleepAction(1000),
@@ -304,8 +321,7 @@ public class Auton {
                 outake.toTransfer,
                 outake.openClaw,
                 new SleepAction(1000),
-                lift.lowered,
-                lift.waitSlide(),
+               // liftLowered(),
                 intake.armLower
         );
     }
@@ -353,4 +369,13 @@ public class Auton {
         );
     }
 }
+
+/*Ryan: 1430
+* Bet:
+
+* Sam: 580
+* Bet:
+*
+*Pot: 140
+ */
 

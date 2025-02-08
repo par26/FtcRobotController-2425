@@ -53,6 +53,7 @@ public class SXTeleOp extends OpMode  {
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
 
+
         TeleState = TeleOpState.IN;
 
         lift = new Lift(hardwareMap);
@@ -104,7 +105,7 @@ public class SXTeleOp extends OpMode  {
                 outake.openClaw,
                 outake.toTransfer,
                 extend.extendEx,
-                new SleepAction(500),
+                new SleepAction(1250),
                 intake.armLower,
                 intake.intakeIn
 
@@ -163,32 +164,32 @@ public class SXTeleOp extends OpMode  {
         }
 
         //TELEOP STATE FAILSAFE (GP2)
-        if (currentGamepad2.y && !previousGamepad2.y) {
+        if (currentGamepad2.a && !previousGamepad2.a) {
             switchToOuttake();
 
             telemetry.addLine("Tele State: TRANSFER IN");
             TeleState = TeleOpState.TRANSFER_IN;
         }
 
-        if (currentGamepad2.b && !previousGamepad2.b) {
+        if (currentGamepad2.x && !previousGamepad2.x) {
             switchToTransfer();
 
             TeleState = TeleOpState.IN;
         }
 
-        if (currentGamepad2.x && !previousGamepad2.x) {
+        if (currentGamepad2.b && !previousGamepad2.b) {
             switchToTransfer();
 
             TeleState = TeleOpState.OUT;
         }
 
-        if (currentGamepad2.a && !previousGamepad2.a) {
+        if (currentGamepad2.y && !previousGamepad2.y) {
             switchToIntake();
 
             TeleState = TeleOpState.TRANSFER_OUT;
         }
 
-        if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
+        if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
             outake.switchClawState();
             telemetry.addLine("Claw State: " + outake.getClawState());
         }
@@ -216,9 +217,13 @@ public class SXTeleOp extends OpMode  {
             Actions.runBlocking(lift.l2Touch);
         }
 
+        if(currentGamepad1.a && previousGamepad1.a) {
+            lift.resetEncoder();
+        }
+
 
         //driveing nyoooommmm
-        follower.setTeleOpMovementVectors(squareInput(-gamepad1.left_stick_y), squareInput(-gamepad1.left_stick_x), squareInput(-gamepad1.right_stick_x), true);
+        follower.setTeleOpMovementVectors(squareInput(-gamepad1.left_stick_y), squareInput(-gamepad1.left_stick_x), (Math.pow(-gamepad1.right_stick_x, 3)), true);
 
 
         follower.update();

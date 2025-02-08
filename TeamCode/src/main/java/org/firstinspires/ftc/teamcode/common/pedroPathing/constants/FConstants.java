@@ -14,6 +14,8 @@ public class FConstants {
     static {
         FollowerConstants.localizers = Localizers.PINPOINT;
 
+        //FollowerConstants.automaticHoldEnd = false;
+
         PinpointConstants.forwardY = 0.94;
         PinpointConstants.strafeX = 2.185;
         PinpointConstants.distanceUnit = DistanceUnit.INCH;
@@ -66,6 +68,8 @@ public class FConstants {
         FollowerConstants.pathEndHeadingConstraint = 0.007;
 
         FollowerConstants.pathEndTimeoutConstraint = 50;
+
+        FollowerConstants.useBrakeModeInTeleOp = true;
 
     }
 }

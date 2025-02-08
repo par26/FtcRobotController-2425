@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
 import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.autonomous.Auton;
 import org.firstinspires.ftc.teamcode.common.autonomous.FieldConstants;
+import org.firstinspires.ftc.teamcode.common.pedroPathing.FollowPathAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.constants.LConstants;
 
@@ -22,14 +23,13 @@ public class AutonPathTest extends LinearOpMode {
     public void runOpMode() {
         Constants.setConstants(FConstants.class, LConstants.class);
 
-        auton = new Auton(hardwareMap, FieldConstants.RobotStart.BUCKET, new Follower(hardwareMap));
-
         waitForStart();
+
+        auton = new Auton(hardwareMap, FieldConstants.RobotStart.BUCKET, new Follower(hardwareMap));
 
         Actions.runBlocking(
                 new SequentialAction(
-                        auton.depositPreload(),
-                        auton.resetBot()
+                        auton.pathOnly()
                 )
         );
 

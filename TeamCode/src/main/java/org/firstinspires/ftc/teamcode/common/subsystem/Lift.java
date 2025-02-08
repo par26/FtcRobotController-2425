@@ -45,7 +45,7 @@ public class Lift {
 
     State state;
 
-    public static double p = 0.04, i = 0, d = 0.000001, f = 0.01;
+    public static double p = 0.02, i = 0, d = 0.0005, f = 0.01;
     private final double TICKS_PER_REV = 384.5; //ticks
     private final double PULLEY_CIRCUMFERENCE = 4.40945; //inches
 
@@ -60,9 +60,8 @@ public class Lift {
         leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
 
         leftLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        //leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        //leftLift.setDirection(DcMotorEx.Direction.REVERSE);
+        leftLift.setDirection(DcMotorEx.Direction.REVERSE);
 
         liftPID = new PIDFController(p, i, d, f);
 
@@ -103,20 +102,20 @@ public class Lift {
             currentPos = rightLift.getCurrentPosition();
             double pid = liftPID.calculate(rightLift.getCurrentPosition(), target);
 
-
-            // Just make sure it gets to fully retracted if target is 0
-            if (slidesRetracted&& !slidesReached) {
-                power -= .05;
-            } /*else if (target >= MAX_SLIDES_EXTENSION && !slidesReached) {
-                power += 0.1;
-            } */
-
-            if (slidesRetracted) {
-                resetEncoder();
-                setPower(0);
-            } else {
+//
+//            // Just make sure it gets to fully retracted if target is 0
+//            if (slidesRetracted&& !slidesReached) {
+//                power -= .05;
+//            } /*else if (target >= MAX_SLIDES_EXTENSION && !slidesReached) {
+//                power += 0.1;
+//            } */
+//
+//            if (slidesRetracted) {
+//                resetEncoder();
+//                setPower(0);
+//            } else {
                 setPower(pid);
-            }
+            //}
 
         } else {
             setPower(this.power);
