@@ -18,7 +18,7 @@ public class FollowPathAction implements Action {
     private final Follower m_follower;
     private Path m_path;
     private PathChain m_pathChain;
-    private boolean holdEnd = false;
+    private boolean holdEnd = true;
     private boolean started = false;
 
     private double maxPower = .65; // Default max power
