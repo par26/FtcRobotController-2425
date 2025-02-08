@@ -221,6 +221,10 @@ public class SXTeleOp extends OpMode  {
             lift.resetEncoder();
         }
 
+        //Intake Controls
+        if (gamepad2.dpad_up) {
+            intake.setSpin(Intake.IntakeState.REVERSE, false);
+        }
 
         //driveing nyoooommmm
         follower.setTeleOpMovementVectors(squareInput(-gamepad1.left_stick_y), squareInput(-gamepad1.left_stick_x), (Math.pow(-gamepad1.right_stick_x, 3)), true);

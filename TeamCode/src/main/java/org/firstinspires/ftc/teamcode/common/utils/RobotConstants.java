@@ -5,9 +5,9 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class RobotConstants {
     public static double INTAKE_ARM_RETRACT = 0.35;
-    public static double INTAKE_ARM_LOWER = 0.19;
+    public static double INTAKE_ARM_LOWER = 0.2;
     public static double WRIST_TWIST_POSITION = 1;
-    public static double OUTAKE_ARM_LOWER = 0.2;
+    public static double OUTAKE_ARM_LOWER = 0.125;
     public static double OUTAKE_ARM_BUCKET = 0.8;
     public static double OUTAKE_ARM_SPECIMEN = 0.8;
     public static double CLAW_OPEN = 0.5;
