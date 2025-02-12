@@ -32,11 +32,14 @@ public class BlueBucket extends LinearOpMode {
                 new SequentialAction(
                         auton.depositPreload(),
                         new SleepAction(5000),
-                        auton.handleBucketChain(),
                         auton.park(),
                         auton.resetBot()
                 )
         );
+
+        if(isStopRequested()) {
+            Actions.runBlocking(auton.outake.toBucket);
+        }
 
     }
 }

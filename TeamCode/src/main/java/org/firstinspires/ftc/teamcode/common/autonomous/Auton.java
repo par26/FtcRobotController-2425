@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.common.action.ParallelAction;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
 import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.FollowPathAction;
+import org.firstinspires.ftc.teamcode.common.pedroPathing.HoldPointAction;
 import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
@@ -214,20 +215,44 @@ public class Auton {
     public Action pathOnly() {
         return new SequentialAction(
                 new FollowPathAction(follower, depositPreload),
+                new HoldPointAction(follower, bucketScorePose, 1000),
                 new FollowPathAction(follower, sample1),
+                new SleepAction(1000),
                 new FollowPathAction(follower, score1),
+                new SleepAction(1000),
                 new FollowPathAction(follower, sample2),
+                new SleepAction(1000),
                 new FollowPathAction(follower, score2),
+                new SleepAction(1000),
                 new FollowPathAction(follower, sample3),
+                new SleepAction(1000),
                 new FollowPathAction(follower, score3)
+        );
+        
+    }
+
+    public Action DepositPreload1() {
+        return new SequentialAction(
+                new ParallelAction(
+                        new FollowPathAction(follower, depositPreload),
+                        new HoldPointAction(follower, bucketScorePose, 4000)
+                ),
+                new ParallelAction(
+
+                intake.armLower,
+                outake.toBucket,
+                intake.intakeIn
+                )
         );
     }
 
-
     public Action depositPreload() {
-        return new SequentialAction(
+        return new ParallelAction(
+                new HoldPointAction(follower, bucketScorePose, 4),
+                new SequentialAction(
                 //TODO: Add subsystem actions
                 new ParallelAction(
+
                         intake.armLower,
                         outake.toBucket,
                         intake.intakeIn
@@ -245,7 +270,7 @@ public class Auton {
 
                 new SleepAction(300),
                 resetBot()
-        );
+        ));
     }
 
     public Action handleBucketChain() {
@@ -253,19 +278,29 @@ public class Auton {
         return new SequentialAction(
                 new FollowPathAction(follower, sample1),
                 new SleepAction(1000),
-                pickUpSample(),
+                new ParallelAction(
+                        new HoldPointAction(follower, sample1Pose, 5000),
+                        pickUpSample()
+                )
+               ,
                 new FollowPathAction(follower, score1),
                 depositSampleHigh(),
                 resetBot(),
                 new SleepAction(1000),
                 new FollowPathAction(follower, sample2),
-                pickUpSample(),
+                new ParallelAction(
+                        new HoldPointAction(follower, sample2Pose, 5000),
+                        pickUpSample()
+                ),
                 new FollowPathAction(follower, score2),
                 depositSampleHigh(),
                 resetBot(),
                 new SleepAction(1000),
                 new FollowPathAction(follower, sample3),
-                pickUpSample(),
+                new ParallelAction(
+                        new HoldPointAction(follower, sample3Pose, 5000),
+                        pickUpSample()
+                ),
                 new FollowPathAction(follower, score3),
                 depositSampleHigh(),
                 resetBot(),
@@ -303,9 +338,12 @@ public class Auton {
 
     //Bucket Specific
     public Action depositSampleHigh() {
-        return new SequentialAction(
+
+        return new ParallelAction(
+                new HoldPointAction(follower, bucketScorePose, 3000),
+                new SequentialAction(
                 outake.closeClaw,
-                //liftHighBucket(),
+                liftHighBucket(),
                 new SleepAction(150),
                 outake.toBucket,
                 new SleepAction(1000),
@@ -313,7 +351,8 @@ public class Auton {
 
 
                 new SleepAction(300)
-        );
+        ));
+
     }
 
     public Action resetBot() {
@@ -335,6 +374,13 @@ public class Auton {
 
     public Action liftLowBucket() {
         return new SequentialAction(
+
+                new ParallelAction(
+                        new HoldPointAction(follower, sample2Pose, 5000),
+                        pickUpSample()
+                ),
+
+
                 lift.lowBucket,
                 lift.waitSlide()
         );
