@@ -40,9 +40,9 @@ public class Auton {
     //public Path element1, score1, element2, score2, element3, score3;
     //public PathChain pushSamples, depositPreload, specimen1, specimen2, specimen3, grab1, grab2, grab3, park;
     //Paths & Pathchains
-    public Path depositPreload, sample1, score1, sample2, score2, sample3, score3;
+    public PathChain depositPreload, sample1, score1, sample2, score2, sample3, score3;
     public Path hangSpecimen1, grabSpecimen2, hangSpecimen2, grabSpecimen3, hangSpecimen3, grabSpecimen4, hangSpecimen4, grabSpecimen5, hangSpecimen5;
-    public Path park;
+    public PathChain park;
     public PathChain pushSamples;
     //Poses
     //Both
@@ -127,29 +127,47 @@ public class Auton {
 
     public void buildPaths() {
         if (startLocation == RobotStart.BUCKET) {
-            depositPreload = new Path(new BezierCurve(new Point(spawnPose), new Point(preloadControlPose), new Point(preloadPose)));
-            depositPreload.setLinearHeadingInterpolation(spawnPose.getHeading(), preloadPose.getHeading());
 
-            sample1 = new Path(new BezierCurve(new Point(preloadPose),  new Point(sample1Pose)));
-            sample1.setLinearHeadingInterpolation(preloadPose.getHeading(), sample1Pose.getHeading());
+            depositPreload = follower.pathBuilder()
+                    .addPath(new BezierCurve(new Point(spawnPose), new Point(preloadControlPose), new Point(preloadPose)))
+                    .setLinearHeadingInterpolation(spawnPose.getHeading(), preloadPose.getHeading())
+                    .build();
 
-            score1 = new Path(new BezierLine(new Point(sample1Pose), new Point(scorePose)));
-            score1.setLinearHeadingInterpolation(sample1Pose.getHeading(), scorePose.getHeading());
 
-            sample2 = new Path(new BezierLine(new Point(scorePose), new Point(sample2Pose)));
-            sample2.setLinearHeadingInterpolation(scorePose.getHeading(), sample2Pose.getHeading());
+            sample1 = follower.pathBuilder()
+                    .addPath(new BezierCurve(new Point(preloadPose),  new Point(sample1Pose)))
+                    .setLinearHeadingInterpolation(preloadPose.getHeading(), sample1Pose.getHeading())
+                    .build();
 
-            score2 = new Path(new BezierLine(new Point(sample2Pose), new Point(scorePose)));
-            score2.setLinearHeadingInterpolation(sample2Pose.getHeading(), scorePose.getHeading());
+            score1 = follower.pathBuilder()
+                    .addPath(new BezierLine(new Point(sample1Pose), new Point(scorePose)))
+                    .setLinearHeadingInterpolation(sample1Pose.getHeading(), scorePose.getHeading())
+                    .build();
 
-            sample3 = new Path(new BezierLine(new Point(scorePose), new Point(sample3Pose)));
-            sample3.setLinearHeadingInterpolation(scorePose.getHeading(), sample3Pose.getHeading());
+            sample2 = follower.pathBuilder()
+                    .addPath(new BezierLine(new Point(scorePose), new Point(sample2Pose)))
+                    .setLinearHeadingInterpolation(scorePose.getHeading(), sample2Pose.getHeading())
+                    .build();
 
-            score3 = new Path(new BezierLine(new Point(sample3Pose), new Point(scorePose)));
-            score3.setLinearHeadingInterpolation(sample3Pose.getHeading(), scorePose.getHeading());
+            score2 = follower.pathBuilder()
+                    .addPath(new BezierLine(new Point(sample2Pose), new Point(scorePose)))
+                    .setLinearHeadingInterpolation(sample2Pose.getHeading(), scorePose.getHeading())
+                    .build();
 
-            park = new Path(new BezierCurve(new Point(scorePose), new Point(parkControlPose), new Point(parkPose)));
-            park.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading());
+            sample3 = follower.pathBuilder()
+                    .addPath(new BezierLine(new Point(scorePose), new Point(sample3Pose)))
+                    .setLinearHeadingInterpolation(scorePose.getHeading(), sample3Pose.getHeading())
+                    .build();
+
+            sample3 = follower.pathBuilder()
+                    .addPath(new BezierLine(new Point(sample3Pose), new Point(scorePose)))
+                    .setLinearHeadingInterpolation(sample3Pose.getHeading(), scorePose.getHeading())
+                    .build();
+
+            park = follower.pathBuilder()
+                    .addPath(new BezierCurve(new Point(scorePose), new Point(parkControlPose), new Point(parkPose)))
+                    .setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading())
+                    .build();
         }
 
         if (startLocation == RobotStart.OBSERVATION) {
