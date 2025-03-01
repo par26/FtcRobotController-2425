@@ -19,22 +19,21 @@ import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
 @Autonomous
 public class BlueObservation extends LinearOpMode {
 
-    Lift lift;
-    Outake outake;
+    Auton auton;
 
     @Override
     public void runOpMode() {
         Constants.setConstants(FConstants.class, LConstants.class);
-        lift = new Lift(hardwareMap);
-        outake = new Outake(hardwareMap);
-        lift.start();
-        //outake.start();
 
+        auton = new Auton(hardwareMap, FieldConstants.RobotStart.BUCKET, new Follower(hardwareMap));
 
         waitForStart();
 
-
-        Actions.runBlocking(new SequentialAction(lift.topBucket, lift.waitSlide(), new SleepAction(3000), outake.openClaw, lift.lowered, lift.waitSlide()));
+        Actions.runBlocking(
+                new SequentialAction(
+                        auton.testPath()
+                )
+        );
 
     }
 }

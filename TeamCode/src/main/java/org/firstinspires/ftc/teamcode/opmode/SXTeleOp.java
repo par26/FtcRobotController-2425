@@ -83,8 +83,9 @@ public class SXTeleOp extends OpMode  {
                 outake.openClaw,
                 outake.toTransfer,
                 intake.armToTransfer,
+                new SleepAction(888),
                 extend.retractEx,
-                new SleepAction(800),
+                new SleepAction(888),
                 intake.intakeStop
         ));
     }
@@ -224,6 +225,10 @@ public class SXTeleOp extends OpMode  {
         //Intake Controls
         if (currentGamepad2.dpad_up && previousGamepad2.dpad_up) {
             intake.setSpin(Intake.IntakeState.REVERSE, false);
+        } else if (TeleState == TeleOpState.TRANSFER_OUT) {
+            intake.setSpin(Intake.IntakeState.FORWARD, false);
+        } else {
+            intake.setSpin(Intake.IntakeState.STOP, false);
         }
 
         //driveing nyoooommmm

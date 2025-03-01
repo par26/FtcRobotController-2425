@@ -87,6 +87,8 @@ public class TestPivoting extends OpMode {
 
         if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down) {
             outake.switchClawState();
+            outake.checkPos();
+            telemetry.addLine("Claw: " + outake.getClawState() + outake.clawPos);
         }
 
         telemetry.update();

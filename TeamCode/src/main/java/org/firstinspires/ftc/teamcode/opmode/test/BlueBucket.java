@@ -22,8 +22,6 @@ public class BlueBucket extends LinearOpMode {
     public void runOpMode() {
         Constants.setConstants(FConstants.class, LConstants.class);
 
-
-
         waitForStart();
 
         auton = new Auton(hardwareMap, FieldConstants.RobotStart.BUCKET, new Follower(hardwareMap));
@@ -32,14 +30,11 @@ public class BlueBucket extends LinearOpMode {
                 new SequentialAction(
                         auton.depositPreload(),
                         new SleepAction(5000),
+                        auton.handleBucketChain(),
                         auton.park(),
                         auton.resetBot()
                 )
         );
-
-        if(isStopRequested()) {
-            Actions.runBlocking(auton.outake.toBucket);
-        }
 
     }
 }

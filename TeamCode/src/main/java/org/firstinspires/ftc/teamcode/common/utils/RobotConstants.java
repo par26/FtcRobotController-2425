@@ -4,14 +4,14 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class RobotConstants {
-    public static double INTAKE_ARM_RETRACT = 0.36;
-    public static double INTAKE_ARM_LOWER = 0.19;
+    public static double INTAKE_ARM_RETRACT = 0.338;
+    public static double INTAKE_ARM_LOWER = 0;
     public static double WRIST_TWIST_POSITION = 1;
-    public static double OUTAKE_ARM_LOWER = 0.125;
+    public static double OUTAKE_ARM_LOWER = 0.215;
     public static double OUTAKE_ARM_BUCKET = 1;
     public static double OUTAKE_ARM_SPECIMEN = 1;
-    public static double CLAW_OPEN = 0.5;
-    public static double CLAW_CLOSE = 0;
+    public static double CLAW_OPEN = 0;
+    public static double CLAW_CLOSE = 0.23;
 
     public static double EX_EXTEND = 0.35;
     public static double EX_RETRACT = 0;

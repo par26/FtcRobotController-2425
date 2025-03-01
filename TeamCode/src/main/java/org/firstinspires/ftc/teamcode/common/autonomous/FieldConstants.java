@@ -30,6 +30,7 @@ public class FieldConstants {
     RobotStart {
         BUCKET,
         OBSERVATION,
+        TEST
     }
 
     public static final Pose bucketStartPose = new Pose(7.116, 87.59, Math.toRadians(270));

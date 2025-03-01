@@ -120,6 +120,8 @@ public class Auton {
 //                pushSeg4Pose = pushSeg4FCPose;
 //                pushSeg4Control = pushSeg4FCControl;
                 break;
+            case TEST:
+                spawnPose = new Pose(8.74, 55.22, 0);
         }
 
         follower.setStartingPose(spawnPose);
@@ -127,12 +129,10 @@ public class Auton {
 
     public void buildPaths() {
         if (startLocation == RobotStart.BUCKET) {
-
             depositPreload = follower.pathBuilder()
                     .addPath(new BezierCurve(new Point(spawnPose), new Point(preloadControlPose), new Point(preloadPose)))
                     .setLinearHeadingInterpolation(spawnPose.getHeading(), preloadPose.getHeading())
                     .build();
-
 
             sample1 = follower.pathBuilder()
                     .addPath(new BezierCurve(new Point(preloadPose),  new Point(sample1Pose)))
@@ -229,6 +229,28 @@ public class Auton {
         }
     }
 
+    public Action testPath() {
+        PathChain tPath1 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(8.74, 55.22), new Point(33.96, 41.11)))
+                .setLinearHeadingInterpolation(0, 0)
+                .build();
+        PathChain tPath2 = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(33.96, 41.11), new Point(33.17, 26.62), new Point(9.14, 17.08)))
+                .setLinearHeadingInterpolation(0, Math.toRadians(180))
+                .build();
+
+      return new SequentialAction(
+              new FollowPathAction(follower, tPath1),
+              outake.closeClaw,
+              new HoldPointAction(follower, new Pose(33.96, 41.11), 4000),
+              outake.openClaw,
+              new SleepAction(2000),
+              outake.closeClaw,
+              new FollowPathAction(follower, tPath2),
+              outake.openClaw
+      );
+    }
+
     //depositPreload, sample1, score1, sample2, score2, sample3, score3;
     public Action pathOnly() {
         return new SequentialAction(
@@ -264,16 +286,23 @@ public class Auton {
         );
     }
 
+    public Action extendBot() {
+        return new SequentialAction(
+                extend.extendEx,
+                intake.armLower
+        );
+    }
+
     public Action depositPreload() {
         return new ParallelAction(
-                new HoldPointAction(follower, bucketScorePose, 4),
+                new HoldPointAction(follower, bucketScorePose, 7),
                 new SequentialAction(
                 //TODO: Add subsystem actions
                 new ParallelAction(
 
                         intake.armLower,
-                        outake.toBucket,
-                        intake.intakeIn
+                        outake.toBucket
+                        //intake.intakeIn
                 ),
                 new SleepAction(300),
                 new ParallelAction(
@@ -295,6 +324,7 @@ public class Auton {
         //TODO: use parallel action when auton is substituted with extend working and follow path and extend at the same time
         return new SequentialAction(
                 new FollowPathAction(follower, sample1),
+                extendBot(),
                 new SleepAction(1000),
                 new ParallelAction(
                         new HoldPointAction(follower, sample1Pose, 5000),
@@ -304,6 +334,7 @@ public class Auton {
                 new FollowPathAction(follower, score1),
                 depositSampleHigh(),
                 resetBot(),
+                extendBot(),
                 new SleepAction(1000),
                 new FollowPathAction(follower, sample2),
                 new ParallelAction(
@@ -350,7 +381,8 @@ public class Auton {
                 new SleepAction(700),
                 intake.intakeStop,
 
-                new SleepAction(300)
+                new SleepAction(300),
+                outake.closeClaw
         );
     }
 

@@ -27,7 +27,7 @@ public class Outake {
 
     private double clawClose, clawOpen;
 
-    double clawPos;
+    public double clawPos;
 
     public RunAction openClaw, closeClaw, toTransfer, toBucket, toSpecimen, liftOArm;
     private double ARM_RETRACT;
@@ -52,9 +52,9 @@ public class Outake {
 
         this.claw = clawState.CLOSED;
         lOutake.setDirection(Servo.Direction.REVERSE);
-
-        lOutake.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        rOutake.setPwmRange(new PwmControl.PwmRange(500, 2500));
+//
+//        lOutake.setPwmRange(new PwmControl.PwmRange(500, 2500));
+//        rOutake.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
 
         openClaw = new RunAction(this::openClaw);

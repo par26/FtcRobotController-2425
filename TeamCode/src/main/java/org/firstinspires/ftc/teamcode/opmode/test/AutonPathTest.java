@@ -25,11 +25,11 @@ public class AutonPathTest extends LinearOpMode {
 
         waitForStart();
 
-        auton = new Auton(hardwareMap, FieldConstants.RobotStart.BUCKET, new Follower(hardwareMap));
+        auton = new Auton(hardwareMap, FieldConstants.RobotStart.TEST, new Follower(hardwareMap));
 
         Actions.runBlocking(
                 new SequentialAction(
-                        auton.pathOnly()
+                        auton.testPath()
                 )
         );
 
