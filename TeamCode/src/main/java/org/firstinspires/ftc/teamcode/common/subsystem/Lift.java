@@ -147,7 +147,7 @@ public class Lift {
 
     public void setPower(double power) {
 
-        power = Range.clip(power, -.85, .85);
+        power = Range.clip(power, -.8, .8);
 
         if(Math.abs(lastPower- power) > 0.01) {
             leftLift.setPower(power);

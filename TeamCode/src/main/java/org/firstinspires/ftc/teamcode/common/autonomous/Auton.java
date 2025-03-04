@@ -251,7 +251,34 @@ public class Auton {
       );
     }
 
-    //depositPreload, sample1, score1, sample2, score2, sample3, score3;
+
+    public Action testBucket() {
+        return new SequentialAction(
+                new FollowPathAction(follower, depositPreload),
+                depositSampleHigh(),
+                resetBot(),
+                extendBot(),
+                new FollowPathAction(follower, sample1),
+                pickUpSample(),
+                new FollowPathAction(follower, score1),
+                 depositSampleHigh(),
+                resetBot(),
+                extendBot(),
+                new FollowPathAction(follower, sample2),
+                pickUpSample(),
+                new FollowPathAction(follower, score2),
+                depositSampleHigh(),
+                resetBot(),
+                extendBot(),
+                new FollowPathAction(follower, sample3),
+                pickUpSample(),
+                new FollowPathAction(follower, score3),
+                depositSampleHigh(),
+                resetBot()
+        );
+
+    }
+
     public Action pathOnly() {
         return new SequentialAction(
                 new FollowPathAction(follower, depositPreload),
@@ -274,8 +301,8 @@ public class Auton {
     public Action DepositPreload1() {
         return new SequentialAction(
                 new ParallelAction(
-                        new FollowPathAction(follower, depositPreload),
-                        new HoldPointAction(follower, bucketScorePose, 4000)
+                        new FollowPathAction(follower, depositPreload)
+                        //new HoldPointAction(follower, bucketScorePose, 4000)
                 ),
                 new ParallelAction(
 
@@ -304,6 +331,8 @@ public class Auton {
                         outake.toBucket
                         //intake.intakeIn
                 ),
+
+
                 new SleepAction(300),
                 new ParallelAction(
                         intake.intakeOut,
@@ -371,16 +400,12 @@ public class Auton {
     //Bucket Specific
     public Action pickUpSample() {
         return new SequentialAction(
-               // extend.extendEx,
-                new SleepAction(1000),
                 intake.intakeIn,
-                intake.armLower,
-                new SleepAction(3000),
+                new SleepAction(1000),
                 intake.armToTransfer,
-                //extend.retractEx,
                 new SleepAction(700),
+                extend.retractEx,
                 intake.intakeStop,
-
                 new SleepAction(300),
                 outake.closeClaw
         );
@@ -396,7 +421,7 @@ public class Auton {
                 liftHighBucket(),
                 new SleepAction(150),
                 outake.toBucket,
-                new SleepAction(1000),
+                new SleepAction(400),
                 outake.openClaw,
 
 
@@ -409,8 +434,7 @@ public class Auton {
         return new SequentialAction(
                 outake.toTransfer,
                 outake.openClaw,
-                new SleepAction(1000),
-               // liftLowered(),
+               liftLowered(),
                 intake.armLower
         );
     }

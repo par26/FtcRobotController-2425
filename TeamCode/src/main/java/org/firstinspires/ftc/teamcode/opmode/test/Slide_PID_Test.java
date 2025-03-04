@@ -68,9 +68,11 @@ public class Slide_PID_Test extends OpMode {
         }
 
 
+        lift.update();
+
         telemetry.addData("pos", lift.getCurrentPos());
         telemetry.addData("target", target);
         telemetry.update();
-        lift.update();
+
     }
 }
