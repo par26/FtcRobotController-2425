@@ -199,28 +199,24 @@ public class SXTeleOp extends OpMode  {
 
         //Manual Lift
         double liftPower = gamepad1.right_trigger - gamepad1.left_trigger;
-        if(Math.abs(liftPower) > 0.1) {
-            lift.setManualPower(liftPower);
-        }
+        lift.setPower(liftPower);
 
 
-        //Automatic Lift
-        if(currentGamepad1.dpad_up && previousGamepad1.dpad_up) {
-            Actions.runBlocking(lift.topBucket);
-        }
-        if(currentGamepad1.dpad_down && previousGamepad1.dpad_down) {
-            Actions.runBlocking(lift.lowered);
-        }
-        if(currentGamepad1.dpad_left && previousGamepad1.dpad_left) {
-            Actions.runBlocking(lift.l1Touch);
-        }
-        if(currentGamepad1.dpad_right && previousGamepad1.dpad_right) {
-            Actions.runBlocking(lift.l2Touch);
-        }
+//
+//        //Automatic Lift
+//        if(currentGamepad1.dpad_up && previousGamepad1.dpad_up) {
+//            Actions.runBlocking(lift.topBucket);
+//        }
+//        if(currentGamepad1.dpad_down && previousGamepad1.dpad_down) {
+//            Actions.runBlocking(lift.lowered);
+//        }
+//        if(currentGamepad1.dpad_left && previousGamepad1.dpad_left) {
+//            Actions.runBlocking(lift.l1Touch);
+//        }
+//        if(currentGamepad1.dpad_right && previousGamepad1.dpad_right) {
+//            Actions.runBlocking(lift.l2Touch);
+//        }
 
-        if(currentGamepad1.a && previousGamepad1.a) {
-            lift.resetEncoder();
-        }
 
         //Intake Controls
         if (currentGamepad2.dpad_up && previousGamepad2.dpad_up) {
@@ -236,7 +232,6 @@ public class SXTeleOp extends OpMode  {
 
 
         follower.update();
-        lift.update();
         telemetry.update();
     }
 

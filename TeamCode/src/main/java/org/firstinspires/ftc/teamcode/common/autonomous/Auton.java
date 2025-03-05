@@ -241,13 +241,12 @@ public class Auton {
 
       return new SequentialAction(
               new FollowPathAction(follower, tPath1),
-              outake.closeClaw,
+              intake.intakeIn,
               new HoldPointAction(follower, new Pose(33.96, 41.11), 4000),
-              outake.openClaw,
+              intake.intakeStop,
               new SleepAction(2000),
-              outake.closeClaw,
-              new FollowPathAction(follower, tPath2),
-              outake.openClaw
+              extend.extendEx,
+              new FollowPathAction(follower, tPath2)
       );
     }
 
@@ -259,19 +258,19 @@ public class Auton {
                 resetBot(),
                 extendBot(),
                 new FollowPathAction(follower, sample1),
-                pickUpSample(),
+                new ParallelAction(pickUpSample(), new HoldPointAction(follower, sample1Pose, 4)),
                 new FollowPathAction(follower, score1),
                  depositSampleHigh(),
                 resetBot(),
                 extendBot(),
                 new FollowPathAction(follower, sample2),
-                pickUpSample(),
+                new ParallelAction(pickUpSample(), new HoldPointAction(follower, sample2Pose, 4)),
                 new FollowPathAction(follower, score2),
                 depositSampleHigh(),
                 resetBot(),
                 extendBot(),
                 new FollowPathAction(follower, sample3),
-                pickUpSample(),
+                        new ParallelAction(pickUpSample(), new HoldPointAction(follower, sample3Pose, 4)),
                 new FollowPathAction(follower, score3),
                 depositSampleHigh(),
                 resetBot()
@@ -400,8 +399,8 @@ public class Auton {
     //Bucket Specific
     public Action pickUpSample() {
         return new SequentialAction(
-                intake.intakeIn,
-                new SleepAction(1000),
+                new ParallelAction(intake.intakeIn,
+                new SleepAction(2000)),
                 intake.armToTransfer,
                 new SleepAction(700),
                 extend.retractEx,
@@ -422,7 +421,7 @@ public class Auton {
                 new SleepAction(150),
                 outake.toBucket,
                 new SleepAction(400),
-                outake.openClaw,
+                outake.closeClaw,
 
 
                 new SleepAction(300)

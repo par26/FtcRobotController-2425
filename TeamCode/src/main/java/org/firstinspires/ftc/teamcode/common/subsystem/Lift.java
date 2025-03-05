@@ -45,7 +45,7 @@ public class Lift {
 
     State state;
 
-    public static double p = 0.02, i = 0, d = 0.0005, f = 0.01;
+    public static double p = 1, i = 0, d = 0, f = 0.01;
     private final double TICKS_PER_REV = 384.5; //ticks
     private final double PULLEY_CIRCUMFERENCE = 4.40945; //inches
 
@@ -94,11 +94,6 @@ public class Lift {
             leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
-            slidesReached = liftPID.atSetPoint();
-            slidesRetracted = (target <= 5) && slidesReached;
-
-
-            currentPos = rightLift.getCurrentPosition();
             double pid = liftPID.calculate(rightLift.getCurrentPosition(), target);
 
 //
