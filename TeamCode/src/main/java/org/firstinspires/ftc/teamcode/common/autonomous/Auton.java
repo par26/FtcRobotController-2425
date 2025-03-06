@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.common.subsystem.Extend;
 import org.firstinspires.ftc.teamcode.common.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.common.subsystem.Lift;
 import org.firstinspires.ftc.teamcode.common.subsystem.Outake;
+import org.firstinspires.ftc.teamcode.common.utils.AutonConstants;
 
 
 public class Auton {
@@ -69,7 +70,7 @@ public class Auton {
 
         createPoses();
 
-        follower.setMaxPower(0.65);
+        follower.setMaxPower(0.8);
 
 
         buildPaths();
@@ -121,7 +122,7 @@ public class Auton {
 //                pushSeg4Control = pushSeg4FCControl;
                 break;
             case TEST:
-                spawnPose = new Pose(8.74, 55.22, 0);
+                spawnPose = new Pose(8.74, 55.22, Math.toRadians(270));
         }
 
         follower.setStartingPose(spawnPose);
@@ -232,52 +233,152 @@ public class Auton {
     public Action testPath() {
         PathChain tPath1 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(8.74, 55.22), new Point(33.96, 41.11)))
-                .setLinearHeadingInterpolation(0, 0)
+                .setLinearHeadingInterpolation(Math.toRadians(270), 0)
                 .build();
         PathChain tPath2 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(33.96, 41.11), new Point(33.17, 26.62), new Point(9.14, 17.08)))
-                .setLinearHeadingInterpolation(0, Math.toRadians(180))
+                .setLinearHeadingInterpolation(0, 0)
                 .build();
 
       return new SequentialAction(
               new FollowPathAction(follower, tPath1),
-              intake.intakeIn,
-              new HoldPointAction(follower, new Pose(33.96, 41.11), 4000),
-              intake.intakeStop,
-              new SleepAction(2000),
-              extend.extendEx,
+              new ParallelAction(
+                      new HoldPointAction(follower, new Pose(33.96, 41.11), 8000),
+                      new SequentialAction(
+                              intake.intakeIn,
+                              new SleepAction(5000),
+                              intake.intakeStop,
+                              new SleepAction(2000),
+                              extend.extendEx
+                      )
+              ),
               new FollowPathAction(follower, tPath2)
       );
     }
 
-
-    public Action testBucket() {
+    public Action bucketSequence() {
         return new SequentialAction(
-                new FollowPathAction(follower, depositPreload),
-                depositSampleHigh(),
-                resetBot(),
-                extendBot(),
-                new FollowPathAction(follower, sample1),
-                new ParallelAction(pickUpSample(), new HoldPointAction(follower, sample1Pose, 4)),
-                new FollowPathAction(follower, score1),
-                 depositSampleHigh(),
-                resetBot(),
-                extendBot(),
-                new FollowPathAction(follower, sample2),
-                new ParallelAction(pickUpSample(), new HoldPointAction(follower, sample2Pose, 4)),
-                new FollowPathAction(follower, score2),
-                depositSampleHigh(),
-                resetBot(),
-                extendBot(),
-                new FollowPathAction(follower, sample3),
-                        new ParallelAction(pickUpSample(), new HoldPointAction(follower, sample3Pose, 4)),
-                new FollowPathAction(follower, score3),
-                depositSampleHigh(),
-                resetBot()
+                depositPreload(),
+                handlePickup(sample1),
+                handleScore(score1),
+                handlePickup(sample2),
+                handleScore(score2),
+                handlePickup(sample3),
+                handleScore(score3),
+                park()
         );
-
     }
 
+    public Action handlePickup(PathChain pc) {
+        Path p = pc.getPath(0);
+        Point pt = p.getPoint(1);
+        Pose pose = new Pose(pt.getX(), pt.getY());
+
+        return new SequentialAction(
+                new FollowPathAction(follower, pc),
+                new ParallelAction(
+                        new HoldPointAction(follower, pose, 4000),
+                        new SequentialAction(
+                                pickupFlat(),
+                                inToTransfer()
+                        )
+                )
+        );
+    }
+
+    public Action handleScore(PathChain pc) {
+        Path p = pc.getPath(0);
+        Point pt = p.getPoint(1);
+        Pose pose = new Pose(pt.getX(), pt.getY());
+
+        return new SequentialAction(
+                new FollowPathAction(follower, pc),
+                new ParallelAction(
+                        new HoldPointAction(follower, pose, 4000),
+                        new SequentialAction(
+                                deposit(),
+                                outToTransfer()
+                        )
+                )
+        );
+    }
+
+    public Action park() {
+        return new SequentialAction(
+                new FollowPathAction(follower, park),
+                new ParallelAction(
+                        new HoldPointAction(follower, parkPose, 10000),
+                        new SequentialAction(intake.intakeIn)
+                )
+        );
+    }
+
+    public Action depositPreload() {
+        return new SequentialAction(
+                new FollowPathAction(follower, depositPreload),
+                new ParallelAction(
+                        new HoldPointAction(follower, preloadPose, 10000),
+                        deposit()
+                )
+        );
+    }
+
+    public Action deposit() {
+        return new SequentialAction(
+                outake.closeClaw,
+                new SleepAction(AutonConstants.OUTAKE_CLAW),
+                liftHighBucket(),
+                new SleepAction(AutonConstants.LIFT_TOP_BUCKET),
+                outake.toBucket,
+                new SleepAction(AutonConstants.OUTAKE_ARM_SWITCH),
+                outake.openClaw
+        );
+    }
+
+    //TODO: adjust pickup accordingly
+    public Action pickupFlat() {
+        return new SequentialAction(
+                intake.armLower,
+                intake.intakeIn,
+                extend.extendEx,
+                new SleepAction(1000)
+        );
+    }
+
+    //if vision
+    public Action pickupSub() {
+        return new SequentialAction(
+                extend.extendEx,
+                new SleepAction(AutonConstants.EXTEND_EX),
+                intake.armLower,
+                intake.intakeIn
+
+        );
+    }
+
+
+    public Action outToTransfer() {
+        return new SequentialAction(
+                outake.toTransfer,
+                outake.openClaw,
+                new SleepAction(AutonConstants.OUTAKE_CLAW),
+                liftLowered(),
+                new SleepAction(AutonConstants.LIFT_LOW)
+
+        );
+    }
+
+    public Action inToTransfer() {
+        return new SequentialAction(
+                intake.armToTransfer,
+                intake.intakeStop,
+                new SleepAction(AutonConstants.INTAKE_ARM_BUFFER),
+                extend.retractEx,//hi bby girl
+                new SleepAction(AutonConstants.RETRACT_EX)
+        );
+    }
+
+    /*
     public Action pathOnly() {
         return new SequentialAction(
                 new FollowPathAction(follower, depositPreload),
@@ -296,148 +397,7 @@ public class Auton {
         );
         
     }
-
-    public Action DepositPreload1() {
-        return new SequentialAction(
-                new ParallelAction(
-                        new FollowPathAction(follower, depositPreload)
-                        //new HoldPointAction(follower, bucketScorePose, 4000)
-                ),
-                new ParallelAction(
-
-                intake.armLower,
-                outake.toBucket,
-                intake.intakeIn
-                )
-        );
-    }
-
-    public Action extendBot() {
-        return new SequentialAction(
-                extend.extendEx,
-                intake.armLower
-        );
-    }
-
-    public Action depositPreload() {
-        return new ParallelAction(
-                new HoldPointAction(follower, bucketScorePose, 7),
-                new SequentialAction(
-                //TODO: Add subsystem actions
-                new ParallelAction(
-
-                        intake.armLower,
-                        outake.toBucket
-                        //intake.intakeIn
-                ),
-
-
-                new SleepAction(300),
-                new ParallelAction(
-                        intake.intakeOut,
-                        intake.armToTransfer,
-                        outake.toTransfer
-                ),
-                new SleepAction(300),
-                new FollowPathAction(follower, depositPreload),
-                depositSampleHigh(),
-
-
-                new SleepAction(300),
-                resetBot()
-        ));
-    }
-
-    public Action handleBucketChain() {
-        //TODO: use parallel action when auton is substituted with extend working and follow path and extend at the same time
-        return new SequentialAction(
-                new FollowPathAction(follower, sample1),
-                extendBot(),
-                new SleepAction(1000),
-                new ParallelAction(
-                        new HoldPointAction(follower, sample1Pose, 5000),
-                        pickUpSample()
-                )
-               ,
-                new FollowPathAction(follower, score1),
-                depositSampleHigh(),
-                resetBot(),
-                extendBot(),
-                new SleepAction(1000),
-                new FollowPathAction(follower, sample2),
-                new ParallelAction(
-                        new HoldPointAction(follower, sample2Pose, 5000),
-                        pickUpSample()
-                ),
-                new FollowPathAction(follower, score2),
-                depositSampleHigh(),
-                resetBot(),
-                new SleepAction(1000),
-                new FollowPathAction(follower, sample3),
-                new ParallelAction(
-                        new HoldPointAction(follower, sample3Pose, 5000),
-                        pickUpSample()
-                ),
-                new FollowPathAction(follower, score3),
-                depositSampleHigh(),
-                resetBot(),
-                new SleepAction(1000)
-        );
-    }
-
-//    public Action visionSample() {
-//
-//    }
-
-    public Action hangSpecimen() {
-        return new SequentialAction(
-                //TODO: Implement outake actions
-
-        );
-    }
-
-    //Bucket Specific
-    public Action pickUpSample() {
-        return new SequentialAction(
-                new ParallelAction(intake.intakeIn,
-                new SleepAction(2000)),
-                intake.armToTransfer,
-                new SleepAction(700),
-                extend.retractEx,
-                intake.intakeStop,
-                new SleepAction(300),
-                outake.closeClaw
-        );
-    }
-
-    //Bucket Specific
-    public Action depositSampleHigh() {
-
-        return new ParallelAction(
-                new HoldPointAction(follower, bucketScorePose, 3000),
-                new SequentialAction(
-                outake.closeClaw,
-                liftHighBucket(),
-                new SleepAction(150),
-                outake.toBucket,
-                new SleepAction(400),
-                outake.closeClaw,
-
-
-                new SleepAction(300)
-        ));
-
-    }
-
-    public Action resetBot() {
-        return new SequentialAction(
-                outake.toTransfer,
-                outake.openClaw,
-               liftLowered(),
-                intake.armLower
-        );
-    }
-
+    */
     public Action liftHighBucket() {
         return new SequentialAction(
                 lift.topBucket,
@@ -447,13 +407,6 @@ public class Auton {
 
     public Action liftLowBucket() {
         return new SequentialAction(
-
-                new ParallelAction(
-                        new HoldPointAction(follower, sample2Pose, 5000),
-                        pickUpSample()
-                ),
-
-
                 lift.lowBucket,
                 lift.waitSlide()
         );
@@ -480,13 +433,6 @@ public class Auton {
         );
     }
 
-    //Dual Action
-    public Action park() {
-        return new SequentialAction(
-                new FollowPathAction(follower, park)
-                //impl liftl1 chamber or l2 chamber
-        );
-    }
 }
 
 /*Ryan: 1430

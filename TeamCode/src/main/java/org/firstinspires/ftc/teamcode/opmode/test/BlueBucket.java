@@ -26,7 +26,7 @@ public class BlueBucket extends LinearOpMode {
 
         auton = new Auton(hardwareMap, FieldConstants.RobotStart.BUCKET, new Follower(hardwareMap));
 
-       Actions.runBlocking(auton.testBucket());
+       Actions.runBlocking(auton.bucketSequence());
 
 
     }
