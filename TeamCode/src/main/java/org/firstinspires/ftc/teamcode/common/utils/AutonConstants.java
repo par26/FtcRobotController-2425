@@ -7,7 +7,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class AutonConstants {
     //In Milliseconds
 
-    public static int LIFT_TOP_BUCKET = 2000;
+    public static int LIFT_TOP_BUCKET = 800;
     public static int LIFT_LOW = 1800;
     public static int RETRACT_EX = 800;
     public static int EXTEND_EX = 1000;

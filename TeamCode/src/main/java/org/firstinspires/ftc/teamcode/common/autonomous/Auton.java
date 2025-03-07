@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.common.action.Action;
 import org.firstinspires.ftc.teamcode.common.action.ParallelAction;
 import org.firstinspires.ftc.teamcode.common.action.SequentialAction;
+import org.firstinspires.ftc.teamcode.common.action.OrAction;
 import org.firstinspires.ftc.teamcode.common.action.SleepAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.FollowPathAction;
 import org.firstinspires.ftc.teamcode.common.pedroPathing.HoldPointAction;
@@ -70,10 +71,10 @@ public class Auton {
 
         createPoses();
 
-        follower.setMaxPower(0.8);
-
 
         buildPaths();
+
+        follower.setMaxPower(0.95);
     }
 
     private void startSubsystems() {
@@ -160,7 +161,7 @@ public class Auton {
                     .setLinearHeadingInterpolation(scorePose.getHeading(), sample3Pose.getHeading())
                     .build();
 
-            sample3 = follower.pathBuilder()
+            score3 = follower.pathBuilder()
                     .addPath(new BezierLine(new Point(sample3Pose), new Point(scorePose)))
                     .setLinearHeadingInterpolation(sample3Pose.getHeading(), scorePose.getHeading())
                     .build();
@@ -259,6 +260,7 @@ public class Auton {
     public Action bucketSequence() {
         return new SequentialAction(
                 depositPreload(),
+                new SleepAction(800),
                 handlePickup(sample1),
                 handleScore(score1),
                 handlePickup(sample2),
@@ -277,7 +279,7 @@ public class Auton {
         return new SequentialAction(
                 new FollowPathAction(follower, pc),
                 new ParallelAction(
-                        new HoldPointAction(follower, pose, 4000),
+                        new HoldPointAction(follower, pose, 4500),
                         new SequentialAction(
                                 pickupFlat(),
                                 inToTransfer()
@@ -294,7 +296,7 @@ public class Auton {
         return new SequentialAction(
                 new FollowPathAction(follower, pc),
                 new ParallelAction(
-                        new HoldPointAction(follower, pose, 4000),
+                        new HoldPointAction(follower, pose, 8000),
                         new SequentialAction(
                                 deposit(),
                                 outToTransfer()
@@ -317,8 +319,11 @@ public class Auton {
         return new SequentialAction(
                 new FollowPathAction(follower, depositPreload),
                 new ParallelAction(
-                        new HoldPointAction(follower, preloadPose, 10000),
-                        deposit()
+                        new HoldPointAction(follower, preloadPose, 6500),
+                        new SequentialAction(
+                                deposit(),
+                                outToTransfer()
+                        )
                 )
         );
     }
@@ -338,10 +343,10 @@ public class Auton {
     //TODO: adjust pickup accordingly
     public Action pickupFlat() {
         return new SequentialAction(
+                //extend.extendEx,
                 intake.armLower,
                 intake.intakeIn,
-                extend.extendEx,
-                new SleepAction(1000)
+                new SleepAction(2000)
         );
     }
 
@@ -373,7 +378,7 @@ public class Auton {
                 intake.armToTransfer,
                 intake.intakeStop,
                 new SleepAction(AutonConstants.INTAKE_ARM_BUFFER),
-                extend.retractEx,//hi bby girl
+               // extend.retractEx,//hi bby girl
                 new SleepAction(AutonConstants.RETRACT_EX)
         );
     }

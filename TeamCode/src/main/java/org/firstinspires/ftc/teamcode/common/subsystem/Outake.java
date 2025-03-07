@@ -50,6 +50,7 @@ public class Outake {
         rOutake = hardwareMap.get(ServoImplEx.class, "rightOutake");
 
 
+        //oClaw.setDirection(Servo.Direction.REVERSE);
         this.claw = clawState.CLOSED;
         lOutake.setDirection(Servo.Direction.REVERSE);
 //

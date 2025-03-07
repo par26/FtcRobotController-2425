@@ -33,7 +33,7 @@ public class FieldConstants {
         TEST
     }
 
-    public static final Pose bucketStartPose = new Pose(7.116, 87.59, Math.toRadians(270));
+    public static final Pose bucketStartPose = new Pose(6.389078498293515, 112.7098976109215, Math.toRadians(270));
     public static final Pose observationStartPose = new Pose(9.5, 65.25, Math.toRadians(180));
 
     // Preload Poses
@@ -41,10 +41,10 @@ public class FieldConstants {
     public static final Pose bucketPreloadPose = new Pose(15.2, 127.8, Math.toRadians(315));
     public static final Pose observationPreloadPose = new Pose(38.25, 60.625, Math.toRadians(180));
 
-    public static final Pose bucketPreloadControl = new Pose(15.66, 93.02);
+    public static final Pose bucketPreloadControl = new Pose(15.235494880546076, 120.57337883959043);
 
     //Bucket Score Poses TODO: adjust accordingly
-    public static final Pose bucketScorePose = new Pose(15.2, 127.8, Math.toRadians(315));
+    public static final Pose bucketScorePose = new Pose(14.5, 129, Math.toRadians(315));
 
     //Observation Grab Poses
     public static final Pose observationGrabPose = new Pose(12.3, 33, Math.toRadians(270));
@@ -64,9 +64,9 @@ public class FieldConstants {
 //    public static final Pose bucketSampleBottomPose = new Pose(39.3, 132.48,  Math.toRadians(60));
 
     // To Replace w/ Extend
-    public static final Pose bucketSampleTopPose = new Pose(25, 125, Math.toRadians(345));
-    public static final Pose bucketSampleMiddlePose = new Pose(25, 129, Math.toRadians(8));
-    public static final Pose bucketSampleBottomPose = new Pose(25, 134,  Math.toRadians(20));
+    public static final Pose bucketSampleTopPose = new Pose(24.737201365187715, 121.55631399317407, Math.toRadians(360));
+    public static final Pose bucketSampleMiddlePose = new Pose(24.737201365187715, 132.20477815699658, Math.toRadians(360));
+    public static final Pose bucketSampleBottomPose = new Pose(32.10921501706485, 128.9283276450512,  Math.toRadians(40));
 
     //Push Points (im gonna cray cray)
     public static final Pose pushSeg1FCPose = new Pose(59.64,31.44, Math.toRadians(190));
@@ -82,8 +82,8 @@ public class FieldConstants {
     //TODO: will need adjusting, not minmaxed
     public static final Pose observationParkPose = new Pose(60, 47, 0);
 
-    public static final Pose bucketParkPose = new Pose(59, 97, Math.toRadians(90));
-    public static final Pose bucketParkControl = new Pose(70.38, 106.87);
+    public static final Pose bucketParkPose = new Pose(64.7098976109215, 95.5085324232082, Math.toRadians(260));
+    public static final Pose bucketParkControl = new Pose(67.00341296928327, 114.67576791808874);
 
 
 }
